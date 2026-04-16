@@ -58,9 +58,9 @@ for (let i = 1; i <= totalepisodios; i++) {
             return;
         }
 
-        // 2. MONTA O LINK CORRETO PARA O IFRAME (PREVIEW)
-        // Note o uso da crase ( ` ) e do ${idDrive}
-        const urlVideoParaOPlayer = `https://drive.google.com${idDrive}/preview`;
+        // 2. AGORA SIM: LINK COM BARRA E CAMINHO COMPLETO
+        // Drive.google.com + /file/d/ + ID + /preview
+        const urlVideoParaOPlayer = `https://google.com{idDrive}/preview`;
         
         const idUnico = `ore_dake_ep${i}`;
         const caminhoPlayer = "../player.html";
@@ -77,4 +77,5 @@ for (let i = 1; i <= totalepisodios; i++) {
     container.appendChild(div);
 }
 </script>
+
 
