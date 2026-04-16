@@ -3,69 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ore dake Haireru Kakushi Dungeon - Todos os Episódios</title>
-    <link rel="stylesheet" href="all_animes.css">
-    
-    <style>
-        /* Estilo básico para os cards de episódios (caso seu CSS não tenha) */
-        .ep-card {
-            background: #1e1e1e;
-            color: white;
-            padding: 15px;
-            margin: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            text-align: center;
-        }
-        .ep-card:hover {
-            background: #ff5722;
-            transform: scale(1.05);
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-    </style>
+    <title>Ore dake Haireru Kakushi Dungeon - Episódios</title>
+    <!-- Certifique-se de que o caminho do seu CSS está correto abaixo -->
+    <link rel="stylesheet" href="all_animes.css"> 
 </head>
 <body>
 
-    <div class="container">
+    <!-- 1. CABEÇALHO (HEADER) -->
+    <div class="anime-header">
+        <img src="../pngs/capas/capa1.jpg" class="poster" alt="Poster">
         
-        <!-- Poster e Informações do Anime -->
-        <img src="../pngs/capas/capa1.jpg" class="poster" alt="Capa do Anime">
-        
-        <h1>Ore dake Haireru Kakushi Dungeon</h1>
-        <p><strong>2021</strong> • ⭐ 7.0</p>
-        
-        <p><strong>Gêneros:</strong> Ação, Aventura, Fantasia</p>
-        
-        <p>
-            A Dungeon Secreta é um lugar lendário onde escondem-se raros tesouros e itens. 
-            Nor, o terceiro filho de um clã de nobres falidos que acaba de perder sua única oportunidade de emprego, 
-            ouve falar por acaso da dungeon. Ele logo adquire uma habilidade que lhe permite criar, editar e conferir 
-            habilidades… E para usá-la, ele precisa acumular pontos através de tarefas, como comer refeições deliciosas 
-            e realizando atividades sexuais com indivíduos sedutores do sexo oposto.
-        </p>
-
-        <h2>Temporada 1</h2>
-        
-        <!-- Lista de episódios -->
-        <div id="lista-episodios" class="episodios-grid">
-            <!-- Os cards serão gerados pelo JavaScript -->
+        <div class="info">
+            <h1>Ore dake Haireru Kakushi Dungeon</h1>
+            <div class="rating">⭐ 7.0</div>
+            
+            <div class="tags">
+                <span>2021</span>
+                <span>Ação</span>
+                <span>Aventura</span>
+                <span>Fantasia</span>
+            </div>
+            
+            <p class="sinopse">
+                A Dungeon Secreta é um lugar lendário onde escondem-se raros tesouros e itens. 
+                Nor, o terceiro filho de um clã de nobres falidos, adquire uma habilidade que lhe permite criar, editar e conferir habilidades… 
+                Para usá-la, ele precisa acumular pontos através de tarefas inusitadas.
+            </p>
         </div>
+    </div>
 
+    <!-- 2. CONTAINER DE EPISÓDIOS -->
+    <div class="episodios-container">
+        <div class="temporada-btn">Temporada 1</div>
+        
+        <div id="lista-episodios">
+            <!-- O JS vai gerar os .ep-card aqui dentro -->
+        </div>
     </div>
 
     <script>
         const container = document.getElementById('lista-episodios');
-        const pastaThumb = "ore";
+        const pastaThumb = "ore"; // Nome da pasta das suas miniaturas
         const nomeAnime = "Ore dake Haireru Kakushi Dungeon";
 
-        // ================== CADASTRE OS IDs DO GOOGLE DRIVE AQUI ==================
+        // IDs DO GOOGLE DRIVE
         const idsGoogleDrive = {
-            1: "1fR1OnRUMQ_07JwVxmuso_y8wvDR6UPaL",   // Episódio 1 (já preenchido)
+            1: "1fR1OnRUMQ_07JwVxmuso_y8wvDR6UPaL",
             2: "ID_AQUI",
             3: "ID_AQUI",
             4: "ID_AQUI",
@@ -89,28 +72,30 @@
                 const idDrive = idsGoogleDrive[i];
                 
                 if (!idDrive || idDrive === "ID_AQUI") {
-                    alert("Este episódio ainda não foi vinculado ao Google Drive!");
+                    alert("Este episódio ainda não está disponível!");
                     return;
                 }
 
-                // Link CORRETO para preview do Google Drive
+                // Link de Preview do Drive (Funciona com o <iframe> do seu player)
                 const urlVideoParaOPlayer = `https://drive.google.com/file/d/${idDrive}/preview`;
-
                 const idUnico = `ore_dake_ep${i}`;
-                const caminhoPlayer = "../player.html";   // ajuste o caminho se necessário
+                const caminhoPlayer = "../player.html";
                 const nomeepisodio = `${nomeAnime} - Episódio ${i}`;
 
-                // Redireciona para o player com os parâmetros
                 window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(nomeepisodio)}`;
             };
 
+            // Estrutura interna do card para combinar com o CSS
             div.innerHTML = `
-                <strong>Episódio ${i}</strong>
+                <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${i}.jpg');">
+                    <!-- Se a imagem falhar, o número aparece no centro -->
+                    ${i}
+                </div>
+                <p>Episódio ${i}</p>
             `;
 
             container.appendChild(div);
         }
     </script>
-
 </body>
 </html>
