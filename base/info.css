@@ -1,185 +1,171 @@
+/* --- 1. VARIÁVEIS E RESET --- */
+:root {
+    --accent: #3498db;
+    --glass-bg: rgba(15, 23, 42, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glow: rgba(52, 152, 219, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* --- 2. LAYOUT BODY --- */
 body {
     background-image: url('../pngs/png3.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: fixed; /* Mantém o fundo parado ao rolar */
-
+    background-attachment: fixed;
+    
     margin: 0;
-    min-height: 100vh; /* Altura mínima da tela inteira */
+    min-height: 100vh;
     width: 100%;
-    overflow-x: hidden; /* Evita barra lateral chata */
+    overflow-x: hidden;
     display: flex;
-    flex-wrap: wrap; /* Permite que o Aside e o Main se organizem */
-}
-
-.blob {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: var(--accent);
-            filter: blur(80px);
-            border-radius: 50%;
-            z-index: 0;
-            opacity: 0.15;
-        }
-
-        aside {
-            width: 260px;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid var(--glass-border);
-            padding: 40px 25px;
-            z-index: 2;
-        }
-
-        main {
-            flex: 1;
-            padding: 40px;
-            z-index: 2;
-            display: grid;
-            grid-template-rows: auto 1fr;
-            gap: 30px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: px 1fr;
-            gap: 25px;
-        }
-
-        .card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 24px;
-            backdrop-filter: blur(12px);
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-
-        .card:hover {
-            border-color: var(--accent);
-            box-shadow: 0 0 20px var(--glow);
-            transform: translateY(-5px);
-        }
-
-        .card-main { grid-column: span 2; }
-
-        .stat-label { color: #94a3b8; font-size: 14px; margin-bottom: 8px; }
-        .stat-value { font-size: 32px; font-weight: 700; letter-spacing: -1px; }
-   
-.hotbar-container {
-    position: fixed;
-    bottom: 20px; /* Distância do fundo da tela */
-    left: 50%;
-    transform: translateX(-50%); /* Centraliza horizontalmente */
-    
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    background-color: rgba(0, 0, 0, 0.6); /* Fundo escuro transparente */
-    border: 2px solid #fff;
-    border-radius: 12px;
-    backdrop-filter: blur(10px); /* Efeito de vidro */
-}
-
-.hotbar-item {
-    width: 50px;
-    height: 50px;
-    background-color: #444;
-    border: 2px solid #888;
-    border-radius: 8px;
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    font-family: 'Segoe UI', Roboto, sans-serif;
     color: white;
-    font-weight: bold;
-    font-family: sans-serif;
-    cursor: pointer;
-    transition: 0.2s; /* Animação suave */
 }
 
-/* Efeito ao passar o mouse ou selecionar */
-.hotbar-item:hover {
-    background-color: #3498db;
-    border-color: #fff;
-    transform: scale(1.1) translateY(-5px); /* Sobe um pouquinho */
+/* --- 3. COMPONENTES VISUAIS (BLOBS) --- */
+.blob {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: var(--accent);
+    filter: blur(80px);
+    border-radius: 50%;
+    z-index: 0;
+    opacity: 0.15;
+    pointer-events: none;
 }
-.hotbar-item:nth-child(1) { 
-    background-image: url('../pngs/INICIO.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-.hotbar-item:nth-child(2) { 
-    background-image: url('../pngs/livro.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-.hotbar-item:nth-child(3) { 
-    background-image: url('../pngs/lupa.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-.hotbar-item:nth-child(4) { 
-    background-image: url('../pngs/info.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-.hotbar-item:nth-child(5) { 
-    background-image: url('../pngs/sair.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-/* Ajuste para o Aside (Menu lateral) */
+
+/* --- 4. ASIDE E MAIN --- */
 aside {
     width: 260px;
-    min-height: 100vh;
-    box-sizing: border-box;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid var(--glass-border);
+    padding: 40px 25px;
+    z-index: 2;
 }
 
-/* Ajuste para o Grid de Cards */
+main {
+    flex: 1;
+    padding: 40px;
+    z-index: 2;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 30px;
+}
+
+/* --- 5. GRID DE CARDS --- */
 .grid {
     display: grid;
-    /* Aqui ele tenta colocar 3 colunas, mas diminui se não couber */
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 25px;
 }
 
-/* --- MEDIA QUERIES (PARA CELULAR) --- */
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 24px;
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--glow);
+    transform: translateY(-5px);
+}
+
+.card-main { grid-column: span 2; }
+
+.stat-label { color: #94a3b8; font-size: 14px; margin-bottom: 8px; }
+.stat-value { font-size: 32px; font-weight: 700; letter-spacing: -1px; }
+
+/* --- 6. HOTBAR (NAVBAR INFERIOR) --- */
+.hotbar-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background-color: rgba(0, 0, 0, 0.85); /* Mais escuro para destacar */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 18px;
+    backdrop-filter: blur(15px);
+    z-index: 9999; /* GARANTE QUE FICA SOBRE TUDO */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.hotbar-item {
+    width: 48px;
+    height: 48px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background-size: 24px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.hotbar-item:hover {
+    background-color: var(--accent);
+    border-color: #fff;
+    transform: scale(1.1) translateY(-5px);
+}
+
+/* ÍCONES DA HOTBAR */
+.hotbar-item:nth-child(1) { background-image: url('../pngs/INICIO.png'); }
+.hotbar-item:nth-child(2) { background-image: url('../pngs/livro.png'); }
+.hotbar-item:nth-child(3) { background-image: url('../pngs/lupa.png'); }
+.hotbar-item:nth-child(4) { background-image: url('../pngs/info.png'); }
+.hotbar-item:nth-child(5) { background-image: url('../pngs/sair.png'); }
+
+/* --- 7. RESPONSIVIDADE (MEDIA QUERIES) --- */
 @media (max-width: 768px) {
     body {
-        flex-direction: column; /* Coloca o menu em cima e o conteúdo embaixo */
+        flex-direction: column;
+        padding-bottom: 100px; /* ABRE ESPAÇO PARA A BARRA NÃO COBRIR O FIM DA PÁGINA */
     }
 
     aside {
         width: 100%;
         min-height: auto;
-        padding: 20px;
+        padding: 30px 20px;
+        border-right: none;
+        border-bottom: 1px solid var(--glass-border);
     }
 
     main {
-        padding: 15px;
+        padding: 20px;
     }
 
     .card-main {
-        grid-column: span 1; /* No celular o card grande ocupa apenas 1 coluna */
+        grid-column: span 1;
     }
 
     .hotbar-container {
-        width: 90%; /* Deixa a barra de baixo mais fina no celular */
+        width: 92%;
+        bottom: 15px;
         justify-content: space-around;
+        gap: 5px;
     }
-    
+
     .hotbar-item {
-        width: 40px; /* Ícones um pouco menores no celular */
-        height: 40px;
+        width: 42px;
+        height: 42px;
+        background-size: 20px;
     }
 }
