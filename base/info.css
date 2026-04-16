@@ -127,7 +127,7 @@ main {
 }
 
 /* ÍCONES DA HOTBAR */
-.hotbar-item:nth-child(1) { background-image: url('../pngs/INICIO.png'); }
+.hotbar-item:nth-child(1) { background-image: url('../pngs/inicio.png'); }
 .hotbar-item:nth-child(2) { background-image: url('../pngs/livro.png'); }
 .hotbar-item:nth-child(3) { background-image: url('../pngs/lupa.png'); }
 .hotbar-item:nth-child(4) { background-image: url('../pngs/info.png'); }
