@@ -1,7 +1,7 @@
 <div class="conteudo-principal">
 <div class="anime-header">
-    <LINK rel="stylesheet" href="all_animes.CSS"></LINK>
-    <img src="../PNGS/CAPAS/CAPA14.jpg" class="poster"> <!-- Coloque o poster aqui -->
+    <LINK rel="stylesheet" href="all_animes.css"></LINK>
+    <img src="../pngs/capas/capa14.jpg" class="poster"> <!-- Coloque o poster aqui -->
     <div class="info">
         <h1>One Room, Hiatari Futsuu, Tenshi-tsuki</h1>
         <p class="ano">2024</p>
@@ -16,7 +16,7 @@
 </div>
 
 <div class="episodios-container">
-    <h2>Temporadas e Episódios</h2>
+    <h2>Temporadas e episódios</h2>
     <div class="temporada-btn"> Temporada 1</div>
     
     <!-- Lista de episódios (suas boxes) -->
@@ -26,24 +26,24 @@
 </div>
 <script>
 const container = document.getElementById('lista-episodios');
-const totalEpisodios = 12;
-const pastaAnime = "one_room_LG"; // Nome da pasta do anime
+const totalepisodios = 12;
+const pastaAnime = "one_room"; // Nome da pasta do anime
 const pastaThumb = "one";         // Nome da pasta das capas
 
-for (let i = 1; i <= totalEpisodios; i++) {
+for (let i = 1; i <= totalepisodios; i++) {
     // Cria a estrutura da div
     const div = document.createElement('div');
     div.className = 'ep-card';
     
     // Define o link de clique
     div.onclick = () => {
-        window.location.href = `../ANIMES/${pastaAnime}/EP${i}.mp4`;
+        window.location.href = `../animes/${pastaAnime}/ep${i}.mp4`;
     };
 
     // Define o conteúdo interno
     div.innerHTML = `
-        <div class="ep-thumb" style="background-image: url('../PNGS/MINICAP/${pastaThumb}/EP${i}.jpg');"></div>
-        <p>Episódio ${i}</p>
+        <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${i}.jpg');"></div>
+        <p>episódio ${i}</p>
     `;
 
     // Adiciona ao container

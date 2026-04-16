@@ -1,5 +1,5 @@
 [
-    { "href": "../sites/ORE.html", "foto": "../pngs/capas/capa1.jpg", "titulo": "Ore dake" },
+    { "href": "../sites/ore.html", "foto": "../pngs/capas/capa1.jpg", "titulo": "Ore dake" },
     { "href": "../sites/danny.html", "foto": "../pngs/capas/capa2.jpg", "titulo": "Danny Phantom" },
     { "href": "../sites/darling.html", "foto": "../pngs/capas/capa3.jpg", "titulo": "Darling in the Franxx" },
     { "href": "../sites/death.html", "foto": "../pngs/capas/capa4.jpg", "titulo": "Death March" },
@@ -12,7 +12,7 @@
     { "href": "../sites/404.html", "foto": "../pngs/capas/capa11.jpg", "titulo": "saikyou shokugyou" },
     { "href": "../sites/404.html", "foto": "../pngs/capas/capa12.jpg", "titulo": "Mizu Zokusei" },
     { "href": "../sites/404.html", "foto": "../pngs/capas/capa13.jpg", "titulo": "Izure saikyou" },
-    { "href": "../sites/One.html", "foto": "../pngs/capas/capa14.jpg", "titulo": "One Room" },
+    { "href": "../sites/one.html", "foto": "../pngs/capas/capa14.jpg", "titulo": "One Room" },
     { "href": "../sites/404.html", "foto": "../pngs/capas/capa15.jpg", "titulo": "solo Leveling" },
     { "href": "../sites/404.html", "foto": "../pngs/capas/capa16.jpg", "titulo": "sokushi Cheat ga" },
     { "href": "../sites/404.html", "foto": "../pngs/capas/capa17.jpg", "titulo": "seiken Gakuin" },
