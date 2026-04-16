@@ -1,4 +1,4 @@
-<link rel="stylesheet" type="text/css" href="ALL_filmes.CSS">
+<link rel="stylesheet" type="text/css" href="all_filmes.css">
 <script src="../base/seglock.js"></script>
 <a href="javascript:history.back()" class="btn-voltar">
     <span class="icon">←</span>
@@ -8,7 +8,7 @@
     <main class="movie-container">
         <section class="poster-section">
             <div class="poster-card">
-                <img src="../pngs/CAPAS/TELA1.jpg" alt="Poster">
+                <img src="../pngs/capas/tela1.jpg" alt="Poster">
             </div>
          <button id="play-button" class="btn-trailer">▶ Assistir Agora</button>
         </section>
@@ -36,7 +36,7 @@
         <!-- Card 1 -->
 <a href="javascript:void(0)" class="sequel-item" onclick="assistirFilme('2', 'O Bicho Vai Pegar 2')">
     <div class="thumb-wrapper">
-        <img src="../pngs/CAPAS/TELA2.jpg" alt="Filme 2">
+        <img src="../pngs/capas/tela2.jpg" alt="Filme 2">
         <div class="play-overlay"><span>▶</span></div>
     </div>
     <span class="sequel-name">O Bicho Vai Pegar 2</span>
@@ -45,7 +45,7 @@
         <!-- Card 2 -->
 <a href="javascript:void(0)" class="sequel-item" onclick="assistirFilme('3', 'O Bicho Vai Pegar 3')">
     <div class="thumb-wrapper">
-        <img src="../pngs/CAPAS/TELA3.jpg" alt="Filme 3">
+        <img src="../pngs/capas/tela3.jpg" alt="Filme 3">
         <div class="play-overlay"><span>▶</span></div>
     </div>
     <span class="sequel-name">O Bicho Vai Pegar 3</span>
@@ -55,7 +55,7 @@
        <!-- Remova o href direto para o mp4 e adicione o onclick -->
 <a href="javascript:void(0)" class="sequel-item" onclick="assistirFilme('4', 'O Bicho Vai Pegar 4')">
     <div class="thumb-wrapper">
-        <img src="../pngs/CAPAS/TELA4.jpg" alt="Filme 4">
+        <img src="../pngs/capas/tela4.jpg" alt="Filme 4">
         <div class="play-overlay"><span>▶</span></div>
     </div>
     <span class="sequel-name">O Bicho Vai Pegar 4</span>
@@ -82,14 +82,14 @@
     // 3. Atualiza os elementos visuais da página principal baseado na URL
     if (nomesFilmes[numFilme]) {
         document.querySelector('.title').innerText = nomesFilmes[numFilme];
-        document.querySelector('.poster-card img').src = `../pngs/CAPAS/TELA${numFilme}.jpg`;
+        document.querySelector('.poster-card img').src = `../pngs/capas/tela${numFilme}.jpg`;
     }
 
     // 4. FUNÇÃO ÚNICA PARA ASSISTIR (Usada tanto pelo botão quanto pelos cards)
     function assistirFilme(numero, titulo) {
         const idUnico = `FILME_OBVP_${numero}`;
         const caminhoPlayer = "../player.html";
-        const urlVideo = `FILMES/FILME${numero}.mp4`;
+        const urlVideo = `filmes/FILME${numero}.mp4`;
 
         window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideo)}&titulo=${encodeURIComponent(titulo)}`;
     }
