@@ -1,7 +1,7 @@
 <div class="conteudo-principal">
 <div class="anime-header">
-    <LINK rel="stylesheet" href="all_animes.CSS"></LINK>
-    <img src="../PNGS/CAPAS/CAPA5.jpg" class="poster"> <!-- Coloque o poster aqui -->
+    <LINK rel="stylesheet" href="all_animes.css"></LINK>
+    <img src="../pngs/capas/capa5.jpg" class="poster"> <!-- Coloque o poster aqui -->
     <div class="info">
         <h1>Dungeon ni Deai wo Motomeru no wa Machigatteiru Darou ka?</h1>
         <p class="ano">2015</p>
@@ -73,12 +73,12 @@ configTemporadas.forEach((temp) => {
         div.onclick = () => {
             const idUnico = `${pastaAnime}_EP${numeroEP}`;
             const caminhoPlayer = "../player.html";
-            const urlVideo = `ANIMES/${pastaAnime}/EP${numeroEP}.mp4`;
+            const urlVideo = `animes/${pastaAnime}/ep${numeroEP}.mp4`;
             window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideo)}&titulo=${encodeURIComponent(nomeAnime + ' - EP ' + numeroEP)}`;
         };
 
         div.innerHTML = `
-            <div class="ep-thumb" style="background-image: url('../PNGS/MINICAP/${pastaThumb}/EP${numeroEP}.jpg'); background-size: cover; background-position: center;"></div>
+            <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${numeroEP}.jpg'); background-size: cover; background-position: center;"></div>
             <p>Episódio ${numeroEP}</p>
         `;
 

@@ -24,19 +24,16 @@
         window.location.href = "../index.html";
     }
 
-    // Função para carregar os dados do arquivo JSON local
     async function carregarCards() {
         const container = document.querySelector('.cards-container');
         
         try {
-            // Busca o arquivo local
             const resposta = await fetch('../database/dados.json');
-            
             if (!resposta.ok) throw new Error("Arquivo não encontrado");
             
             const dados = await resposta.json();
 
-            container.innerhtml = ""; // Limpa o "carregando"
+            container.innerHTML = ""; // CORRIGIDO: innerHTML com letras maiúsculas
 
             dados.forEach(item => {
                 const cardhtml = `
@@ -45,16 +42,16 @@
                         <p class="box-title">${item.titulo}</p>
                     </div>
                 `;
-                container.innerhtml += cardhtml;
+                container.innerHTML += cardhtml; // CORRIGIDO: innerHTML
             });
 
         } catch (erro) {
             console.error("Erro:", erro);
-            container.innerhtml = "<p style='color:white;'>Erro ao carregar dados. Verifique se o arquivo dados.json existe.</p>";
+            container.innerHTML = "<p style='color:white;'>Erro ao carregar dados.</p>";
         }
     }
 
-    // Inicia a carga
+    // Inicia a carga dos cards
     carregarCards();
 
     // Evento de Clique nos cards
@@ -66,19 +63,19 @@
         }
     });
 
-// 3. BOTÕES DA HOTBAR
-document.getElementById('btn-sair').addEventListener('click', () => {
-    sessionStorage.removeItem('logado'); 
-    window.location.href = "../index.html"; 
-});
+    // BOTÕES DA HOTBAR
+    document.getElementById('btn-sair').addEventListener('click', () => {
+        sessionStorage.removeItem('logado'); 
+        window.location.href = "../index.html"; 
+    });
 
-document.getElementById('btnhm').addEventListener('click', () => window.location.href = "p1.html");
-document.getElementById('btnfl').addEventListener('click', () => window.location.href = "fl.html");
-document.getElementById('btnnt').addEventListener('click', () => window.location.href = "info.html");
-document.getElementById('btnLP').addEventListener('click', () => window.location.href = "../sites/bar.html");
+    document.getElementById('btnhm').addEventListener('click', () => window.location.href = "p1.html");
+    document.getElementById('btnfl').addEventListener('click', () => window.location.href = "fl.html");
+    document.getElementById('btnnt').addEventListener('click', () => window.location.href = "info.html");
+    document.getElementById('btnLP').addEventListener('click', () => window.location.href = "../sites/bar.html");
 
-// Inicializa a página
-window.onload = carregarTudo;
+    // Inicializa a página corretamente chamando a função que você criou
+    window.onload = carregarCards; 
 
 </script>
 </body>

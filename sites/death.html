@@ -1,7 +1,7 @@
 <div class="conteudo-principal">
 <div class="anime-header">
-    <LINK rel="stylesheet" href="all_animes.CSS"></LINK>
-    <img src="../PNGS/CAPAS/CAPA4.jpg" class="poster"> <!-- Coloque o poster aqui -->
+    <LINK rel="stylesheet" href="all_animes.css"></LINK>
+    <img src="../pngs/capas/capa4.jpg" class="poster"> <!-- Coloque o poster aqui -->
     <div class="info">
         <h1>Death March kara Hajimaru Isekai Kyousoukyoku</h1>
         <p class="ano">2018</p>
@@ -34,12 +34,12 @@ for (let i = 1; i <= totalEpisodios; i++) {
     
     // Define o link de clique
     div.onclick = () => {
-        window.location.href = `../ANIMES/${pastaAnime}/EP${i}.mp4`;
+        window.location.href = `../animes/${pastaAnime}/ep${i}.mp4`;
     };
 
     // Define o conteúdo interno
     div.innerHTML = `
-        <div class="ep-thumb" style="background-image: url('../PNGS/MINICAP/${pastaThumb}/EP${i}.jpg');"></div>
+        <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${i}.jpg');"></div>
         <p>Episódio ${i}</p>
     `;
 
