@@ -1,103 +1,200 @@
-/* Ajustes do Topo */
-/* --- 1. RESET E FUNDO --- */
+/* --- 1. RESET E VARIÁVEIS --- */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
+:root {
+    --primary: #e74c3c;
+    --bg-dark: rgba(10, 10, 10, 0.95);
+    --glass: rgba(255, 255, 255, 0.05);
+    --text-main: #ffffff;
+    --text-dim: #b3b3b3;
+}
+
+/* --- 2. CORPO E FUNDO --- */
 body {
-    width: 100%; 
+    width: 100%;
     min-height: 100vh;
-    margin: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    
-    /* FUNDO FIXO */
-    background-color:rgba(0, 0, 0, 0.7); ;
+    background-color: #000;
+    background-image: linear-gradient(to bottom, rgba(0,0,0,0.6), #000), url('../pngs/seu-fundo.jpg');
     background-size: cover;
-    
+    background-position: center;
+    background-attachment: fixed;
+    color: var(--text-main);
     display: flex;
     flex-direction: column;
-    align-items: center; /* Alinha o conteúdo ao centro do navegador */
-    padding: 40px 0;
+    align-items: center;
+    padding: 20px;
+    overflow-x: hidden;
 }
+
+/* --- 3. CABEÇALHO DO ANIME (HEADER) --- */
 .anime-header {
     display: flex;
+    flex-wrap: wrap; /* Permite quebrar linha no celular */
     gap: 30px;
-    width: 1200px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 30px;
-    border-radius: 10px;
+    width: 100%;
+    max-width: 1100px;
+    background: var(--bg-dark);
+    padding: 40px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
     margin-bottom: 30px;
+    backdrop-filter: blur(10px);
 }
 
 .poster {
-    width: 200px;
-    height: 300px;
-    border-radius: 5px;
+    width: 240px;
+    height: 350px;
+    border-radius: 12px;
     object-fit: cover;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transition: transform 0.3s ease;
 }
 
-.info h1 { color: #fff; font-family: sans-serif; margin: 0; }
-.rating { color: #f1c40f; font-size: 24px; margin: 15px 0; }
+.poster:hover {
+    transform: scale(1.02);
+}
+
+.info {
+    flex: 1;
+    min-width: 300px;
+}
+
+.info h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    letter-spacing: -1px;
+}
+
+.rating {
+    color: #f1c40f;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
 
 .tags span {
-    background: #333;
-    color: #bbb;
-    padding: 5px 10px;
-    border-radius: 5px;
-    margin-right: 10px;
-    font-size: 14px;
+    background: var(--glass);
+    color: var(--text-dim);
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 .sinopse {
-    color: #ccc;
-    line-height: 1.6;
-    margin-top: 20px;
-    max-width: 800px;
+    color: var(--text-dim);
+    line-height: 1.8;
+    font-size: 1rem;
+    max-width: 700px;
 }
 
-/* Área de Episódios */
+/* --- 4. CONTAINER DE EPISÓDIOS --- */
 .episodios-container {
-    width: 1200px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 20px;
-    border-radius: 10px;
+    width: 100%;
+    max-width: 1100px;
+    background: var(--bg-dark);
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 .temporada-btn {
-    background: #e74c3c;
+    background: var(--primary);
     color: white;
-    width: 200px;
-    padding: 15px;
-    border-radius: 5px;
+    padding: 12px 30px;
+    border-radius: 8px;
     font-weight: bold;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     display: inline-block;
+    cursor: pointer;
+    transition: 0.3s;
+    border: none;
+}
+
+.temporada-btn:hover {
+    filter: brightness(1.2);
+    transform: translateY(-2px);
 }
 
 .ep-card {
     display: flex;
     align-items: center;
     gap: 20px;
-    padding: 10px;
-    border-bottom: 1px solid #333;
+    padding: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
     cursor: pointer;
-    color: #fff;
+    transition: 0.2s;
+    border-radius: 10px;
 }
 
-.ep-card:hover { background: rgba(255,255,255,0.1); }
+.ep-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    padding-left: 20px;
+}
 
 .ep-thumb {
-    width: 100px;
-    height: 57px;
-    background: #555;
+    width: 140px;
+    height: 80px;
+    background: #222;
+    border-radius: 6px;
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 0.8rem;
     font-weight: bold;
-    background-size: cover;       /* Preenche o espaço sem distorcer */
-    background-position: center;  /* Centraliza a imagem (foca no meio) */
-    background-repeat: no-repeat; /* Impede a imagem de ficar repetindo */
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0; /* Impede a imagem de encolher */
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.ep-card p {
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+/* --- 5. MEDIA QUERIES (RESPONSIVIDADE TOTAL) --- */
+@media (max-width: 768px) {
+    .anime-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .info {
+        min-width: 100%;
+    }
+
+    .tags {
+        justify-content: center;
+    }
+
+    .poster {
+        width: 180px;
+        height: 260px;
+    }
+
+    .info h1 {
+        font-size: 1.8rem;
+    }
+
+    .ep-thumb {
+        width: 100px;
+        height: 60px;
+    }
 }
