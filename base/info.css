@@ -1,0 +1,143 @@
+body {
+    /* Define o caminho da imagem dentro da pasta pngs */
+    background-image: url('../pngs/png3.jpg');
+
+    /* Garante que a foto cubra a tela inteira sem repetir */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* Mantém as configurações anteriores */
+    width: 1366px;
+    height: 768px;
+    margin: 0 auto;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.blob {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            filter: blur(80px);
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0.15;
+        }
+
+        aside {
+            width: 260px;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            padding: 40px 25px;
+            z-index: 2;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px;
+            z-index: 2;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 30px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: px 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--glow);
+            transform: translateY(-5px);
+        }
+
+        .card-main { grid-column: span 2; }
+
+        .stat-label { color: #94a3b8; font-size: 14px; margin-bottom: 8px; }
+        .stat-value { font-size: 32px; font-weight: 700; letter-spacing: -1px; }
+   
+.hotbar-container {
+    position: fixed;
+    bottom: 20px; /* Distância do fundo da tela */
+    left: 50%;
+    transform: translateX(-50%); /* Centraliza horizontalmente */
+    
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.6); /* Fundo escuro transparente */
+    border: 2px solid #fff;
+    border-radius: 12px;
+    backdrop-filter: blur(10px); /* Efeito de vidro */
+}
+
+.hotbar-item {
+    width: 50px;
+    height: 50px;
+    background-color: #444;
+    border: 2px solid #888;
+    border-radius: 8px;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    font-family: sans-serif;
+    cursor: pointer;
+    transition: 0.2s; /* Animação suave */
+}
+
+/* Efeito ao passar o mouse ou selecionar */
+.hotbar-item:hover {
+    background-color: #3498db;
+    border-color: #fff;
+    transform: scale(1.1) translateY(-5px); /* Sobe um pouquinho */
+}
+.hotbar-item:nth-child(1) { 
+    background-image: url('../pngs/INICIO.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(2) { 
+    background-image: url('../pngs/livro.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(3) { 
+    background-image: url('../pngs/lupa.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(4) { 
+    background-image: url('../pngs/info.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(5) { 
+    background-image: url('../pngs/sair.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}

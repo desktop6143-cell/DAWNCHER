@@ -1,0 +1,89 @@
+<div class="conteudo-principal">
+<div class="anime-header">
+    <LINK rel="stylesheet" href="all_animes.CSS"></LINK>
+    <img src="../PNGS/CAPAS/CAPA5.jpg" class="poster"> <!-- Coloque o poster aqui -->
+    <div class="info">
+        <h1>Dungeon ni Deai wo Motomeru no wa Machigatteiru Darou ka?</h1>
+        <p class="ano">2015</p>
+        <div class="rating">⭐ 7.2</div>
+        <div class="tags">
+            <span>Ação</span> <span>romance</span> <span>Fantasia</span> <span>Aventura</span> <span>Ficção científica</span>
+        </div>
+        <p class="sinopse">
+        Baseado na light novel de mesmo nome escrita por Fujino Omori e ilustrada por Suzuhito Yasuda, Dungeon ni Deai o Motomeru no wa Machigatteiru Darou ka se passa no mundo de Orario, onde aventureiros se unem para caçar tesouros em labirintos subterrâneos conhecidos como Dungeon. No entanto, para Bell Cranel, fama e dinheiro estão em segundo plano; o que ele mais quer encontrar, na verdade, são garotas! Mas ele logo descobre que dentro de uma Dungeon tudo pode acontecer e, no fim, ele que acaba sendo a donzela em perigo! danmachi</div>
+</div>
+
+<div class="episodios-container">
+    <h2>Temporadas e Episódios</h2>
+    <P></P>
+    
+    
+<div id="lista-episodios" class="container-cards">
+    <!-- O JavaScript vai preencher aqui automaticamente -->
+</div>
+<script>
+const container = document.getElementById('lista-episodios');
+
+// CONFIGURAÇÃO MANUAL DAS TEMPORADAS
+const configTemporadas = [
+    { nome: "Temporada 1", eps: 14 }, // Adicionei o nome aqui para o JS criar a 1
+    { nome: "Temporada 2", eps: 13 },
+    { nome: "Temporada 3", eps: 13 },
+    { nome: "Temporada 4", eps: 22 },
+    { nome: "Temporada 5", eps: 15 }
+];
+
+const pastaAnime = "NI_DEAI"; 
+const pastaThumb = "NI_DEAI";
+const nomeAnime = "Dungeon ni Deai"; 
+
+let contadorGlobal = 1; 
+
+configTemporadas.forEach((temp) => {
+    if (temp.nome !== "") {
+        const linhaTitulo = document.createElement('div');
+        linhaTitulo.style.width = "100%";
+        linhaTitulo.style.display = "flex";
+        linhaTitulo.style.justifyContent = "flex-start";
+        linhaTitulo.style.margin = "35px 0 15px 0";
+
+        const tituloBtn = document.createElement('div');
+        tituloBtn.innerText = temp.nome;
+        
+        // ESTILIZAÇÃO PARA IGUALAR À IMAGEM
+        tituloBtn.style.backgroundColor = "#e74c3c";
+        tituloBtn.style.color = "#ffffff";
+        tituloBtn.style.width = "210px";        
+        tituloBtn.style.padding = "12px 18px";
+        tituloBtn.style.textAlign = "left";
+        tituloBtn.style.fontSize = "19px";      
+        tituloBtn.style.fontWeight = "700"; // Deixa a letra "gordinha" igual à foto
+        tituloBtn.style.borderRadius = "6px";
+        tituloBtn.style.boxShadow = "2px 2px 5px rgba(0,0,0,0.2)"; // Sombra leve da imagem
+
+        linhaTitulo.appendChild(tituloBtn);
+        container.appendChild(linhaTitulo);
+    }
+
+    for (let i = 1; i <= temp.eps; i++) {
+        const numeroEP = contadorGlobal;
+        const div = document.createElement('div');
+        div.className = 'ep-card';
+        
+        div.onclick = () => {
+            const idUnico = `${pastaAnime}_EP${numeroEP}`;
+            const caminhoPlayer = "../player.html";
+            const urlVideo = `ANIMES/${pastaAnime}/EP${numeroEP}.mp4`;
+            window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideo)}&titulo=${encodeURIComponent(nomeAnime + ' - EP ' + numeroEP)}`;
+        };
+
+        div.innerHTML = `
+            <div class="ep-thumb" style="background-image: url('../PNGS/MINICAP/${pastaThumb}/EP${numeroEP}.jpg'); background-size: cover; background-position: center;"></div>
+            <p>Episódio ${numeroEP}</p>
+        `;
+
+        container.appendChild(div);
+        contadorGlobal++;
+    }
+});
+</script>

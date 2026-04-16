@@ -1,0 +1,50 @@
+<div class="conteudo-principal">
+<div class="anime-header">
+    <LINK rel="stylesheet" href="all_animes.CSS"></LINK>
+    <img src="../PNGS/CAPAS/CAPA3.jpg" class="poster"> <!-- Coloque o poster aqui -->
+    <div class="info">
+        <h1>Darling in the franxx</h1>
+        <p class="ano">2018</p>
+        <div class="rating">⭐ 7.4</div>
+        <div class="tags">
+            <span>Ação</span> <span>romance</span> <span>Fantasia</span> <span>Aventura</span> <span>Mecha</span> <span>Ficção científica</span>
+        </div>
+        <p class="sinopse">
+         A história está definida no futuro distante. A terra está arruinada, e a humanidade estabelece a plantação móvel da fort city. Os pilotos produziram dentro de Plantation ao vivo em Mistilteinn, também conhecido como “birdcage”. As crianças vivem ali sem saber nada do mundo exterior nem da liberdade do céu. Suas vidas consistem em lutar para realizar missões. Seus inimigos são misteriosas formas de vida gigantes conhecidas como Kyōryū, e os robôs pilotos das crianças chamaram Franxx para enfrentarem-se contra eles. Para as crianças, montar o Franxx prova sua existência. Um menino chamado Hiro é chamado de Código: 016, e ele já foi conhecido como um prodígio. No entanto, ele ficou para trás, e sua existência parece desnecessária. Não pilotar um Franxx é o mesmo que deixar de existir. Um dia, aparece uma menina misteriosa conhecida como “Zero Two”. Dois chifres crescem fora de sua cabeça. </p>
+    </div>
+</div>
+
+<div class="episodios-container">
+    <h2>Temporadas e Episódios</h2>
+    <div class="temporada-btn"> Temporada 1</div>
+    
+    
+<div id="lista-episodios" class="container-cards">
+    <!-- O JavaScript vai preencher aqui automaticamente -->
+</div>
+<script>
+const container = document.getElementById('lista-episodios');
+const totalEpisodios = 24;
+const pastaAnime = "Darling_in_the_franxx"; // Nome da pasta do anime
+const pastaThumb = "franxx";         // Nome da pasta das capas
+
+for (let i = 1; i <= totalEpisodios; i++) {
+    // Cria a estrutura da div
+    const div = document.createElement('div');
+    div.className = 'ep-card';
+    
+    // Define o link de clique
+    div.onclick = () => {
+        window.location.href = `../ANIMES/${pastaAnime}/EP${i}.mp4`;
+    };
+
+    // Define o conteúdo interno
+    div.innerHTML = `
+        <div class="ep-thumb" style="background-image: url('../PNGS/MINICAP/${pastaThumb}/EP${i}.jpg');"></div>
+        <p>Episódio ${i}</p>
+    `;
+
+    // Adiciona ao container
+    container.appendChild(div);
+}
+</script>

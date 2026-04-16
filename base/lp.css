@@ -1,0 +1,95 @@
+body {
+    /* Define o caminho da imagem dentro da pasta pngs */
+    background-image: url('pngs/png4.jpg');
+
+    /* Garante que a foto cubra a tela inteira sem repetir */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* Mantém as configurações anteriores */
+    width: 1366px;
+    height: 768px;
+    margin: 0 auto;
+}
+.hotbar-container {
+    position: fixed;
+    bottom: 20px; /* Distância do fundo da tela */
+    left: 50%;
+    transform: translateX(-50%); /* Centraliza horizontalmente */
+    
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.6); /* Fundo escuro transparente */
+    border: 2px solid #fff;
+    border-radius: 12px;
+    backdrop-filter: blur(10px); /* Efeito de vidro */
+}
+
+
+
+
+.box-item {
+    width: 150px;
+    height: 150px;
+    background-color: rgba(52, 152, 219, 0.8); /* Azul com leve transparência */
+    border: 3px solid #fff;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    transition: transform 0.2s;
+}
+
+.box-item:hover {
+    transform: translateY(-10px); /* Pula um pouquinho ao passar o mouse */
+    background-color: #3498db;
+}
+
+.box-title {
+    color: white;
+    font-family: sans-serif;
+    font-weight: bold;
+    margin-top: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Sombra para ler melhor sobre o fundo */
+}
+/* Efeito ao passar o mouse ou selecionar */
+.hotbar-item:hover {
+    background-color: #3498db;
+    border-color: #fff;
+    transform: scale(1.1) translateY(-5px); /* Sobe um pouquinho */
+}
+.hotbar-item:nth-child(1) { 
+    background-image: url('pngs/INICIO.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(2) { 
+    background-image: url('pngs/livro.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(3) { 
+    background-image: url('pngs/lupa.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(4) { 
+    background-image: url('pngs/info.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(5) { 
+    background-image: url('pngs/sair.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}

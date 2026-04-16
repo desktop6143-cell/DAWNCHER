@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="PT-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="info.css">
+</head>
+<body>
+    <div class="blob" style="top: 10%; right: 10%;"></div>
+    <div class="blob" style="bottom: 5%; left: 30%; background: #c026d3;"></div>
+
+<div class="hotbar-container">
+    <div class="hotbar-item" title="casa"bntcs id=""></div>
+    <div class="hotbar-item" title="blibioteca" id="btnBL"></div>
+    <div class="hotbar-item" title="pesquisa" id="btnLP"></div>
+    <div class="hotbar-item" title="informação"></div>
+    <div class="hotbar-item" title="sair" id="btn-sair"></div>
+</div>
+<main>
+        <header>
+            <h1 style="font-weight: 300;">Bem-vindo, <span style="font-weight: 700;">Forum do DEV</span></h1>
+        </header>
+        <section class="grid">
+            <div class="card"><div class="stat-label">Versão atual 1.0.5</div><div class="stat-value">filmeteca,mais segurança, banco de dados, Api de gerencimento e Histórico, tempo de play</div></div>
+            <div class="card"><div class="stat-label">Progressões</div><div class="stat-value">13.5% estou trabalhando o maximo para esse projeto.</div></div>
+            <div class="card"><div class="stat-label">Alertas</div><div class="stat-value" style="color: #fb7185;">03<h6> Animes sem paginas e episodios. implemetar livrioteca e audioteca como támbém filmes. mais inportante tempo de uso.</h6></div></div>
+            <div class="card card-main"><h3>Histórico</h3></div>
+        <div class="card">
+           <div class="stat-label">Tempo de Uso Total</div>
+           <div id="tempo-display" class="stat-value">0d 00:00:00</div>
+        </div>
+        </section>
+    </main>
+
+<script>
+
+// Se não encontrar o 'logado' na memória, volta para o index
+if (sessionStorage.getItem('logado') !== 'true') {
+    window.location.href = "../index.html"; // Coloque aqui o nome do seu arquivo de login
+}
+
+
+    // Seleciona o 5º item da hotbar
+const btnSair = document.querySelector('.hotbar-item:nth-child(5)');
+
+btnSair.addEventListener('click', () => {
+    // Apaga a memória de login
+    sessionStorage.removeItem('logado'); 
+    // Ou usa sessionStorage.clear(); para apagar tudo
+    
+    window.location.href = "../index.html"; 
+});
+  // Seleciona o 2º item da hotbar
+const btnBL = document.querySelector('.hotbar-item:nth-child(2)');
+
+btnBL.addEventListener('click', () => {
+window.location.href = "BL.HTML";
+});
+
+// Seleciona o 1º item da hotbar
+const btncs = document.querySelector('.hotbar-item:nth-child(1)');
+
+btncs.addEventListener('click', () => {
+window.location.href = "p1.html";
+});
+  // Seleciona o 3º item da hotbar
+const btnLP = document.querySelector('.hotbar-item:nth-child(3)');
+
+btnLP.addEventListener('click', () => {
+window.location.href = "../SITES/bar.html";
+});
+// 1. Verifica se já existe uma data de início salva, se não, cria uma AGORA
+    if (!localStorage.getItem('data_inicio_uso')) {
+        localStorage.setItem('data_inicio_uso', Date.now());
+    }
+
+    const dataInicio = parseInt(localStorage.getItem('data_inicio_uso'));
+    const display = document.getElementById('tempo-display');
+
+    function atualizarTempoReal() {
+        const agora = Date.now();
+        const diferencaEmSegundos = Math.floor((agora - dataInicio) / 1000);
+
+        // Cálculos de conversão (1 dia = 86400 segundos)
+        const dias = Math.floor(diferencaEmSegundos / 86400);
+        const horas = Math.floor((diferencaEmSegundos % 86400) / 3600);
+        const minutos = Math.floor((diferencaEmSegundos % 3600) / 60);
+        const segundos = diferencaEmSegundos % 60;
+
+        // Formatação visual (00:00:00)
+        const h = horas.toString().padStart(2, '0');
+        const m = minutos.toString().padStart(2, '0');
+        const s = segundos.toString().padStart(2, '0');
+
+        display.innerText = `${dias}d ${h}:${m}:${s}`;
+    }
+
+    // Atualiza a cada segundo na tela
+    setInterval(atualizarTempoReal, 1000);
+    atualizarTempoReal();
+</script>
+</body>
+</html>

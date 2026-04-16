@@ -1,0 +1,57 @@
+<div class="conteudo-principal">
+<div class="anime-header">
+    <LINK rel="stylesheet" href="all_animes.CSS"></LINK>
+    <img src="../PNGS/CAPAS/CAPA1.jpg" class="poster"> <!-- Coloque o poster aqui -->
+    <div class="info">
+        <h1>Ore dake Haireru Kakushi Dungeon</h1>
+        <p class="ano">2021</p>
+        <div class="rating">⭐ 7.0</div>
+        <div class="tags">
+            <span>Ação</span> <span>Aventura</span> <span>Fantasia</span>
+        </div>
+        <p class="sinopse">
+           Ore dake Haireru Kakushi Dungeon Todos os Episodios Online, Assistir Ore dake Haireru Kakushi Dungeon Anime Completo.
+A Dungeon Secreta é um lugar lendário onde escondem-se raros tesouros e itens. Nor, o terceiro filho de um clã de nobres falidos que acaba de perder sua única oportunidade de emprego, ouve falar por acaso da dungeon. Ele logo adquire uma habilidade que lhe permite criar, editar e conferir habilidades… E para usá-la, ele precisa acumular pontos através de tarefas, como comer refeições deliciosas e realizando atividades sexuais com indivíduas sedutoras do sexo oposto.
+        </p>
+    </div>
+</div>
+
+<div class="episodios-container">
+    <h2>Temporadas e Episódios</h2>
+    <div class="temporada-btn"> Temporada 1</div>
+
+<div id="lista-episodios" class="container-cards">
+    <!-- O JavaScript vai preencher aqui automaticamente -->
+</div>
+<script>
+const container = document.getElementById('lista-episodios');
+const totalEpisodios = 12;
+const pastaAnime = "ore_dake_BR"; 
+const pastaThumb = "ore";
+const nomeAnime = "Ore dake Haireru Kakushi Dungeon"; 
+
+for (let i = 1; i <= totalEpisodios; i++) {
+    const div = document.createElement('div');
+    div.className = 'ep-card';
+    
+    div.onclick = () => {
+        const idUnico = `${pastaAnime}_EP${i}`;
+        
+        // Como este arquivo está em /SITES/ e o player na raiz /
+        const caminhoPlayer = "../player.html";
+        
+        // O player na raiz acessa a pasta ANIMES diretamente
+        const urlVideoParaOPlayer = `ANIMES/${pastaAnime}/EP${i}.mp4`;
+        const nomeEpisodio = `${nomeAnime} - Episódio ${i}`;
+
+        window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(nomeEpisodio)}`;
+    };
+
+    div.innerHTML = `
+        <div class="ep-thumb" style="background-image: url('../PNGS/MINICAP/${pastaThumb}/EP${i}.jpg');"></div>
+        <p>Episódio ${i}</p>
+    `;
+
+    container.appendChild(div);
+}
+</script>

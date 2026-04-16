@@ -1,0 +1,171 @@
+/* --- CONFIGURAÇÃO GLOBAL --- */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    /* FUNDO */
+    background: #1a1a1a url('../pngs/PNG2.jpg') no-repeat center center fixed;
+    background-size: cover;
+
+    /* ALINHAMENTO */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 20px 150px 20px; /* Padding extra embaixo para a hotbar */
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* --- GRID DE CARDS --- */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 colunas padrão */
+    gap: 30px;
+    width: 100%;
+    max-width: 1100px; /* Largura máxima controlada */
+    margin: 0 auto;
+}
+
+/* --- ESTILO DOS CARDS --- */
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.1);
+}
+
+.box-item {
+    width: 160px;
+    height: 160px;
+    background-color: #3498db;
+    border-radius: 20px;
+    border: 4px solid #fff;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+}
+
+.box-title {
+    margin-top: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 1100px) { .cards-container { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 850px) { .cards-container { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { 
+    .cards-container { grid-template-columns: repeat(2, 1fr); }
+    .box-item { width: 130px; height: 130px; }
+}
+
+/* FOTOS DOS BOX (Exemplos) */
+.foto-p1 { background-image: url('../pngs/CAPAS/CAPA1.jpg'); }
+.foto-p2 { background-image: url('../pngs/CAPAS/CAPA2.jpg'); }
+.foto-p3 { background-image: url('../pngs/CAPAS/CAPA3.jpg'); }
+.foto-p4 { background-image: url('../pngs/CAPAS/CAPA4.jpg'); }
+.foto-p5 { background-image: url('../pngs/CAPAS/CAPA5.jpg'); }
+.foto-p6 { background-image: url('../pngs/CAPAS/CAPA6.jpg'); }
+.foto-p7 { background-image: url('../pngs/CAPAS/CAPA7.jpg'); }
+.foto-p8 { background-image: url('../pngs/CAPAS/CAPA8.jpg'); }
+.foto-p9 { background-image: url('../pngs/CAPAS/CAPA9.jpg'); }
+.foto-p10 { background-image: url('../pngs/CAPAS/CAPA10.jpg'); }
+.foto-p11 { background-image: url('../pngs/CAPAS/CAPA11.jpg'); }
+.foto-p12 { background-image: url('../pngs/CAPAS/CAPA12.jpg'); }
+.foto-p13 { background-image: url('../pngs/CAPAS/CAPA13.jpg'); }
+.foto-p14 { background-image: url('../pngs/CAPAS/CAPA14.jpg'); }
+.foto-p15 { background-image: url('../pngs/CAPAS/CAPA15.jpg'); }
+.foto-p16 { background-image: url('../pngs/CAPAS/CAPA16.jpg'); }
+.foto-p17 { background-image: url('../pngs/CAPAS/CAPA17.jpg'); }
+.foto-p18 { background-image: url('../pngs/CAPAS/CAPA18.jpg'); }
+.foto-p19 { background-image: url('../pngs/CAPAS/CAPA19.jpg'); }
+.foto-p20 { background-image: url('../pngs/CAPAS/CAPA20.jpg'); }
+/* ... adicione as outras conforme seu padrão ... */
+
+/* --- HOTBAR --- */
+.hotbar-container {
+    position: fixed;
+    bottom: 10px; /* Distância do fundo da tela */
+    left: 50%;
+    transform: translateX(-50%); /* Centraliza horizontalmente */
+    
+    display: flex;
+    gap: 20px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.6); /* Fundo escuro transparente */
+    border: 1px solid #fff;
+    border-radius: 12px;
+    backdrop-filter: blur(10px); /* Efeito de vidro */
+}
+.hotbar-item {
+    width: 50px;
+    height: 50px;
+    background-color: #444;
+    border: 2px solid #888;
+    border-radius: 8px;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    font-family: sans-serif;
+    cursor: pointer;
+    transition: 0.2s; /* Animação suave */
+}
+/* Efeito ao passar o mouse ou selecionar */
+.hotbar-item:hover {
+    background-color: #3498db;
+    border-color: #fff;
+    transform: scale(1.1) translateY(-5px); /* Sobe um pouquinho */
+}
+.hotbar-item:nth-child(1) { 
+    background-image: url('../pngs/INICIO.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(2) { 
+    background-image: url('../pngs/play.jpg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(3) { 
+    background-image: url('../pngs/lupa1.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(4) { 
+    background-image: url('../pngs/info.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(5) { 
+    background-image: url('../pngs/sair.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
+/* Scrollbar Personalizada */
+body::-webkit-scrollbar { width: 10px; }
+body::-webkit-scrollbar-track { background: #111; }
+body::-webkit-scrollbar-thumb { background: #3498db; border-radius: 10px; }

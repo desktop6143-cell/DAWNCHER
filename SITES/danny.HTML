@@ -1,0 +1,49 @@
+<div class="conteudo-principal">
+<div class="anime-header">
+    <LINK rel="stylesheet" href="all_animes.CSS"></LINK>
+    <img src="../PNGS/CAPAS/CAPA2.jpg" class="poster"> <!-- Coloque o poster aqui -->
+    <div class="info">
+        <h1>Danny Phantom</h1>
+        <p class="ano">2004</p>
+        <div class="rating">⭐ 7.0</div>
+        <div class="tags">
+            <span>Ação</span> <span>Aventura</span> <span>Fantasia</span>
+        </div>
+        <p class="sinopse">
+        Danny Fenton E hum Típico adolescente tímido e “Invisível” de 14 Anos. Estudando nenhum colégio Seu, o Instituto Casper, elemento Localidade: Não se enquadra los nenhuma tribo e e discriminado Pelos Demais Alunos Pelo excêntrico ramo de Família SUA, a Caça AOS fantasmas, uma Exceção de SEUS DOIS amigos, uma vegetariana gótica Sam Mason EO tecno-nerd Tucker Foley. Tudo muda num dia los Opaco Danny AO trazer SEUS Amigos para Conhecer o Laboratório de SEUS Pais, Aceita hum Desafio de Sam de Entrar nenhuma inacabado inventários de SEUS Pais, Uma Máquina Que cria hum portal de para uma “zona fantasma”. Só Que hum Acidente Acontece when elemento SEM sabre encosta nenhum interruptor e Ativa o portal com elementos Dentro. Bombardeado Pela Energia da Máquina, Seu Corpo e contaminado Pelo ectoplasma e se transfor los hum híbrido Humano / fantasma, com Medo da Reação de SEUS Pais Caçadores elemento cria uma Identidade secreta fazer Herói Danny Phantom. Juntamente com A Ajuda de SEUS DOIS amigos, e Mais Adiante de SUA IRMA, elementos usa SEUS Poderes sobrenaturais parágrafo lutar contra fantasmas OS Malignos that assombram SUA Cidade. 
+        </p>
+    </div>
+</div>
+
+<div class="episodios-container">
+    <h2>Temporadas e Episódios</h2>
+    <div class="temporada-btn"> Temporada 1</div>
+     <div id="lista-episodios" class="container-cards">
+    <!-- O JavaScript vai preencher aqui automaticamente -->
+</div>
+<script>
+const container = document.getElementById('lista-episodios');
+const totalEpisodios = 54;
+const pastaAnime = "danny"; // Nome da pasta do anime
+const pastaThumb = "danny";         // Nome da pasta das capas
+
+for (let i = 1; i <= totalEpisodios; i++) {
+    // Cria a estrutura da div
+    const div = document.createElement('div');
+    div.className = 'ep-card';
+    
+    // Define o link de clique
+    div.onclick = () => {
+        window.location.href = `../ANIMES/${pastaAnime}/EP${i}.mp4`;
+    };
+
+    // Define o conteúdo interno
+    div.innerHTML = `
+        <div class="ep-thumb" style="background-image: url('../PNGS/MINICAP/${pastaThumb}/EP${i}.jpg');"></div>
+        <p>Episódio ${i}</p>
+    `;
+
+    // Adiciona ao container
+    container.appendChild(div);
+}
+</script>

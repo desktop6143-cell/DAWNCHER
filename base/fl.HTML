@@ -1,0 +1,232 @@
+<!DOCTYPE html> <script src= "seglock.js"></script>
+<html lang="PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="cards-container"></div> <!-- Usando CLASS aqui -->
+
+    <div class="hotbar-container">
+        <div class="hotbar-item" title="Início" id="btnhm"></div>
+        <div class="hotbar-item" title="Biblioteca" id="btnBL"></div>
+        <div class="hotbar-item" title="Pesquisa" id="btnLP"></div>
+        <div class="hotbar-item" title="Informação" id="btnnt"></div>
+        <div class="hotbar-item" title="Sair" id="btn-sair"></div>
+    </div>
+</body>
+</html>
+    <script>
+
+    // Função para carregar os dados do arquivo JSON local
+    async function carregarCards() {
+        const container = document.querySelector('.cards-container');
+        
+        try {
+            // Busca o arquivo local
+            const resposta = await fetch('../database/filmes.json');
+            
+            if (!resposta.ok) throw new Error("Arquivo não encontrado");
+            
+            const dados = await resposta.json();
+
+            container.innerHTML = ""; // Limpa o "carregando"
+
+            dados.forEach(item => {
+                const cardHTML = `
+                    <div class="card" data-href="${item.href}">
+                        <div class="box-item" style="background-image: url('${item.foto}');"></div>
+                        <p class="box-title">${item.titulo}</p>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+
+        } catch (erro) {
+            console.error("Erro:", erro);
+            container.innerHTML = "<p style='color:white;'>Erro ao carregar dados. Verifique se o arquivo dados.json existe.</p>";
+        }
+    }
+
+    // Inicia a carga
+    carregarCards();
+
+    // Evento de Clique nos cards
+    document.addEventListener('click', (e) => {
+        const card = e.target.closest('.card');
+        if (card) {
+            const href = card.getAttribute('data-href');
+            if (href) window.location.href = href;
+        }
+    });
+
+// 3. BOTÕES DA HOTBAR
+document.getElementById('btn-sair').addEventListener('click', () => {
+    sessionStorage.removeItem('logado'); 
+    window.location.href = "../index.html"; 
+});
+
+document.getElementById('btnhm').addEventListener('click', () => window.location.href = "p1.HTML");
+document.getElementById('btnBL').addEventListener('click', () => window.location.href = "BL.HTML");
+document.getElementById('btnnt').addEventListener('click', () => window.location.href = "info.html");
+document.getElementById('btnLP').addEventListener('click', () => window.location.href = "../SITES/bar.html");
+
+// Inicializa a página
+window.onload = carregarTudo;
+
+</script>
+<style>
+    /* --- CONFIGURAÇÃO GLOBAL --- */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    /* FUNDO */
+    background: #1a1a1a url('../pngs/PNG9.jpg') no-repeat center center fixed;
+    background-size: cover;
+
+    /* ALINHAMENTO */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 20px 150px 20px; /* Padding extra embaixo para a hotbar */
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* --- GRID DE CARDS --- */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 colunas padrão */
+    gap: 30px;
+    width: 100%;
+    max-width: 1100px; /* Largura máxima controlada */
+    margin: 0 auto;
+}
+
+/* --- ESTILO DOS CARDS --- */
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.1);
+}
+
+.box-item {
+    width: 160px;
+    height: 160px;
+    background-color: #3498db;
+    border-radius: 20px;
+    border: 4px solid #fff;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+}
+
+.box-title {
+    margin-top: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 1100px) { .cards-container { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 850px) { .cards-container { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { 
+    .cards-container { grid-template-columns: repeat(2, 1fr); }
+    .box-item { width: 130px; height: 130px; }
+}
+
+/* FOTOS DOS BOX (Exemplos) */
+
+
+/* --- HOTBAR --- */
+.hotbar-container {
+    position: fixed;
+    bottom: 10px; /* Distância do fundo da tela */
+    left: 50%;
+    transform: translateX(-50%); /* Centraliza horizontalmente */
+    
+    display: flex;
+    gap: 20px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.6); /* Fundo escuro transparente */
+    border: 1px solid #fff;
+    border-radius: 12px;
+    backdrop-filter: blur(10px); /* Efeito de vidro */
+}
+.hotbar-item {
+    width: 50px;
+    height: 50px;
+    background-color: #444;
+    border: 2px solid #888;
+    border-radius: 8px;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    font-family: sans-serif;
+    cursor: pointer;
+    transition: 0.2s; /* Animação suave */
+}
+/* Efeito ao passar o mouse ou selecionar */
+.hotbar-item:hover {
+    background-color: #3498db;
+    border-color: #fff;
+    transform: scale(1.1) translateY(-5px); /* Sobe um pouquinho */
+}
+.hotbar-item:nth-child(1) { 
+    background-image: url('../pngs/INICIO.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(2) { 
+    background-image: url('../pngs/livro.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(3) { 
+    background-image: url('../pngs/lupa1.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(4) { 
+    background-image: url('../pngs/info.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.hotbar-item:nth-child(5) { 
+    background-image: url('../pngs/sair.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
+/* Scrollbar Personalizada */
+body::-webkit-scrollbar { width: 10px; }
+body::-webkit-scrollbar-track { background: #111; }
+body::-webkit-scrollbar-thumb { background: #3498db; border-radius: 10px; }
+
+</style>

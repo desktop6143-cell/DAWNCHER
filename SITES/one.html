@@ -1,0 +1,52 @@
+<div class="conteudo-principal">
+<div class="anime-header">
+    <LINK rel="stylesheet" href="all_animes.CSS"></LINK>
+    <img src="../PNGS/CAPAS/CAPA14.jpg" class="poster"> <!-- Coloque o poster aqui -->
+    <div class="info">
+        <h1>One Room, Hiatari Futsuu, Tenshi-tsuki</h1>
+        <p class="ano">2024</p>
+        <div class="rating">⭐ 4.0</div>
+        <div class="tags">
+            <span>harém</span> <span>romance</span> <span>Fantasia</span> <span>comedia</span> <span>sobrenatural</span>
+        </div>
+        <p class="sinopse">
+         Shintaro Tokumitsu é um estudante do ensino médio vivendo sozinho, mas as coisas tomam um rumo inesperado quando uma garota chamada Towa aparece em sua varanda! Não só ela é incrivelmente pura e doce, mas há algo diferente sobre ela – algo… divino. Quem é a nova colega de quarto de Shintaro e que travessuras adoráveis ​​​​o aguardam?!
+        </p>
+    </div>
+</div>
+
+<div class="episodios-container">
+    <h2>Temporadas e Episódios</h2>
+    <div class="temporada-btn"> Temporada 1</div>
+    
+    <!-- Lista de episódios (suas boxes) -->
+    <div class="lista-episodios">
+        <div id="lista-episodios" class="container-cards">
+    <!-- O JavaScript vai preencher aqui automaticamente -->
+</div>
+<script>
+const container = document.getElementById('lista-episodios');
+const totalEpisodios = 12;
+const pastaAnime = "one_room_LG"; // Nome da pasta do anime
+const pastaThumb = "one";         // Nome da pasta das capas
+
+for (let i = 1; i <= totalEpisodios; i++) {
+    // Cria a estrutura da div
+    const div = document.createElement('div');
+    div.className = 'ep-card';
+    
+    // Define o link de clique
+    div.onclick = () => {
+        window.location.href = `../ANIMES/${pastaAnime}/EP${i}.mp4`;
+    };
+
+    // Define o conteúdo interno
+    div.innerHTML = `
+        <div class="ep-thumb" style="background-image: url('../PNGS/MINICAP/${pastaThumb}/EP${i}.jpg');"></div>
+        <p>Episódio ${i}</p>
+    `;
+
+    // Adiciona ao container
+    container.appendChild(div);
+}
+</script>

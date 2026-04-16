@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<script src="../base/seglock.js"></script>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Anime Search System</title>
+    <style>
+* { box-sizing: border-box; 
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #000;
+}
+
+.search-box {
+    text-align: center;
+    border: 2px solid #00ffcc;
+    padding: 60px; /* Aumentei um pouco o respiro interno */
+    background: rgba(0, 255, 204, 0.05);
+    box-shadow: 0 0 30px rgba(0, 255, 204, 0.15);
+    position: relative;
+    
+    /* Garante que o box tenha um tamanho fixo para não "dançar" na tela */
+    min-width: 500px;
+}
+
+/* Ajuste no botão para ficar igual à sua imagem */
+button {
+    margin-top: 40px;
+    background: #00ffcc;
+    color: #000;
+    border: none;
+    padding: 12px 50px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+        /* Cantoneiras Estilo Anime */
+        .search-box::before {
+            content: ""; position: absolute; top: -10px; left: -10px;
+            width: 30px; height: 30px; border-top: 5px solid #bc13fe; border-left: 5px solid #bc13fe;
+        }
+
+        h2 { color: #bc13fe; text-transform: uppercase; letter-spacing: 5px; margin-bottom: 30px; }
+
+        input {
+            width: 400px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #00ffcc;
+            color: #fff;
+            font-size: 20px;
+            padding: 10px;
+            outline: none;
+            text-align: center;
+            text-transform: lowercase;
+        }
+
+        button:hover { background: #bc13fe; color: white; }
+
+        #mensagem { color: #ff0055; margin-top: 15px; height: 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="search-box">
+        <h2>Sistema De Pesquisa</h2>
+        <input type="text" id="inputPagina" placeholder="NOME DO ARQUIVO..." onkeydown="if(event.key === 'Enter') acessar()">
+        <div id="mensagem"></div>
+        <button onclick="acessar()">ACESSAR</button>
+    </div>
+
+    <!-- Primeiro importa o arquivo de dados -->
+<script src="../database/title.js"></script>
+
+<script>
+    function acessar() {
+        const input = document.getElementById('inputPagina').value.toLowerCase().trim();
+        const msg = document.getElementById('mensagem');
+
+        // O 'bancoDeDados' agora vem do arquivo db.js externo
+        if (bancoDeDados[input]) {
+            msg.style.color = "#00ffcc";
+            msg.innerText = "ACESSANDO: " + input.toUpperCase();
+            
+            // Verifica se o destino já tem .html ou se precisa adicionar
+            let destino = bancoDeDados[input];
+            if (!destino.includes(".html")) {
+                // Se o destino for "filme1?f=2", ele insere o .html antes do "?"
+                if (destino.includes("?")) {
+                    destino = destino.replace("?", ".html?");
+                } else {
+                    destino = destino + ".html";
+                }
+            }
+
+            setTimeout(() => {
+                window.location.href = destino;
+            }, 500);
+        } else {
+            msg.style.color = "#ff0055";
+            msg.innerText = "ERRO: IDENTIDADE NÃO RECONHECIDA.";
+        }
+    }
+</script>
+
+</body>
+</html>

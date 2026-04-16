@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Player de Vídeo</title>
+    <style>
+        body { background: #000; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; font-family: sans-serif; }
+        .video-container { width: 1366px; height: 768px; background: #000; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        video { width: 100%; height: 100%; outline: none; }
+        .voltar { position: absolute; top: 20px; left: 20px; color: #fff; text-decoration: none; background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 5px; }
+        h2 { margin-bottom: 10px; font-weight: 300; }
+    </style>
+</head>
+<body>
+   <button onclick="voltarParaLista()" class="voltar">← Voltar para episódios</button>
+    <h2 id="display-titulo">Carregando...</h2>
+    
+    <div class="video-container">
+        <video id="meuVideo" controls></video>
+    </div>
+
+<!-- ... resto igual ... -->
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const videoId = params.get('id');
+    const titulo = decodeURIComponent(params.get('titulo') || 'Sem título');
+    const videoUrl = decodeURIComponent(params.get('url'));
+
+    const player = document.getElementById('meuVideo');
+    document.getElementById('display-titulo').innerText = titulo;
+    player.src = videoUrl;
+
+    let jaCarregouTempoInicial = false;
+
+    // ==================== BOTÃO VOLTAR ====================
+    function voltarParaLista() {
+        window.history.back();
+    }
+
+    // ==================== FUNÇÃO PARA SALVAR ====================
+    function salvarTempo() {
+        if (player.currentTime < 10) return;
+
+        fetch('http://localhost:3000/atualizar-tempo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                video_id: videoId, 
+                tempo: Math.floor(player.currentTime)
+            })
+        })
+        .then(() => {
+            console.log(`✅ Tempo salvo: ${Math.floor(player.currentTime)}s`);
+        })
+        .catch(err => {
+            console.log("Erro ao salvar tempo:", err.message);
+        });
+    }
+
+    // 1. Registrar vídeo no histórico
+    fetch('http://localhost:3000/historico', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ video_id: videoId, titulo: titulo })
+    }).catch(() => {});
+
+    // 2. Carregar tempo salvo
+    player.addEventListener('loadedmetadata', async () => {
+        if (jaCarregouTempoInicial) return;
+
+        try {
+            const res = await fetch('http://localhost:3000/historico');
+            const historico = await res.json();
+            const salvo = historico.find(h => h.video_id === videoId);
+            
+            if (salvo && salvo.tempo > 15) {
+                player.currentTime = salvo.tempo;
+                console.log(`Retomando do tempo: ${salvo.tempo.toFixed(1)}s`);
+            }
+        } catch (e) {
+            console.log("Sem histórico anterior.");
+        } finally {
+            jaCarregouTempoInicial = true;
+        }
+    }, { once: true });
+
+    // 3. Salvamentos automáticos (sem causar recarregamento)
+    player.addEventListener('ended', salvarTempo);
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && player.currentTime > 20) {
+            salvarTempo();
+        }
+    });
+
+    window.addEventListener('beforeunload', salvarTempo);
+</script>
+
+</body>
+</html>

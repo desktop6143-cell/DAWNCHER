@@ -1,0 +1,143 @@
+<body>
+   <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Anime Dashboard 1366x768</title>
+    <style>
+        /* TRAVA A TELA NAS DIMENSÕES EXATAS */
+        * { box-sizing: border-box; }
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 1366px;
+            height: 768px;
+            overflow: hidden; /* Proíbe subir ou descer */
+            background-color: #050505;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #00ffcc;
+        }
+
+        /* CONTAINER PRINCIPAL */
+        .dashboard {
+            width: 1366px;
+            height: 768px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 Colunas */
+            grid-template-rows: repeat(2, 1fr);    /* 2 Linhas */
+            gap: 20px;
+            padding: 30px;
+            background: radial-gradient(circle, #1a1a2e 0%, #050505 100%);
+        }
+
+        /* ESTILO DOS 8 BOXES */
+        .box {
+            border: 2px solid #00ffcc;
+            background: rgba(0, 255, 204, 0.05);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: inset 0 0 15px rgba(0, 255, 204, 0.2), 
+                        0 0 10px rgba(0, 255, 204, 0.1);
+            transition: 0.3s;
+        }
+
+        /* DETALHES DE CANTO (ESTILO ANIME) */
+        .box::before {
+            content: "";
+            position: absolute;
+            top: -5px; left: -5px;
+            width: 20px; height: 20px;
+            border-top: 4px solid #ff0055;
+            border-left: 4px solid #ff0055;
+        }
+
+        /* VARIAÇÃO DE CORES PARA OS BOXES */
+        .box:nth-child(even) { border-color: #bc13fe; color: #bc13fe; }
+        .box:nth-child(even)::before { border-color: #00ffcc; }
+
+        .box-title {
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .box-content {
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+        /* EFEITO DE SCANLINE (LINHAS DE TV ANTIGA) */
+        .scanline {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanline"></div>
+
+    <div class="dashboard">
+        <div class="box"><div class="box-title">System Status</div><div class="box-content">ONLINE</div></div>
+        <div class="box"><div class="box-title">Pilot Sync</div><div class="box-content">98.2%</div></div>
+        <div class="box"><div class="box-title">Energy</div><div class="box-content">MAX</div></div>
+        <div class="box"><div class="box-title">Target</div><div class="box-content">LOCKED</div></div>
+        <div class="box"><div class="box-title">Sector</div><div class="box-content">B-12</div></div>
+        <div class="box"><div class="box-title">Threat Level</div><div class="box-content">LOW</div></div>
+        <div class="box"><div class="box-title">Coolant</div><div class="box-content">OPTIMAL</div></div>
+        <div class="box"><div class="box-title">Database</div><div class="box-content">READY</div></div>
+    </div>
+    <div class="hotbar-container">
+        <div class="hotbar-item" title="casa"></div>
+        <div class="hotbar-item" title="blibioteca" id="btnBL"></div>
+        <div class="hotbar-item" title="pesquisa"></div>
+        <div class="hotbar-item" title="informação" id="btnnt"></div>
+        <div class="hotbar-item" title="sair" id="btn-sair"></div>
+</div>
+<script>
+
+// Se não encontrar o 'logado' na memória, volta para o index
+if (sessionStorage.getItem('logado') !== 'true') {
+    window.location.href = "index.html"; // Coloque aqui o nome do seu arquivo de login
+}
+
+
+    // Seleciona o 5º item da hotbar
+const btnSair = document.querySelector('.hotbar-item:nth-child(5)');
+
+btnSair.addEventListener('click', () => {
+    // Apaga a memória de login
+    sessionStorage.removeItem('logado'); 
+    // Ou usa sessionStorage.clear(); para apagar tudo
+    
+    window.location.href = "index.html"; 
+});
+  // Seleciona o 2º item da hotbar
+const btnBL = document.querySelector('.hotbar-item:nth-child(2)');
+
+btnBL.addEventListener('click', () => {
+window.location.href = "BL.HTML";
+});
+
+  // Seleciona o 4º item da hotbar
+const btnnt = document.querySelector('.hotbar-item:nth-child(4)');
+
+btnnt.addEventListener('click', () => {
+window.location.href = "info.html";
+});
+
+</script>
+</body>
+</html>
+

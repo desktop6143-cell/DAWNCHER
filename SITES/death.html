@@ -1,0 +1,49 @@
+<div class="conteudo-principal">
+<div class="anime-header">
+    <LINK rel="stylesheet" href="all_animes.CSS"></LINK>
+    <img src="../PNGS/CAPAS/CAPA4.jpg" class="poster"> <!-- Coloque o poster aqui -->
+    <div class="info">
+        <h1>Death March kara Hajimaru Isekai Kyousoukyoku</h1>
+        <p class="ano">2018</p>
+        <div class="rating">⭐ 7.8</div>
+        <div class="tags">
+            <span>Ação</span> <span>Harém</span> <span>Fantasia</span> <span>Aventura</span>
+        </div>
+        <p class="sinopse">
+        Conta a história de um programador de 29 anos que vai parar em um mundo de RPG. Ele reencarna em um corpo de 15 anos e depois de entender o que esta acontecendo decide tentar viver em paz por ali. Infelizmente a aparição do Maou vai atrapalhar seus planos. Pelo que li é focado em slice of life, e não tanto em aventura e ação. O protagonista é completamente overpower inclusive, graças a um evento que ocorreu quando ele chegou lá e ele ganha um bando de leveis e skills.</div>
+</div>
+
+<div class="episodios-container">
+    <h2>Temporadas e Episódios</h2>
+    <div class="temporada-btn"> Temporada 1</div>
+    
+    
+<div id="lista-episodios" class="container-cards">
+    <!-- O JavaScript vai preencher aqui automaticamente -->
+</div>
+<script>
+const container = document.getElementById('lista-episodios');
+const totalEpisodios = 12;
+const pastaAnime = "death"; // Nome da pasta do anime
+const pastaThumb = "death";         // Nome da pasta das capas
+
+for (let i = 1; i <= totalEpisodios; i++) {
+    // Cria a estrutura da div
+    const div = document.createElement('div');
+    div.className = 'ep-card';
+    
+    // Define o link de clique
+    div.onclick = () => {
+        window.location.href = `../ANIMES/${pastaAnime}/EP${i}.mp4`;
+    };
+
+    // Define o conteúdo interno
+    div.innerHTML = `
+        <div class="ep-thumb" style="background-image: url('../PNGS/MINICAP/${pastaThumb}/EP${i}.jpg');"></div>
+        <p>Episódio ${i}</p>
+    `;
+
+    // Adiciona ao container
+    container.appendChild(div);
+}
+</script>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated Login & Registration Form | Codehal</title>
+  <link rel="stylesheet" type="text/css" href="main.css">
+</head>
+<body>
+  <div class="wrapper">
+    <div class="form-wrapper sign-in">
+      <form action="">
+        <h2>Login</h2>
+        <div class="input-group">
+          <input type="text" id="ID" required>
+          <label for="">Username</label>
+        </div>
+        <div class="input-group">
+          <input type="password" id="senha" required>
+          <label for="">Password</label>autocomplete="off
+        </div>
+        <div class="remember">
+          <label><input type="checkbox"> Remember me</label>
+        </div>
+        <button type="submit">Login</button>
+        </div>
+      </form>
+    </div>
+      </form>
+    </div>
+  </div>
+<script>
+    // O ponto (.) antes de wrapper indica que estamos chamando a CLASSE
+const formulario = document.querySelector('.wrapper');
+
+formulario.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const user = document.getElementById('ID').value;
+    const pass = document.getElementById('senha').value;
+
+    if (user === "HOST" && pass === "NK9574") {
+        sessionStorage.setItem('logado', 'true');
+        window.location.href = "base/p1.html";
+    } else {
+        alert("Erro!");
+    }
+});
+
+</script>
+</body>
+</html>

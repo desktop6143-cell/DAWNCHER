@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Animes</title>
+    <link rel="stylesheet" href="P1.CSS">
+    <style>
+        /* Estilo rápido para organizar a seção */
+        #lista-continuar { display: flex; gap: 15px; overflow-x: auto; padding: 10px; }
+        .ep-card { min-width: 200px; background: #222; border-radius: 8px; cursor: pointer; color: white; padding: 10px; border: 1px solid #444; }
+        .progresso-bg { background: #555; height: 5px; width: 100%; margin-top: 10px; border-radius: 3px; }
+        .progresso-bar { background: red; height: 100%; width: 50%; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<!-- SEÇÃO CONTINUAR ASSISTINDO -->
+<section id="secao-continuar" style="display: none; margin: 20px;">
+    <h2 style="color: white; font-family: sans-serif;">Continuar Assistindo</h2>
+    <div id="lista-continuar"></div>
+</section>
+
+<div class="hotbar-container">
+    <div class="hotbar-item" title="casa"></div>
+    <div class="hotbar-item" title="biblioteca" id="btnBL"></div>
+    <div class="hotbar-item" title="pesquisa" id="btnLP"></div>
+    <div class="hotbar-item" title="informação" id="btnnt"></div>
+    <div class="hotbar-item" title="sair" id="btn-sair"></div>
+</div>
+
+<script>
+// 1. VERIFICAÇÃO DE LOGIN
+if (sessionStorage.getItem('logado') !== 'true') {
+    window.location.href = "../index.html"; 
+}
+
+// 2. FUNÇÃO PRINCIPAL: CARREGAR HISTÓRICO DO SERVIDOR NODE
+async function carregarTudo() {
+    try {
+        // ATENÇÃO: Node está na 3000!
+        const resposta = await fetch('http://localhost:3000/historico');
+        const historico = await resposta.json();
+
+        if (historico.length === 0) return;
+
+        const container = document.getElementById('lista-continuar');
+        const secao = document.getElementById('secao-continuar');
+        
+        secao.style.display = 'block';
+        container.innerHTML = ''; 
+
+        historico.forEach(item => {
+            if(!item.titulo) return; // Pula registros vazios
+
+            const card = document.createElement('div');
+            card.className = 'ep-card';
+            
+            card.onclick = () => {
+                // Aqui você deve passar a URL do vídeo se tiver, 
+                // ou o player.html deve saber carregar pelo ID
+                window.location.href = `player.html?id=${item.video_id}&titulo=${encodeURIComponent(item.titulo)}`;
+            };
+
+            card.innerHTML = `
+                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">${item.titulo}</div>
+                <div class="progresso-bg">
+                    <div class="progresso-bar"></div>
+                </div>
+                <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Retomar vídeo</p>
+            `;
+            container.appendChild(card);
+        });
+    } catch (erro) {
+        console.error("Servidor Node (3000) não encontrado.");
+    }
+}
+
+// 3. BOTÕES DA HOTBAR
+document.getElementById('btn-sair').addEventListener('click', () => {
+    sessionStorage.removeItem('logado'); 
+    window.location.href = "../index.html"; 
+});
+
+document.getElementById('btnBL').addEventListener('click', () => window.location.href = "BL.HTML");
+document.getElementById('btnnt').addEventListener('click', () => window.location.href = "info.html");
+document.getElementById('btnLP').addEventListener('click', () => window.location.href = "../SITES/bar.html");
+
+// Inicializa a página
+window.onload = carregarTudo;
+
+</script>
+</body>
+</html>
