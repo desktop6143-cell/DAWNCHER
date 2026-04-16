@@ -31,21 +31,21 @@
             
             const dados = await resposta.json();
 
-            container.innerHTML = ""; // Limpa o "carregando"
+            container.innerhtml = ""; // Limpa o "carregando"
 
             dados.forEach(item => {
-                const cardHTML = `
+                const cardhtml = `
                     <div class="card" data-href="${item.href}">
                         <div class="box-item" style="background-image: url('${item.foto}');"></div>
                         <p class="box-title">${item.titulo}</p>
                     </div>
                 `;
-                container.innerHTML += cardHTML;
+                container.innerhtml += cardhtml;
             });
 
         } catch (erro) {
             console.error("Erro:", erro);
-            container.innerHTML = "<p style='color:white;'>Erro ao carregar dados. Verifique se o arquivo dados.json existe.</p>";
+            container.innerhtml = "<p style='color:white;'>Erro ao carregar dados. Verifique se o arquivo dados.json existe.</p>";
         }
     }
 
@@ -67,10 +67,10 @@ document.getElementById('btn-sair').addEventListener('click', () => {
     window.location.href = "../index.html"; 
 });
 
-document.getElementById('btnhm').addEventListener('click', () => window.location.href = "p1.HTML");
-document.getElementById('btnBL').addEventListener('click', () => window.location.href = "BL.HTML");
+document.getElementById('btnhm').addEventListener('click', () => window.location.href = "p1.html");
+document.getElementById('btnBL').addEventListener('click', () => window.location.href = "bl.html");
 document.getElementById('btnnt').addEventListener('click', () => window.location.href = "info.html");
-document.getElementById('btnLP').addEventListener('click', () => window.location.href = "../SITES/bar.html");
+document.getElementById('btnLP').addEventListener('click', () => window.location.href = "../sites/bar.html");
 
 // Inicializa a página
 window.onload = carregarTudo;
@@ -193,7 +193,7 @@ body {
     transform: scale(1.1) translateY(-5px); /* Sobe um pouquinho */
 }
 .hotbar-item:nth-child(1) { 
-    background-image: url('../pngs/INICIO.png');
+    background-image: url('../pngs/inicio.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;

@@ -10,7 +10,7 @@ body {
     overflow-x: hidden;
 
     /* FUNDO */
-    background: #1a1a1a url('../pngs/PNG2.jpg') no-repeat center center fixed;
+    background: #1a1a1a url('../pngs/png2.jpg') no-repeat center center fixed;
     background-size: cover;
 
     /* ALINHAMENTO */
@@ -18,10 +18,10 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 50px 20px 150px 20px; /* Padding extra embaixo para a hotbar */
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'segoe UI', sans-serif;
 }
 
-/* --- GRID DE CARDS --- */
+/* --- GRID DE CARDs --- */
 .cards-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr); /* 5 colunas padrão */
@@ -31,7 +31,7 @@ body {
     margin: 0 auto;
 }
 
-/* --- ESTILO DOS CARDS --- */
+/* --- EsTILO DOs CARDs --- */
 .card {
     display: flex;
     flex-direction: column;
@@ -65,7 +65,7 @@ body {
     text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
 }
 
-/* --- RESPONSIVIDADE --- */
+/* --- REsPONsIVIDADE --- */
 @media (max-width: 1100px) { .cards-container { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 850px) { .cards-container { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 600px) { 
@@ -73,27 +73,27 @@ body {
     .box-item { width: 130px; height: 130px; }
 }
 
-/* FOTOS DOS BOX (Exemplos) */
-.foto-p1 { background-image: url('../pngs/CAPAS/CAPA1.jpg'); }
-.foto-p2 { background-image: url('../pngs/CAPAS/CAPA2.jpg'); }
-.foto-p3 { background-image: url('../pngs/CAPAS/CAPA3.jpg'); }
-.foto-p4 { background-image: url('../pngs/CAPAS/CAPA4.jpg'); }
-.foto-p5 { background-image: url('../pngs/CAPAS/CAPA5.jpg'); }
-.foto-p6 { background-image: url('../pngs/CAPAS/CAPA6.jpg'); }
-.foto-p7 { background-image: url('../pngs/CAPAS/CAPA7.jpg'); }
-.foto-p8 { background-image: url('../pngs/CAPAS/CAPA8.jpg'); }
-.foto-p9 { background-image: url('../pngs/CAPAS/CAPA9.jpg'); }
-.foto-p10 { background-image: url('../pngs/CAPAS/CAPA10.jpg'); }
-.foto-p11 { background-image: url('../pngs/CAPAS/CAPA11.jpg'); }
-.foto-p12 { background-image: url('../pngs/CAPAS/CAPA12.jpg'); }
-.foto-p13 { background-image: url('../pngs/CAPAS/CAPA13.jpg'); }
-.foto-p14 { background-image: url('../pngs/CAPAS/CAPA14.jpg'); }
-.foto-p15 { background-image: url('../pngs/CAPAS/CAPA15.jpg'); }
-.foto-p16 { background-image: url('../pngs/CAPAS/CAPA16.jpg'); }
-.foto-p17 { background-image: url('../pngs/CAPAS/CAPA17.jpg'); }
-.foto-p18 { background-image: url('../pngs/CAPAS/CAPA18.jpg'); }
-.foto-p19 { background-image: url('../pngs/CAPAS/CAPA19.jpg'); }
-.foto-p20 { background-image: url('../pngs/CAPAS/CAPA20.jpg'); }
+/* FOTOs DOs BOX (Exemplos) */
+.foto-p1 { background-image: url('../pngs/capas/capa1.jpg'); }
+.foto-p2 { background-image: url('../pngs/capas/capa2.jpg'); }
+.foto-p3 { background-image: url('../pngs/capas/capa3.jpg'); }
+.foto-p4 { background-image: url('../pngs/capas/capa4.jpg'); }
+.foto-p5 { background-image: url('../pngs/capas/capa5.jpg'); }
+.foto-p6 { background-image: url('../pngs/capas/capa6.jpg'); }
+.foto-p7 { background-image: url('../pngs/capas/capa7.jpg'); }
+.foto-p8 { background-image: url('../pngs/capas/capa8.jpg'); }
+.foto-p9 { background-image: url('../pngs/capas/capa9.jpg'); }
+.foto-p10 { background-image: url('../pngs/capas/capa10.jpg'); }
+.foto-p11 { background-image: url('../pngs/capas/capa11.jpg'); }
+.foto-p12 { background-image: url('../pngs/capas/capa12.jpg'); }
+.foto-p13 { background-image: url('../pngs/capas/capa13.jpg'); }
+.foto-p14 { background-image: url('../pngs/capas/capa14.jpg'); }
+.foto-p15 { background-image: url('../pngs/capas/capa15.jpg'); }
+.foto-p16 { background-image: url('../pngs/capas/capa16.jpg'); }
+.foto-p17 { background-image: url('../pngs/capas/capa17.jpg'); }
+.foto-p18 { background-image: url('../pngs/capas/capa18.jpg'); }
+.foto-p19 { background-image: url('../pngs/capas/capa19.jpg'); }
+.foto-p20 { background-image: url('../pngs/capas/capa20.jpg'); }
 /* ... adicione as outras conforme seu padrão ... */
 
 /* --- HOTBAR --- */
@@ -127,14 +127,14 @@ body {
     cursor: pointer;
     transition: 0.2s; /* Animação suave */
 }
-/* Efeito ao passar o mouse ou selecionar */
+/* Efeito ao pasar o mouse ou selecionar */
 .hotbar-item:hover {
     background-color: #3498db;
     border-color: #fff;
-    transform: scale(1.1) translateY(-5px); /* Sobe um pouquinho */
+    transform: scale(1.1) translateY(-5px); /* sobe um pouquinho */
 }
 .hotbar-item:nth-child(1) { 
-    background-image: url('../pngs/INICIO.png');
+    background-image: url('../pngs/inicio.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -165,7 +165,7 @@ body {
 }
 
 
-/* Scrollbar Personalizada */
+/* scrollbar Personalizada */
 body::-webkit-scrollbar { width: 10px; }
 body::-webkit-scrollbar-track { background: #111; }
 body::-webkit-scrollbar-thumb { background: #3498db; border-radius: 10px; }
