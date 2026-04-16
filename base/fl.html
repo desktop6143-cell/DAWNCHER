@@ -40,12 +40,12 @@
                         <p class="box-title">${item.titulo}</p>
                     </div>
                 `;
-                container.innerhtml += cardhtml;
+                container.innerHTML += cardhtml;
             });
 
         } catch (erro) {
             console.error("Erro:", erro);
-            container.innerhtml = "<p style='color:white;'>Erro ao carregar dados. Verifique se o arquivo dados.json existe.</p>";
+            container.innerHTML = "<p style='color:white;'>Erro ao carregar dados. Verifique se o arquivo dados.json existe.</p>";
         }
     }
 
