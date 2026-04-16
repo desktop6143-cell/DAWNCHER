@@ -3,137 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <title>Player de Vídeo</title>
-  <style>
-    body { 
-        background: #000; 
-        margin: 0; 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        justify-content: center; 
-        min-height: 100vh; /* Ajustado para min-height */
-        color: white; 
-        font-family: sans-serif; 
-        padding: 20px;
-    }
-    .video-container { 
-        width: 100%;       /* Ocupa a largura da tela */
-        max-width: 1100px; /* Mas não passa de 1100px no PC */
-        aspect-ratio: 16 / 9; /* Mantém o formato de cinema/TV automaticamente */
-        background: #000; 
-        box-shadow: 0 0 50px rgba(0,0,0,0.8); 
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    video { width: 100%; height: 100%; outline: none; }
-    
-    .voltar { 
-        position: absolute; 
-        top: 20px; 
-        left: 20px; 
-        color: #fff; 
-        text-decoration: none; 
-        background: rgba(255,255,255,0.1); 
-        padding: 10px 20px; 
-        border-radius: 50px; 
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.2);
-        z-index: 10;
-    }
-    h2 { 
-        margin-top: 60px; /* Dá espaço para o botão voltar no celular */
-        margin-bottom: 20px; 
-        font-weight: 300; 
-        text-align: center;
-        font-size: 1.2rem;
-    }
-</style>
-
+    <style>
+        body { 
+            background: #000; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            color: white; 
+            font-family: sans-serif; 
+            padding: 20px;
+        }
+        .video-container { 
+            width: 100%;       
+            max-width: 1100px; 
+            aspect-ratio: 16 / 9; 
+            background: #000; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.8); 
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        /* Iframe ocupa tudo */
+        iframe { width: 100%; height: 100%; border: none; }
+        
+        .voltar { 
+            position: absolute; 
+            top: 20px; 
+            left: 20px; 
+            color: #fff; 
+            text-decoration: none; 
+            background: rgba(255,255,255,0.1); 
+            padding: 10px 20px; 
+            border-radius: 50px; 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 10;
+            cursor: pointer;
+        }
+        h2 { 
+            margin-top: 60px; 
+            margin-bottom: 20px; 
+            font-weight: 300; 
+            text-align: center;
+            font-size: 1.2rem;
+        }
+    </style>
 </head>
 <body>
-   <button onclick="voltarParaLista()" class="voltar">← Voltar para episódios</button>
+    <button onclick="voltarParaLista()" class="voltar">← Voltar para episódios</button>
     <h2 id="display-titulo">Carregando...</h2>
     
     <div class="video-container">
-       <iframe id="meuVideo" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
+       <iframe id="meuVideo" src="" allowfullscreen allow="autoplay"></iframe>
     </div>
 
-<!-- ... resto igual ... -->
 <script>
+    // 1. PEGAR PARÂMETROS DA URL
     const params = new URLSearchParams(window.location.search);
-    const videoId = params.get('id');
     const titulo = decodeURIComponent(params.get('titulo') || 'Sem título');
     const videoUrl = decodeURIComponent(params.get('url'));
 
     const player = document.getElementById('meuVideo');
     document.getElementById('display-titulo').innerText = titulo;
-    player.src = videoUrl;
 
-    let jaCarregouTempoInicial = false;
+    // 2. CARREGAR O VÍDEO NO IFRAME
+    if (videoUrl) {
+        player.src = videoUrl;
+    } else {
+        document.getElementById('display-titulo').innerText = "Erro: Vídeo não encontrado.";
+    }
 
-    // ==================== BOTÃO VOLTAR ====================
+    // 3. FUNÇÃO VOLTAR
     function voltarParaLista() {
-        window.history.back();
+        // Se houver histórico, volta, senão vai para a home
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.location.href = "index.html";
+        }
     }
 
-    // ==================== FUNÇÃO PARA SALVAR ====================
-    function salvarTempo() {
-        if (player.currentTime < 10) return;
-
-        fetch('http://localhost:3000/atualizar-tempo', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                video_id: videoId, 
-                tempo: Math.floor(player.currentTime)
-            })
-        })
-        .then(() => {
-            console.log(`✅ Tempo salvo: ${Math.floor(player.currentTime)}s`);
-        })
-        .catch(err => {
-            console.log("Erro ao salvar tempo:", err.message);
-        });
-    }
-
-    // 1. Registrar vídeo no histórico
-    fetch('http://localhost:3000/historico', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ video_id: videoId, titulo: titulo })
-    }).catch(() => {});
-
-    // 2. Carregar tempo salvo
-    player.addEventListener('loadedmetadata', async () => {
-        if (jaCarregouTempoInicial) return;
-
-        try {
-            const res = await fetch('http://localhost:3000/historico');
-            const historico = await res.json();
-            const salvo = historico.find(h => h.video_id === videoId);
-            
-            if (salvo && salvo.tempo > 15) {
-                player.currentTime = salvo.tempo;
-                console.log(`Retomando do tempo: ${salvo.tempo.toFixed(1)}s`);
-            }
-        } catch (e) {
-            console.log("Sem histórico anterior.");
-        } finally {
-            jaCarregouTempoInicial = true;
-        }
-    }, { once: true });
-
-    // 3. Salvamentos automáticos (sem causar recarregamento)
-    player.addEventListener('ended', salvarTempo);
-
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden && player.currentTime > 20) {
-            salvarTempo();
-        }
-    });
-
-    window.addEventListener('beforeunload', salvarTempo);
+    /* 
+       AVISO: Funções de 'salvarTempo' e 'currentTime' foram removidas 
+       pois o Google Drive dentro de um <iframe> não permite que seu site 
+       saiba em que minuto o vídeo está por questões de segurança.
+    */
 </script>
 
 </body>
 </html>
+
