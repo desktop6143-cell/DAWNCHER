@@ -1,1 +1,100 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saikyou no Shokugyou wa Yuusha demo Kenja demo Naku Kanteishi (Kari) Rashii desu yo? - Episódios</title>
+    <!-- Certifique-se de que o caminho do seu CSS está correto abaixo -->
+    <link rel="stylesheet" href="all_animes.css"> 
+</head>
+<body>
+
+    <!-- 1. CABEÇALHO (HEADER) -->
+    <div class="anime-header">
+        <img src="../pngs/capas/capa11.jpg" class="poster" alt="Poster">
+        
+        <div class="info">
+            <h1>Saikyou no Shokugyou wa Yuusha demo Kenja demo Naku Kanteishi (Kari) Rashii desu yo? </h1>
+            <div class="rating">⭐ 0.0</div>
+            
+            <div class="tags">
+                <span>2026</span>
+                <span>Ação</span>
+                <span>Aventura</span>
+                <span>Fantasia</span>
+            </div>
+            
+            <p class="sinopse">
+              Hibiki, um estudante do ensino médio que foi repentinamente transportado para outro mundo, vaga sozinho por uma vasta pradaria de um mundo fantástico habitado por monstros. Tudo o que ele possui são habilidades não relacionadas ao combate, como Avaliação. Ele é salvo de uma situação desesperadora, e suas habilidades poderosas florescem.
+            </p>
+        </div>
+    </div>
+
+    <!-- 2. CONTAINER DE EPISÓDIOS -->
+    <div class="episodios-container">
+        <div class="temporada-btn">Temporada 1</div>
+        
+        <div id="lista-episodios">
+            <!-- O JS vai gerar os .ep-card aqui dentro -->
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('lista-episodios');
+        const pastaThumb = "shokugyou"; // Nome da pasta das suas miniaturas
+        const nomeAnime = "shokugyou";
+
+        // IDs DO GOOGLE DRIVE
+        const idsGoogleDrive = {
+            1: "1fR1OnRUMQ_07JwVxmuso_y8wvDR6UPaL",
+            2: "19rRTK0GVb0FDJX_JiQTBR-FXu4CSMPnR",
+            3: "1QqNSp-AyFsRa2eb2OMvJxddCrvi6R1ad",
+            4: "1zcsRdhw98PCJR8WyGdobcOj-i6P-uAF3",
+            5: "1niolKJR_jj8uqTOmJ_Haf-FR8EUpVmpH",
+            6: "1jt4_CmZoiiH4L4R3iWWrTJu0GroZiR-M",
+            7: "1bfwlPaExMIU87DhhIwORyK9fDzJIBwaw",
+            8: "1ytxw0VCI9djwPZ3kp_9_10QdmiGPvitl",
+            9: "1opVb0cFahPT0OD_7XAJ71Lo5WK5CWKXJ",
+            10: "1QaCdlbZmKdgQVpUFcCfZZraDNkdHQx3R",
+            11: "1KUjZuQfS4gwFKjdddAhuyDya-q6Km24H",
+            12: "1XpvF6EKzQIYsD3Cf0rWau3i3wn0Bg4OZ"
+        };
+
+        const totalepisodios = 12;
+
+        for (let i = 1; i <= totalepisodios; i++) {
+            const div = document.createElement('div');
+            div.className = 'ep-card';
+            
+            div.onclick = () => {
+                const idDrive = idsGoogleDrive[i];
+                
+                if (!idDrive || idDrive === "ID_AQUI") {
+                    alert("Este episódio ainda não está disponível!");
+                    return;
+                }
+
+                // Link de Preview do Drive (Funciona com o <iframe> do seu player)
+                const urlVideoParaOPlayer = `https://drive.google.com/file/d/${idDrive}/preview`;
+                const idUnico = `shokugyou${i}`;
+                const caminhoPlayer = "../player.html";
+                const nomeepisodio = `${nomeAnime} - Episódio ${i}`;
+
+                window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(nomeepisodio)}`;
+            };
+
+            // Estrutura interna do card para combinar com o CSS
+            div.innerHTML = `
+                <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${i}.jpg');">
+                    <!-- Se a imagem falhar, o número aparece no centro -->
+                    ${i}
+                </div>
+                <p>Episódio ${i}</p>
+            `;
+
+            container.appendChild(div);
+        }
+    </script>
+</body>
+</html>
