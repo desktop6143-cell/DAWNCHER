@@ -29,10 +29,9 @@ const pastaThumb = "ore";
 const nomeAnime = "Ore dake Haireru Kakushi Dungeon"; 
 
 // 1. CADASTRE OS IDS DO DRIVE AQUI
-// O ID é aquele código longo que fica no link do compartilhamento
 const idsGoogleDrive = {
-    1: "1fR1OnRUMQ_07JwVxmuso_y8wvDR6UPaL", // EP 01 (Já configurado)
-    2: "ID_AQUI", // Substitua pelo ID do EP 02
+    1: "1fR1OnRUMQ_07JwVxmuso_y8wvDR6UPaL", 
+    2: "ID_AQUI", 
     3: "ID_AQUI",
     4: "ID_AQUI",
     5: "ID_AQUI",
@@ -54,26 +53,22 @@ for (let i = 1; i <= totalepisodios; i++) {
     div.onclick = () => {
         const idDrive = idsGoogleDrive[i];
         
-        // Verifica se o ID foi preenchido
         if (!idDrive || idDrive === "ID_AQUI") {
             alert("Este episódio ainda não foi vinculado ao Google Drive!");
             return;
         }
 
-        // 2. MONTA O LINK DIRETO PARA O PLAYER
-       // Substitua a linha antiga por esta:
-const urlVideoParaOPlayer = `https://google.com{idDrive}/preview`;
-
+        // 2. MONTA O LINK CORRETO PARA O IFRAME (PREVIEW)
+        // Note o uso da crase ( ` ) e do ${idDrive}
+        const urlVideoParaOPlayer = `https://google.com{idDrive}/preview`;
         
         const idUnico = `ore_dake_ep${i}`;
         const caminhoPlayer = "../player.html";
         const nomeepisodio = `${nomeAnime} - episódio ${i}`;
 
-        // Envia para o player via URL
         window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(nomeepisodio)}`;
     };
 
-    // Mantém suas miniaturas originais
     div.innerHTML = `
         <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${i}.jpg');"></div>
         <p>Episódio ${i}</p>
@@ -82,3 +77,4 @@ const urlVideoParaOPlayer = `https://google.com{idDrive}/preview`;
     container.appendChild(div);
 }
 </script>
+
