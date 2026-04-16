@@ -1,21 +1,18 @@
 body {
-    /* Define o caminho da imagem dentro da pasta pngs */
     background-image: url('../pngs/png3.jpg');
-
-    /* Garante que a foto cubra a tela inteira sem repetir */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    background-attachment: fixed; /* Mantém o fundo parado ao rolar */
 
-    /* Mantém as configurações anteriores */
-    width: 1366px;
-    height: 768px;
-    margin: 0 auto;
-    overflow: hidden;
+    margin: 0;
+    min-height: 100vh; /* Altura mínima da tela inteira */
+    width: 100%;
+    overflow-x: hidden; /* Evita barra lateral chata */
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-wrap: wrap; /* Permite que o Aside e o Main se organizem */
 }
+
 .blob {
             position: absolute;
             width: 300px;
@@ -140,4 +137,49 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+}
+/* Ajuste para o Aside (Menu lateral) */
+aside {
+    width: 260px;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* Ajuste para o Grid de Cards */
+.grid {
+    display: grid;
+    /* Aqui ele tenta colocar 3 colunas, mas diminui se não couber */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+/* --- MEDIA QUERIES (PARA CELULAR) --- */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column; /* Coloca o menu em cima e o conteúdo embaixo */
+    }
+
+    aside {
+        width: 100%;
+        min-height: auto;
+        padding: 20px;
+    }
+
+    main {
+        padding: 15px;
+    }
+
+    .card-main {
+        grid-column: span 1; /* No celular o card grande ocupa apenas 1 coluna */
+    }
+
+    .hotbar-container {
+        width: 90%; /* Deixa a barra de baixo mais fina no celular */
+        justify-content: space-around;
+    }
+    
+    .hotbar-item {
+        width: 40px; /* Ícones um pouco menores no celular */
+        height: 40px;
+    }
 }
