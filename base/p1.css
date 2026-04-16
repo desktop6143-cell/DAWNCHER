@@ -1,21 +1,25 @@
 body {
-    /* Define o caminho da imagem dentro da pasta pngs */
+    /* Define o caminho da imagem */
     background-image: url('../pngs/png5.jpg');
 
-    /* Garante que a foto cubra a tela inteira sem repetir */
+    /* CONFIGURAÇÃO RESPONSIVA DO FUNDO */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    background-attachment: fixed; /* Opcional: fixa o fundo ao rolar */
 
-    /* Mantém as configurações anteriores */
-    width: 1366px;
-    height: 768px;
-    margin: 0 auto;
-    overflow: hidden;
+    /* AJUSTE DE TAMANHO (REMOVA OS PX FIXOS) */
+    margin: 0;
+    min-height: 100vh; /* Ocupa 100% da altura da tela */
+    width: 100%;       /* Ocupa 100% da largura da tela */
+    
+    overflow-x: hidden; /* Evita barra de rolagem lateral */
     display: flex;
+    flex-direction: column; /* Organiza os itens em coluna */
     justify-content: center;
     align-items: center;
 }
+
 #lista-continuar {
     display: flex;
     gap: 20px;
@@ -93,4 +97,9 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+}
+.hotbar-container {
+    /* ... seu código anterior ... */
+    max-width: 90%; /* Evita que a barra saia da tela em celulares pequenos */
+    overflow-x: auto; /* Se não couber, permite rolar a barra */
 }
