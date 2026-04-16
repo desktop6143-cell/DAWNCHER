@@ -63,7 +63,7 @@
 
         const totalepisodios = 3;
 
-        for (let i = 1; i <= totalepisodios; i++) {
+              for (let i = 1; i <= totalepisodios; i++) {
             const div = document.createElement('div');
             div.className = 'ep-card';
             
@@ -77,7 +77,7 @@
 
                 // Link de Preview do Drive (Funciona com o <iframe> do seu player)
                 const urlVideoParaOPlayer = `https://drive.google.com/file/d/${idDrive}/preview`;
-                const idUnico = `shokugyou${i}`;
+                const idUnico = `ore_dake_ep${i}`;
                 const caminhoPlayer = "../player.html";
                 const nomeepisodio = `${nomeAnime} - Episódio ${i}`;
 
@@ -96,5 +96,5 @@
             container.appendChild(div);
         }
     </script>
-</body>
+    </body>
 </html>
