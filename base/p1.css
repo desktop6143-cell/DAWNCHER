@@ -1,6 +1,6 @@
 body {
     /* Define o caminho da imagem dentro da pasta pngs */
-    background-image: url('../pngs/PNG5.jpg');
+    background-image: url('../pngs/png5.jpg');
 
     /* Garante que a foto cubra a tela inteira sem repetir */
     background-size: cover;
@@ -65,7 +65,7 @@ body {
     transform: scale(1.1) translateY(-5px); /* Sobe um pouquinho */
 }
 .hotbar-item:nth-child(1) { 
-    background-image: url('../pngs/INICIO.png');
+    background-image: url('../pngs/inicio.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
