@@ -24,34 +24,62 @@ A Dungeon Secreta é um lugar lendário onde escondem-se raros tesouros e itens.
     <!-- O JavaScript vai preencher aqui automaticamente -->
 </div>
 <script>
+<script>
 const container = document.getElementById('lista-episodios');
-const totalepisodios = 12;
-const pastaAnime = "ore_dake"; 
 const pastaThumb = "ore";
 const nomeAnime = "Ore dake Haireru Kakushi Dungeon"; 
+
+// 1. CADASTRE OS IDS DO DRIVE AQUI
+// O ID é aquele código longo que fica no link do compartilhamento
+const idsGoogleDrive = {
+    1: "1fR1OnRUMQ_07JwVxmuso_y8wvDR6UPaL", // EP 01 (Já configurado)
+    2: "ID_AQUI", // Substitua pelo ID do EP 02
+    3: "ID_AQUI",
+    4: "ID_AQUI",
+    5: "ID_AQUI",
+    6: "ID_AQUI",
+    7: "ID_AQUI",
+    8: "ID_AQUI",
+    9: "ID_AQUI",
+    10: "ID_AQUI",
+    11: "ID_AQUI",
+    12: "ID_AQUI"
+};
+
+const totalepisodios = 12;
 
 for (let i = 1; i <= totalepisodios; i++) {
     const div = document.createElement('div');
     div.className = 'ep-card';
     
     div.onclick = () => {
-        const idUnico = `${pastaAnime}_ep${i}`;
+        const idDrive = idsGoogleDrive[i];
         
-        // Como este arquivo está em /SITES/ e o player na raiz /
+        // Verifica se o ID foi preenchido
+        if (!idDrive || idDrive === "ID_AQUI") {
+            alert("Este episódio ainda não foi vinculado ao Google Drive!");
+            return;
+        }
+
+        // 2. MONTA O LINK DIRETO PARA O PLAYER
+        const urlVideoParaOPlayer = `https://google.com{idDrive}`;
+        
+        const idUnico = `ore_dake_ep${i}`;
         const caminhoPlayer = "../player.html";
-        
-        // O player na raiz acessa a pasta animes diretamente
-        const urlVideoParaOPlayer = `animes/${pastaAnime}/ep${i}.mp4`;
         const nomeepisodio = `${nomeAnime} - episódio ${i}`;
 
+        // Envia para o player via URL
         window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(nomeepisodio)}`;
     };
 
+    // Mantém suas miniaturas originais
     div.innerHTML = `
         <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${i}.jpg');"></div>
-        <p>episódio ${i}</p>
+        <p>Episódio ${i}</p>
     `;
 
     container.appendChild(div);
 }
+</script>
+
 </script>
