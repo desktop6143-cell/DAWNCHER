@@ -2,12 +2,19 @@
 const bancoDeDados = {
     // ANIMES
     "ore": "ore",
-    "ore dark": "ore",
+    "ore dake": "ore",
     "one room": "one",
-    "danny": "DANNY",
+    "danny": "danny",
     "the franxx": "darling",
     "darling"  : "darling",
     "darling in the franxx"  : "darling",
+    "death"  : "death",
+    "death march"  : "death",
+    "dungeon ni deai"  : "ni_deai",
+    "ni deai"  : "ni_deai",
+    "dungeon"  : "ni_deai",
+
+
 
     // FILMES (O Bicho Vai Pegar)
     "o bicho vai pegar": "O_BICHO_VAI_PEGAR", // ou o nome do seu arquivo html de filmes
