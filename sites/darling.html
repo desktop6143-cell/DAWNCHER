@@ -28,21 +28,54 @@ const totalEpisodios = 24;
 const pastaAnime = "Darling_in_the_franxx"; // Nome da pasta do anime
 const pastaThumb = "franxx";         // Nome da pasta das capas
 
-for (let i = 1; i <= totalEpisodios; i++) {
-    // Cria a estrutura da div
-    const div = document.createElement('div');
-    div.className = 'ep-card';
-    
-    // Define o link de clique
-    div.onclick = () => {
-        window.location.href = `../animes/${pastaAnime}/ep${i}.mp4`;
-    };
+  // IDs DO GOOGLE DRIVE
+        const idsGoogleDrive = {
+            1:"ID_AQUI",
+            2: "1l6rZNacuUDmJLTjPS3jNc9CLkBtcNam7",
+            3: "ID_AQUI",
+            4:"ID_AQUI",
+            5: "ID_AQUI",
+            6: "ID_AQUI",
+            7: "ID_AQUI",
+            8: "ID_AQUI",
+            9: "ID_AQUI",
+            10: "ID_AQUI",
+            11: "ID_AQUI",
+            12: "ID_AQUI",
+            13: "ID_AQUI",
+            14: "ID_AQUI",
+            15: "ID_AQUI",
+            16: "ID_AQUI",
+            17: "ID_AQUI",
+            18: "ID_AQUI",
+            19: "ID_AQUI",
+            20: "ID_AQUI",
+            21: "ID_AQUI",
+            22: "ID_AQUI",
+            23: "ID_AQUI",
+            24: "ID_AQUI"
+        };
 
-    // Define o conteúdo interno
-    div.innerHTML = `
-        <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${i}.jpg');"></div>
-        <p>Episódio ${i}</p>
-    `;
+        for (let i = 1; i <= totalepisodios; i++) {
+            const div = document.createElement('div');
+            div.className = 'ep-card';
+            
+            div.onclick = () => {
+                const idDrive = idsGoogleDrive[i];
+                
+                if (!idDrive || idDrive === "ID_AQUI") {
+                    alert("Este episódio ainda não está disponível!");
+                    return;
+                }
+
+                // Link de Preview do Drive (Funciona com o <iframe> do seu player)
+                const urlVideoParaOPlayer = `https://drive.google.com/file/d/${idDrive}/preview`;
+                const idUnico = `ore_dake_ep${i}`;
+                const caminhoPlayer = "../player.html";
+                const nomeepisodio = `${nomeAnime} - Episódio ${i}`;
+
+                window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(nomeepisodio)}`;
+            };
 
     // Adiciona ao container
     container.appendChild(div);
