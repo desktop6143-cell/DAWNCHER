@@ -76,6 +76,13 @@ const pastaThumb = "franxx";         // Nome da pasta das capas
 
                 window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(nomeepisodio)}`;
             };
+              div.innerHTML = `
+                <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${i}.jpg');">
+                    <!-- Se a imagem falhar, o número aparece no centro -->
+                </div>
+                <p>Episódio ${i}</p>
+            `;
+
 
     // Adiciona ao container
     container.appendChild(div);
