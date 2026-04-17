@@ -12,53 +12,48 @@
         <p class="sinopse">
          A história está definida no futuro distante. A terra está arruinada, e a humanidade estabelece a plantação móvel da fort city. Os pilotos produziram dentro de Plantation ao vivo em Mistilteinn, também conhecido como “birdcage”. As crianças vivem ali sem saber nada do mundo exterior nem da liberdade do céu. Suas vidas consistem em lutar para realizar missões. Seus inimigos são misteriosas formas de vida gigantes conhecidas como Kyōryū, e os robôs pilotos das crianças chamaram Franxx para enfrentarem-se contra eles. Para as crianças, montar o Franxx prova sua existência. Um menino chamado Hiro é chamado de Código: 016, e ele já foi conhecido como um prodígio. No entanto, ele ficou para trás, e sua existência parece desnecessária. Não pilotar um Franxx é o mesmo que deixar de existir. Um dia, aparece uma menina misteriosa conhecida como “Zero Two”. Dois chifres crescem fora de sua cabeça. </p>
     </div>
-</div>
 
-<div class="episodios-container">
-    <h2>Temporadas e Episódios</h2>
-    <div class="temporada-btn"> Temporada 1</div>
-    
-    
-   <div class="episodios-container">
+    <!-- 2. CONTAINER DE EPISÓDIOS -->
+    <div class="episodios-container">
         <div class="temporada-btn">Temporada 1</div>
         
         <div id="lista-episodios">
             <!-- O JS vai gerar os .ep-card aqui dentro -->
         </div>
     </div>
-<script>
-const container = document.getElementById('lista-episodios');
-const totalEpisodios = 24;
-const pastaAnime = "Darling_in_the_franxx"; // Nome da pasta do anime
-const pastaThumb = "franxx";         // Nome da pasta das capas
 
-  // IDs DO GOOGLE DRIVE
-        const idsGoogleDrive = {
-            1:"ID_AQUI",
-            2: "1l6rZNacuUDmJLTjPS3jNc9CLkBtcNam7",
-            3: "ID_AQUI",
-            4:"ID_AQUI",
-            5: "ID_AQUI",
-            6: "ID_AQUI",
-            7: "ID_AQUI",
-            8: "ID_AQUI",
-            9: "ID_AQUI",
-            10: "ID_AQUI",
-            11: "ID_AQUI",
-            12: "ID_AQUI",
-            13: "ID_AQUI",
-            14: "ID_AQUI",
-            15: "ID_AQUI",
-            16: "ID_AQUI",
-            17: "ID_AQUI",
-            18: "ID_AQUI",
-            19: "ID_AQUI",
-            20: "ID_AQUI",
-            21: "ID_AQUI",
-            22: "ID_AQUI",
-            23: "ID_AQUI",
-            24: "ID_AQUI"
-        };
+    <script>
+        const container = document.getElementById('lista-episodios');
+        const pastaThumb = "franxx"; // Nome da pasta das suas miniaturas
+        const nomeAnime = "Darling in the franxx";
+
+     const idsGoogleDrive = {
+         1:"ID_AQUI",
+         2: "1l6rZNacuUDmJLTjPS3jNc9CLkBtcNam7",
+         3: "ID_AQUI", 4:"ID_AQUI",
+         5: "ID_AQUI",
+         6: "ID_AQUI",
+         7: "ID_AQUI",
+         8: "ID_AQUI",
+         9: "ID_AQUI",
+         10: "ID_AQUI", 
+         11: "ID_AQUI",
+         12: "ID_AQUI", 
+         13: "ID_AQUI",
+         14: "ID_AQUI", 
+         15: "ID_AQUI", 
+         16: "ID_AQUI", 
+         17: "ID_AQUI",
+         18: "ID_AQUI",
+         19: "ID_AQUI",
+         20: "ID_AQUI",
+         21: "ID_AQUI",
+         22: "ID_AQUI",
+         23: "ID_AQUI",
+         24: "ID_AQUI" 
+     };
+ 
+        const totalepisodios = 12;
 
         for (let i = 1; i <= totalepisodios; i++) {
             const div = document.createElement('div');
@@ -74,21 +69,23 @@ const pastaThumb = "franxx";         // Nome da pasta das capas
 
                 // Link de Preview do Drive (Funciona com o <iframe> do seu player)
                 const urlVideoParaOPlayer = `https://drive.google.com/file/d/${idDrive}/preview`;
-                const idUnico = `Darling in the franxx${i}`;
+                const idUnico = `Darling in the franxx{i}`;
                 const caminhoPlayer = "../player.html";
                 const nomeepisodio = `${nomeAnime} - Episódio ${i}`;
 
                 window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(nomeepisodio)}`;
             };
-              div.innerHTML = `
+
+            // Estrutura interna do card para combinar com o CSS
+            div.innerHTML = `
                 <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${i}.jpg');">
                     <!-- Se a imagem falhar, o número aparece no centro -->
                 </div>
                 <p>Episódio ${i}</p>
             `;
 
-
-    // Adiciona ao container
-    container.appendChild(div);
-}
-</script>
+            container.appendChild(div);
+        }
+    </script>
+</body>
+</html>
