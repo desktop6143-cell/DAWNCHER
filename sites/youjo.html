@@ -17,32 +17,59 @@
     <div class="temporada-btn"> Temporada 1</div>
     
     
-<div id="lista-episodios" class="container-cards">
-    <!-- O JavaScript vai preencher aqui automaticamente -->
-</div>
 <script>
-const container = document.getElementById('lista-episodios');
-const totalEpisodios = 12;
-const pastaAnime = "youjo"; // Nome da pasta do anime
-const pastaThumb = "youjo";         // Nome da pasta das capas
+        const container = document.getElementById('lista-episodios');
+        const pastaThumb = "youjo"; // Nome da pasta das suas miniaturas
+        const nomeAnime = "Youjo Senki";
 
-for (let i = 1; i <= totalEpisodios; i++) {
-    // Cria a estrutura da div
-    const div = document.createElement('div');
-    div.className = 'ep-card';
-    
-    // Define o link de clique
-    div.onclick = () => {
-        window.location.href = `../animes/${pastaAnime}/ep${i}.mp4`;
-    };
+     const idsGoogleDrive = {
+         1:"ID_AQUI",
+         2: "ID_AQUI",
+         3: "ID_AQUI",
+         4:"ID_AQUI",
+         5: "ID_AQUI",
+         6: "ID_AQUI",
+         7: "ID_AQUI",
+         8: "ID_AQUI",
+         9: "ID_AQUI",
+         10: "ID_AQUI", 
+         11: "ID_AQUI",
+         12: "ID_AQUI"
+     };
+ 
+        const totalepisodios = 12;
 
-    // Define o conteúdo interno
-    div.innerHTML = `
-        <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${i}.jpg');"></div>
-        <p>Episódio ${i}</p>
-    `;
+        for (let i = 1; i <= totalepisodios; i++) {
+            const div = document.createElement('div');
+            div.className = 'ep-card';
+            
+            div.onclick = () => {
+                const idDrive = idsGoogleDrive[i];
+                
+                if (!idDrive || idDrive === "ID_AQUI") {
+                    alert("Este episódio ainda não está disponível!");
+                    return;
+                }
 
-    // Adiciona ao container
-    container.appendChild(div);
-}
-</script>
+                // Link de Preview do Drive (Funciona com o <iframe> do seu player)
+                const urlVideoParaOPlayer = `https://drive.google.com/file/d/${idDrive}/preview`;
+                const idUnico = `Youjo Senki{i}`;
+                const caminhoPlayer = "../player.html";
+                const nomeepisodio = `${nomeAnime} - Episódio ${i}`;
+
+                window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(nomeepisodio)}`;
+            };
+
+            // Estrutura interna do card para combinar com o CSS
+            div.innerHTML = `
+                <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${i}.jpg');">
+                    <!-- Se a imagem falhar, o número aparece no centro -->
+                </div>
+                <p>Episódio ${i}</p>
+            `;
+
+            container.appendChild(div);
+        }
+    </script>
+</body>
+</html>
