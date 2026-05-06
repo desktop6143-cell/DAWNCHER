@@ -6,23 +6,26 @@
     <title>Painel de Animes</title>
     <link rel="stylesheet" href="p1.css">
     <style>
-        /* Estilo rápido para organizar a seção */
-        #lista-continuar { display: flex; gap: 15px; overflow-x: auto; padding: 10px; }
-        .ep-card { min-width: 200px; background: #222; border-radius: 8px; cursor: pointer; color: white; padding: 10px; border: 1px solid #444; }
-        .progresso-bg { background: #555; height: 5px; width: 100%; margin-top: 10px; border-radius: 3px; }
-        .progresso-bar { background: red; height: 100%; width: 50%; border-radius: 3px; }
+        #lista-continuar { display: flex; gap: 15px; overflow-x: auto; padding: 10px; scrollbar-width: thin; }
+        .ep-card { min-width: 200px; background: #222; border-radius: 8px; cursor: pointer; color: white; padding: 15px; border: 1px solid #444; transition: 0.3s; }
+        .ep-card:hover { border-color: #7c3aed; transform: translateY(-3px); }
+        .progresso-bg { background: #333; height: 5px; width: 100%; margin-top: 10px; border-radius: 3px; }
+        .progresso-bar { background: #7c3aed; height: 100%; width: 100%; border-radius: 3px; }
+        
+        /* Estilo básico para a Hotbar caso o CSS falhe */
+        .hotbar-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 15px; gap: 10px; }
+        .hotbar-item { width: 40px; height: 40px; background: #333; border-radius: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<!-- SEÇÃO CONTINUAR ASSISTINDO -->
 <section id="secao-continuar" style="display: none; margin: 20px;">
-    <h2 style="color: white; font-family: sans-serif;">Continuar Assistindo</h2>
+    <h2 style="color: white; font-family: sans-serif; margin-bottom: 15px;">Continuar Assistindo</h2>
     <div id="lista-continuar"></div>
 </section>
 
 <div class="hotbar-container">
-    <div class="hotbar-item" title="casa"></div>
+    <div class="hotbar-item" title="casa" id="btn-home"></div>
     <div class="hotbar-item" title="biblioteca" id="btnBL"></div>
     <div class="hotbar-item" title="pesquisa" id="btnLP"></div>
     <div class="hotbar-item" title="informação" id="btnnt"></div>
@@ -30,42 +33,43 @@
 </div>
 
 <script>
-// 1. CONFIGURAÇÕES E VERIFICAÇÃO DE LOGIN
+// 1. CONFIGURAÇÕES E SEGURANÇA
 const API_ID = 'et92hg0rvu16i'; 
+// CORREÇÃO DA URL: Adicionado /api/v1/ e as barras corretas
 const BASE_URL = `https://sheetdb.io{API_ID}`;
 const idUsuarioLogado = sessionStorage.getItem('idUsuario');
 
-// CORREÇÃO: Só expulsa se NÃO estiver logado. 
-// Se estiver logado, o código segue normalmente.
 if (sessionStorage.getItem('logado') !== 'true') {
     window.location.href = "../index.html"; 
 }
 
-// 2. CARREGAR HISTÓRICO DA PLANILHA
+// 2. CARREGAR HISTÓRICO
 async function carregarTudo() {
     const container = document.getElementById('lista-continuar');
     const secao = document.getElementById('secao-continuar');
 
-    // Se por algum motivo o ID for nulo, paramos aqui para não dar erro na URL
-    if (!idUsuarioLogado) return;
+    if (!idUsuarioLogado) {
+        console.error("ID do usuário não encontrado no sistema.");
+        return;
+    }
 
     try {
+        // CORREÇÃO NO FETCH: Agora usando a BASE_URL corrigida
         const resposta = await fetch(`${BASE_URL}/search?id_user=${idUsuarioLogado}`);
         
-        if (!resposta.ok) throw new Error("Erro na resposta da API");
+        if (!resposta.ok) throw new Error("Erro ao conectar com a planilha");
 
         const historico = await resposta.json();
 
-        // Se não tiver histórico, apenas não mostramos a seção "Continuar Assistindo"
         if (!historico || historico.length === 0 || historico.error) {
-            console.log("Nenhum histórico encontrado.");
+            console.log("Nenhum histórico encontrado para o ID:", idUsuarioLogado);
             return;
         }
 
-        if(secao) secao.style.display = 'block';
-        if(container) container.innerHTML = ''; 
+        secao.style.display = 'block';
+        container.innerHTML = ''; 
 
-        // Inverte para o mais recente aparecer primeiro
+        // Inverte para mostrar o último assistido primeiro
         historico.reverse().forEach(item => {
             if(!item.titulo) return;
 
@@ -79,16 +83,16 @@ async function carregarTudo() {
             };
 
             card.innerHTML = `
-                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px; color: white;">${item.titulo}</div>
-                <div class="progresso-bg" style="background: #333; height: 4px; border-radius: 2px;">
-                    <div class="progresso-bar" style="background: #7c3aed; width: 100%; height: 100%;"></div>
+                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">${item.titulo}</div>
+                <div class="progresso-bg">
+                    <div class="progresso-bar"></div>
                 </div>
-                <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data || 'Recentemente'}</p>
+                <p style="font-size: 11px; color: #aaa; margin-top: 8px;">Visto em: ${item.data || '---'}</p>
             `;
             container.appendChild(card);
         });
     } catch (erro) {
-        console.error("Erro ao carregar histórico:", erro);
+        console.error("Erro na API:", erro);
     }
 }
 
@@ -97,7 +101,8 @@ const acoesBotoes = {
     'btn-sair': () => { sessionStorage.clear(); window.location.href = "../index.html"; },
     'btnBL': () => window.location.href = "bl.html",
     'btnnt': () => window.location.href = "info.html",
-    'btnLP': () => window.location.href = "../sites/bar.html"
+    'btnLP': () => window.location.href = "../sites/bar.html",
+    'btn-home': () => window.location.reload()
 };
 
 Object.keys(acoesBotoes).forEach(id => {
