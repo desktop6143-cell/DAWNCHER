@@ -131,21 +131,19 @@ const idUser = sessionStorage.getItem('idUsuario');
 const tituloLimpo = decodeURIComponent(tituloVideo || '');
 
 let intervaloSalvar = null;
-let tempoInicial = null;
+let tempoInicial = Date.now();   // Definido uma única vez
 
 if (urlVideo && idUser) {
     document.getElementById('video-frame').src = decodeURIComponent(urlVideo);
     document.getElementById('video-title').innerText = tituloLimpo || 'Assistindo...';
 
-    tempoInicial = Date.now();
-
     intervaloSalvar = setInterval(salvarHistorico, 30000);
     window.addEventListener('beforeunload', salvarHistorico);
 }
 
-// ==================== FUNÇÃO MELHORADA ====================
+// ==================== FUNÇÃO DE SALVAR ====================
 async function salvarHistorico() {
-    if (!idUser || !tempoInicial) return;
+    if (!idUser) return;
 
     const minutosAssistidos = Math.floor((Date.now() - tempoInicial) / 60000);
     const tempoFormatado = minutosAssistidos + " minutos";
@@ -172,7 +170,6 @@ async function salvarHistorico() {
             });
             console.log(`🔄 Atualizado → ${tempoFormatado}`);
         } else {
-            // Cria novo
             const res = await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -194,7 +191,7 @@ async function salvarHistorico() {
     }
 }
 
-// ==================== CONTROLES (mantido) ====================
+// ==================== CONTROLES ====================
 const controls = document.getElementById('controls');
 const wrapper = document.getElementById('wrapper');
 let timeout;
