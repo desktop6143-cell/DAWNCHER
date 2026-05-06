@@ -127,22 +127,23 @@ const urlVideo = params.get('url');
 const tituloVideo = params.get('titulo');
 
 const idUser = sessionStorage.getItem('idUsuario');
+const tituloLimpo = decodeURIComponent(tituloVideo || '');
 
-let ultimoRegistroId = null;
 let intervaloSalvar = null;
 const tempoInicial = Date.now();
 
 if (urlVideo && idUser) {
     document.getElementById('video-frame').src = decodeURIComponent(urlVideo);
-    document.getElementById('video-title').innerText = tituloVideo ? decodeURIComponent(tituloVideo) : 'Assistindo...';
+    document.getElementById('video-title').innerText = tituloLimpo || 'Assistindo...';
 
+    // Salva a cada 30 segundos
     intervaloSalvar = setInterval(salvarHistorico, 30000);
+
+    // Salva quando sair da página
     window.addEventListener('beforeunload', salvarHistorico);
-} else {
-    console.error("Faltando URL ou ID do usuário");
 }
 
-// ==================== FUNÇÃO DE HISTÓRICO ====================
+// ==================== FUNÇÃO DE SALVAR HISTÓRICO ====================
 async function salvarHistorico() {
     if (!idUser) return;
 
@@ -150,6 +151,7 @@ async function salvarHistorico() {
     const tempoFormatado = minutosAssistidos + " minutos";
 
     try {
+        // Tenta atualizar primeiro
         const resUpdate = await fetch(`${API_HISTORICO}/id_user/${idUser}?titulo=${encodeURIComponent(tituloLimpo)}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
@@ -167,6 +169,7 @@ async function salvarHistorico() {
         const resultado = await resUpdate.json();
 
         if (resultado.updated === 0) {
+            // Se não atualizou, cria nova linha
             await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -181,13 +184,16 @@ async function salvarHistorico() {
                     }]
                 })
             });
+            console.log("✅ Nova linha criada");
+        } else {
+            console.log("🔄 Linha atualizada");
         }
     } catch (err) {
         console.error("Erro ao salvar histórico:", err);
     }
 }
 
-// ==================== CONTROLES ====================
+// ==================== CONTROLES DO PLAYER ====================
 const controls = document.getElementById('controls');
 const wrapper = document.getElementById('wrapper');
 let timeout;
@@ -208,9 +214,7 @@ wrapper.addEventListener('mousemove', showControls);
 function voltar() {
     if (intervaloSalvar) clearInterval(intervaloSalvar);
     salvarHistorico();
-    setTimeout(() => {
-        window.history.back();
-    }, 400);
+    setTimeout(() => window.history.back(), 400);
 }
 </script>
 </body>
