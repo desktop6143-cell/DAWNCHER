@@ -1,95 +1,97 @@
 body {
-    /* Define o caminho da imagem dentro da pasta pngs */
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
     background-image: url('pngs/png4.jpg');
-
-    /* Garante que a foto cubra a tela inteira sem repetir */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-
-    /* Mantém as configurações anteriores */
-    width: 1366px;
-    height: 768px;
-    margin: 0 auto;
+    background-attachment: fixed;
+    font-family: 'Segoe UI', sans-serif;
+    overflow-x: hidden;
 }
+
+/* ===================== HOTBAR ===================== */
 .hotbar-container {
     position: fixed;
-    bottom: 20px; /* Distância do fundo da tela */
+    bottom: 25px;
     left: 50%;
-    transform: translateX(-50%); /* Centraliza horizontalmente */
+    transform: translateX(-50%);
     
     display: flex;
-    gap: 10px;
-    padding: 10px;
-    background-color: rgba(0, 0, 0, 0.6); /* Fundo escuro transparente */
-    border: 2px solid #fff;
-    border-radius: 12px;
-    backdrop-filter: blur(10px); /* Efeito de vidro */
-}
-
-
-
-
-.box-item {
-    width: 150px;
-    height: 150px;
-    background-color: rgba(52, 152, 219, 0.8); /* Azul com leve transparência */
-    border: 3px solid #fff;
+    gap: 12px;
+    padding: 12px 18px;
+    background-color: rgba(0, 0, 0, 0.75);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 40px;
-    font-weight: bold;
-    transition: transform 0.2s;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 }
 
-.box-item:hover {
-    transform: translateY(-10px); /* Pula um pouquinho ao passar o mouse */
-    background-color: #3498db;
+.hotbar-item {
+    width: 58px;
+    height: 58px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-size: 32px;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 2px solid rgba(255,255,255,0.2);
 }
 
-.box-title {
-    color: white;
-    font-family: sans-serif;
-    font-weight: bold;
-    margin-top: 10px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Sombra para ler melhor sobre o fundo */
-}
-/* Efeito ao passar o mouse ou selecionar */
+/* Efeitos ao passar o mouse */
 .hotbar-item:hover {
-    background-color: #3498db;
-    border-color: #fff;
-    transform: scale(1.1) translateY(-5px); /* Sobe um pouquinho */
+    transform: scale(1.15) translateY(-6px);
+    border-color: #7c3aed;
+    box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
 }
-.hotbar-item:nth-child(1) { 
-    background-image: url('pngs/inicio.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+
+/* Ícones das imagens */
+.hotbar-item:nth-child(1) { background-image: url('pngs/inicio.png'); } /* Home */
+.hotbar-item:nth-child(2) { background-image: url('pngs/livro.png'); } /* Biblioteca */
+.hotbar-item:nth-child(3) { background-image: url('pngs/lupa.png'); }  /* Pesquisa */
+.hotbar-item:nth-child(4) { background-image: url('pngs/info.png'); }  /* Info */
+.hotbar-item:nth-child(5) { background-image: url('pngs/sair.png'); }  /* Sair */
+
+/* ===================== CARDS ===================== */
+#lista-continuar {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    padding: 15px 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #7c3aed #333;
 }
-.hotbar-item:nth-child(2) { 
-    background-image: url('pngs/livro.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+
+.ep-card {
+    min-width: 210px;
+    background: rgba(30, 30, 30, 0.95);
+    border-radius: 12px;
+    padding: 14px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid #444;
+    backdrop-filter: blur(5px);
 }
-.hotbar-item:nth-child(3) { 
-    background-image: url('pngs/lupa.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+
+.ep-card:hover {
+    transform: translateY(-8px);
+    border-color: #7c3aed;
+    box-shadow: 0 10px 20px rgba(124, 58, 237, 0.3);
 }
-.hotbar-item:nth-child(4) { 
-    background-image: url('pngs/info.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-.hotbar-item:nth-child(5) { 
-    background-image: url('pngs/sair.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+
+/* Remove a barra de rolagem no mobile */
+@media (max-width: 768px) {
+    .hotbar-container {
+        padding: 10px 14px;
+        bottom: 15px;
+    }
+    
+    .hotbar-item {
+        width: 52px;
+        height: 52px;
+    }
 }
