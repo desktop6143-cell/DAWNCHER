@@ -33,17 +33,15 @@
 </div>
 
 <script>
-<script>
 // 1. CONFIGURAÇÕES E SEGURANÇA
 const API_ID = 'et92hg0rvu16i'; 
 
-// ATENÇÃO: Use a tecla ao lado do "P" (crase `) para que o ${} funcione!
-// Não use aspas simples (') nem aspas duplas (") nesta linha.
+// ATENÇÃO: Verifique se usou a CRASE (tecla ao lado do P ou Shift + ´)
+// Não use ' (aspas) nem " (aspas duplas) aqui!
 const BASE_URL = `https://sheetdb.io{API_ID}`; 
 
 const idUsuarioLogado = sessionStorage.getItem('idUsuario');
 
-// Verifica se está logado
 if (sessionStorage.getItem('logado') !== 'true' || !idUsuarioLogado) {
     window.location.href = "../index.html"; 
 }
@@ -54,18 +52,19 @@ async function carregarTudo() {
     const secao = document.getElementById('secao-continuar');
 
     try {
-        console.log("Buscando histórico para o ID:", idUsuarioLogado);
+        // Montamos a URL de busca: https://sheetdb.io
+        const urlFinal = `${BASE_URL}/search?id_user=${idUsuarioLogado}`;
         
-        // Agora a URL será montada corretamente como: https://sheetdb.io
-        const resposta = await fetch(`${BASE_URL}/search?id_user=${idUsuarioLogado}`);
+        console.log("Tentando acessar:", urlFinal); // Verifique se esta URL aparece sem chaves no console!
+
+        const resposta = await fetch(urlFinal);
         
         if (!resposta.ok) throw new Error("Erro na resposta da API");
 
         const historico = await resposta.json();
 
-        // Se não houver dados, encerra silenciosamente
         if (!historico || historico.length === 0 || historico.error) {
-            console.log("Nenhum histórico encontrado para este usuário.");
+            console.log("Nenhum histórico encontrado para o usuário " + idUsuarioLogado);
             return;
         }
 
@@ -99,7 +98,7 @@ async function carregarTudo() {
     }
 }
 
-// 3. BOTÕES DA HOTBAR (Mantenha o seu mapeamento original)
+// 3. BOTÕES DA HOTBAR (Seu código original)
 const acoesBotoes = {
     'btn-sair': () => { sessionStorage.clear(); window.location.href = "../index.html"; },
     'btnBL': () => window.location.href = "bl.html",
@@ -113,7 +112,6 @@ Object.keys(acoesBotoes).forEach(id => {
 });
 
 window.onload = carregarTudo;
-</script>
 </script>
 
 </body>
