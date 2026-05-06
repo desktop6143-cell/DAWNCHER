@@ -33,28 +33,24 @@
 </div>
 
 <script>
-// 1. CONFIGURAÇÕES E SEGURANÇA
 const API_ID = 'et92hg0rvu16i'; 
-// CORREÇÃO DA URL: Adicionado /api/v1/ e as barras corretas
 const BASE_URL = `https://sheetdb.io{API_ID}`;
-const idUsuarioLogado = sessionStorage.getItem('idUsuario');
 
-if (sessionStorage.getItem('logado') !== 'true') {
-    window.location.href = "../index.html"; 
-}
-
-// 2. CARREGAR HISTÓRICO
 async function carregarTudo() {
+    // Pegamos o ID exatamente no momento que a função roda
+    const idUsuarioLogado = sessionStorage.getItem('idUsuario');
+    
     const container = document.getElementById('lista-continuar');
     const secao = document.getElementById('secao-continuar');
 
-    if (!idUsuarioLogado) {
-        console.error("ID do usuário não encontrado no sistema.");
-        return;
+    // Se o ID for null ou a string "null"
+    if (!idUsuarioLogado || idUsuarioLogado === "null") {
+        console.error("ID não encontrado. O login não salvou o ID corretamente.");
+        return; 
     }
 
     try {
-        // CORREÇÃO NO FETCH: Agora usando a BASE_URL corrigida
+        console.log("Buscando histórico para o ID:", idUsuarioLogado);
         const resposta = await fetch(`${BASE_URL}/search?id_user=${idUsuarioLogado}`);
         
         if (!resposta.ok) throw new Error("Erro ao conectar com a planilha");
