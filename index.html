@@ -1,53 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Animated Login & Registration Form | Codehal</title>
+  <title>Login - Fórum do DEV</title>
   <link rel="stylesheet" type="text/css" href="main.css">
 </head>
 <body>
   <div class="wrapper">
     <div class="form-wrapper sign-in">
-      <form action="">
+      <!-- Removi o action para o JS controlar o envio -->
+      <form id="loginForm">
         <h2>Login</h2>
         <div class="input-group">
           <input type="text" id="ID" required>
-          <label for="">Username</label>
+          <label>Username</label>
         </div>
         <div class="input-group">
           <input type="password" id="senha" required>
-          <label for="">Password</label>
+          <label>Password</label>
         </div>
         <div class="remember">
           <label><input type="checkbox"> Remember me</label>
         </div>
-        <button type="submit">Login</button>
-        </div>
-      </form>
-    </div>
+        <button type="submit" id="btn-entrar">Login</button>
       </form>
     </div>
   </div>
+
 <script>
-    // O ponto (.) antes de wrapper indica que estamos chamando a CLASSE
-const formulario = document.querySelector('.wrapper');
+    const API_URL = 'https://sheetdb.io/api/v1/et92hg0rvu16i';
+    const loginForm = document.getElementById('loginForm');
+    const btnEntrar = document.getElementById('btn-entrar');
 
-formulario.addEventListener('submit', (e) => {
-    e.preventDefault();
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Desabilita o botão para evitar múltiplos cliques
+        btnEntrar.innerText = "Verificando...";
+        btnEntrar.disabled = true;
 
-    const user = document.getElementById('ID').value;
-    const pass = document.getElementById('senha').value;
+        const userField = document.getElementById('ID').value;
+        const passField = document.getElementById('senha').value;
 
-    if (user === "HOST" && pass === "NK9574") {
-        sessionStorage.setItem('logado', 'true');
-        window.location.href = "base/p1.html";
-    } else {
-        alert("Erro!");
-    }
-});
+        try {
+            // Faz a requisição para a API do SheetDB
+            const response = await fetch(API_URL);
+            const usuarios = await response.json();
 
+            // Procura o usuário na planilha (colunas: nome e senha)
+            // Certifique-se que na sua planilha o topo das colunas seja "nome" e "senha"
+            const usuarioValido = usuarios.find(u => u.nome === userField && u.senha === passField);
+
+            if (usuarioValido) {
+                sessionStorage.setItem('logado', 'true');
+                // Salva o nome do usuário para usar na aba de informação depois
+                sessionStorage.setItem('nomeUsuario', usuarioValido.nome); 
+                
+                window.location.href = "base/p1.html";
+            } else {
+                alert("Usuário ou senha incorretos!");
+                btnEntrar.innerText = "Login";
+                btnEntrar.disabled = false;
+            }
+        } catch (error) {
+            console.error("Erro ao conectar com o banco:", error);
+            alert("Erro ao conectar com o servidor. Tente novamente.");
+            btnEntrar.innerText = "Login";
+            btnEntrar.disabled = false;
+        }
+    });
 </script>
 </body>
 </html>
