@@ -146,28 +146,31 @@ async function salvarHistorico() {
     if (!idUser) return;
 
     const minutosAssistidos = Math.floor((Date.now() - tempoInicial) / 60000);
-    const tempoFormatado = minutosAssistidos + " minutos";
     const hoje = new Date().toLocaleDateString('pt-BR');
 
+    let tempoFinal = minutosAssistidos + " minutos";
+
+    // Se passou de 15 minutos, considera como Assistido
+    if (minutosAssistidos >= 15) {
+        tempoFinal = "Assistido";
+    }
+
     try {
-        // Busca se já tem registro HOJE deste título
-        const busca = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&data=${hoje}&titulo=${encodeURIComponent(tituloLimpo)}`);
+        const busca = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&titulo=${encodeURIComponent(tituloLimpo)}&data=${hoje}`);
         const registros = await busca.json();
 
         if (registros && registros.length > 0) {
-            // Atualiza o registro de hoje
             const idRegistro = registros[0].id;
 
             await fetch(`${API_HISTORICO}/id/${idRegistro}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    data: { "tempo": tempoFormatado }
+                    data: { "tempo": tempoFinal }
                 })
             });
-            console.log(`🔄 Atualizado → ${tempoFormatado}`);
+            console.log(`🔄 Atualizado → ${tempoFinal}`);
         } else {
-            // Cria novo registro (só 1 por dia)
             await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -177,12 +180,12 @@ async function salvarHistorico() {
                         "titulo": tituloLimpo,
                         "url_acesso": decodeURIComponent(urlVideo || ''),
                         "data": hoje,
-                        "tempo": tempoFormatado,
+                        "tempo": tempoFinal,
                         "status": "Assistindo"
                     }]
                 })
             });
-            console.log("✅ Nova linha criada");
+            console.log("✅ Registro criado");
         }
     } catch (err) {
         console.error("Erro ao salvar histórico:", err);
