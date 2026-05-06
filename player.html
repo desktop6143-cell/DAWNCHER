@@ -130,45 +130,40 @@ const idUser = sessionStorage.getItem('idUsuario');
 
 let ultimoRegistroId = null;
 let intervaloSalvar = null;
-let tempoInicial = Date.now();   // Marca quando o vídeo começou
+const tempoInicial = Date.now();
 
 if (urlVideo && idUser) {
     document.getElementById('video-frame').src = decodeURIComponent(urlVideo);
     document.getElementById('video-title').innerText = tituloVideo ? decodeURIComponent(tituloVideo) : 'Assistindo...';
 
-    intervaloSalvar = setInterval(() => {
-        salvarHistorico();
-    }, 30000);
-
-    window.addEventListener('beforeunload', () => {
-        if (intervaloSalvar) clearInterval(intervaloSalvar);
-        salvarHistorico();
-    });
+    intervaloSalvar = setInterval(salvarHistorico, 25000); // a cada 25 segundos
+    window.addEventListener('beforeunload', salvarHistorico);
 }
 
-// ==================== FUNÇÃO ATUALIZADA ====================
+// ==================== FUNÇÃO CORRIGIDA ====================
 async function salvarHistorico() {
     if (!idUser) return;
 
-    const minutosAssistidos = Math.floor((Date.now() - tempoInicial) / 60000); // minutos assistidos
+    const minutos = Math.floor((Date.now() - tempoInicial) / 60000);
+    const tempoFormatado = minutos + " minutos";
 
     try {
-        const tempoFormatado = minutosAssistidos + " minutos";
-
         if (ultimoRegistroId) {
-            // Atualiza a linha
+            // Atualiza linha existente
             await fetch(`${API_HISTORICO}/id/${ultimoRegistroId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    data: {
+                    data: { 
                         "tempo": tempoFormatado,
                         "status": "Assistindo"
                     }
                 })
             });
-        } else {
-            // Cria nova linha
+            console.log("🔄 Atualizando linha ID:", ultimoRegistroId);
+        } 
+        else {
+            // Cria a primeira linha
             const res = await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -180,19 +175,39 @@ async function salvarHistorico() {
                         "data": new Date().toLocaleDateString('pt-BR'),
                         "tempo": tempoFormatado,
                         "status": "Iniciado"
-                    }]
-                })
-            });
-
-            const resultado = await res.json();
-            if (resultado.created) ultimoRegistroId = resultado.created[0].id;
+                    } 0]) {
+                ultimoRegistroId = resultado.created[0].id;
+                console.log("✅ Linha criada - ID:", ultimoRegistroId);
+            }
         }
     } catch (err) {
         console.error("Erro ao salvar:", err);
     }
 }
 
-// ... (o resto do código de controles e voltar permanece igual)
+// ==================== CONTROLES ====================
+const controls = document.getElementById('controls');
+const wrapper = document.getElementById('wrapper');
+let timeout;
+
+function showControls() {
+    controls.style.opacity = '1';
+    controls.style.pointerEvents = 'auto';
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        controls.style.opacity = '0';
+        controls.style.pointerEvents = 'none';
+    }, 3000);
+}
+
+wrapper.addEventListener('touchstart', showControls);
+wrapper.addEventListener('mousemove', showControls);
+
+function voltar() {
+    if (intervaloSalvar) clearInterval(intervaloSalvar);
+    salvarHistorico();
+    setTimeout(() => window.history.back(), 400);
+}
 </script>
 </body>
 </html>
