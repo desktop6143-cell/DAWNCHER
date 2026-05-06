@@ -42,6 +42,7 @@ if (sessionStorage.getItem('logado') !== 'true' || !idUser) {
 }
 
 // ==================== CARREGAR HISTÓRICO ====================
+// ==================== CARREGAR HISTÓRICO - APENAS O MAIS RECENTE ====================
 async function carregarHistorico() {
     const container = document.getElementById('lista-continuar');
     const secao = document.getElementById('secao-continuar');
@@ -51,32 +52,36 @@ async function carregarHistorico() {
         
         if (!res.ok) throw new Error("Erro na API");
 
-        const dados = await res.json();
+        let dados = await res.json();
 
         if (dados && dados.length > 0) {
             secao.style.display = 'block';
             container.innerHTML = '';
 
-            // Ordena do mais recente pro mais antigo
-            dados.reverse().forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'ep-card';
-                card.innerHTML = `
-                    <div style="font-weight: bold;">${item.titulo}</div>
-                    <div class="progresso-bg"><div class="progresso-bar" style="width: 100%;"></div></div>
-                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">
-                        ${item.data || ''} ${item.tempo ? '- ' + item.tempo : ''}
-                    </p>
-                `;
-                
-                card.onclick = () => {
-                    const urlEnc = encodeURIComponent(item.url_acesso || "");
-                    const titEnc = encodeURIComponent(item.titulo || "");
-                    window.location.href = `player.html?url=${urlEnc}&titulo=${titEnc}`;
-                };
-                
-                container.appendChild(card);
-            });
+            // Pega apenas o item mais recente (o primeiro depois de ordenar por data/hora)
+            const maisRecente = dados.sort((a, b) => {
+                const dataA = new Date(a.data + ' ' + (a.tempo || '00:00'));
+                const dataB = new Date(b.data + ' ' + (b.tempo || '00:00'));
+                return dataB - dataA;
+            })[0];
+
+            const card = document.createElement('div');
+            card.className = 'ep-card';
+            card.innerHTML = `
+                <div style="font-weight: bold;">${maisRecente.titulo}</div>
+                <div class="progresso-bg"><div class="progresso-bar" style="width: 65%;"></div></div>
+                <p style="font-size: 11px; color: #aaa; margin-top: 5px;">
+                    Visto em: ${maisRecente.data} às ${maisRecente.tempo || ''}
+                </p>
+            `;
+            
+            card.onclick = () => {
+                const urlEnc = encodeURIComponent(maisRecente.url_acesso || "");
+                const titEnc = encodeURIComponent(maisRecente.titulo || "");
+                window.location.href = `player.html?url=${urlEnc}&titulo=${titEnc}`;
+            };
+            
+            container.appendChild(card);
         }
     } catch (err) {
         console.error("Erro ao carregar histórico:", err);
