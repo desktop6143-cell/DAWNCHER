@@ -33,16 +33,13 @@
 </div>
 
 <script>
-// 1. CONFIGURAÇÕES (Use CRASE ` para as variáveis funcionarem)
+// 1. CONFIGURAÇÕES E SEGURANÇA (Declaramos apenas UMA vez)
 const API_ID = 'et92hg0rvu16i'; 
-const BASE_URL = `https://sheetdb.io{API_ID}`; 
-const idUsuarioLogado = sessionStorage.getItem('idUsuario');
-// Não use ' (aspas) nem " (aspas duplas) aqui!
-const BASE_URL = `https://sheetdb.io{API_ID}`; 
-
+const BASE_URL = `https://sheetdb.io{API_ID}`; // Use CRASE aqui
 const idUsuarioLogado = sessionStorage.getItem('idUsuario');
 
-if (sessionStorage.getItem('logado') !== 'true' || !idUsuarioLogado) {
+// Verifica se está logado
+if (sessionStorage.getItem('logado') !== 'true') {
     window.location.href = "../index.html"; 
 }
 
@@ -51,54 +48,47 @@ async function carregarTudo() {
     const container = document.getElementById('lista-continuar');
     const secao = document.getElementById('secao-continuar');
 
-    try {
-        // Montamos a URL de busca: https://sheetdb.io
-        const urlFinal = `${BASE_URL}/search?id_user=${idUsuarioLogado}`;
-        
-        console.log("Tentando acessar:", urlFinal); // Verifique se esta URL aparece sem chaves no console!
+    if (!idUsuarioLogado || idUsuarioLogado === "null") {
+        console.error("ID não encontrado");
+        return;
+    }
 
-        const resposta = await fetch(urlFinal);
-        
-        if (!resposta.ok) throw new Error("Erro na resposta da API");
+    try {
+        // AQUI: Não use "const BASE_URL" de novo, apenas use a que já existe
+        const urlBusca = `${BASE_URL}/search?id_user=${idUsuarioLogado}`;
+        console.log("Acessando:", urlBusca);
+
+        const resposta = await fetch(urlBusca);
+        if (!resposta.ok) throw new Error("Erro na planilha");
 
         const historico = await resposta.json();
 
-        if (!historico || historico.length === 0 || historico.error) {
-            console.log("Nenhum histórico encontrado para o usuário " + idUsuarioLogado);
-            return;
-        }
-
-        if(secao) secao.style.display = 'block';
-        if(container) container.innerHTML = ''; 
-
-        // Mostra o mais recente primeiro
-        historico.reverse().forEach(item => {
-            if(!item.titulo) return;
-
-            const card = document.createElement('div');
-            card.className = 'ep-card';
+        if (historico && historico.length > 0) {
+            secao.style.display = 'block';
+            container.innerHTML = '';
             
-            card.onclick = () => {
-                const urlVideo = encodeURIComponent(item.url_acesso || "");
-                const nomeTitulo = encodeURIComponent(item.titulo);
-                window.location.href = `player.html?url=${urlVideo}&titulo=${nomeTitulo}`;
-            };
-
-            card.innerHTML = `
-                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px; color: white;">${item.titulo}</div>
-                <div class="progresso-bg" style="background: #333; height: 4px; border-radius: 2px;">
-                    <div class="progresso-bar" style="background: #7c3aed; width: 100%; height: 100%;"></div>
-                </div>
-                <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data || 'Recentemente'}</p>
-            `;
-            container.appendChild(card);
-        });
+            historico.reverse().forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'ep-card';
+                card.innerHTML = `
+                    <div style="font-size: 14px; font-weight: bold;">${item.titulo}</div>
+                    <div class="progresso-bg"><div class="progresso-bar" style="width: 100%;"></div></div>
+                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data || '---'}</p>
+                `;
+                card.onclick = () => {
+                    const link = encodeURIComponent(item.url_acesso || "");
+                    const nome = encodeURIComponent(item.titulo || "");
+                    window.location.href = `player.html?url=${link}&titulo=${nome}`;
+                };
+                container.appendChild(card);
+            });
+        }
     } catch (erro) {
         console.error("Erro na API:", erro);
     }
 }
 
-// 3. BOTÕES DA HOTBAR (Seu código original)
+// 3. BOTÕES DA HOTBAR (Mantenha o seu mapeamento)
 const acoesBotoes = {
     'btn-sair': () => { sessionStorage.clear(); window.location.href = "../index.html"; },
     'btnBL': () => window.location.href = "bl.html",
@@ -113,6 +103,7 @@ Object.keys(acoesBotoes).forEach(id => {
 
 window.onload = carregarTudo;
 </script>
+
 
 </body>
 </html>
