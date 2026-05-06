@@ -118,99 +118,85 @@
         </div>
     </div>
 
-    <script>
-        // ==================== CONFIGURAÇÕES ====================
-        const API_HISTORICO = 'https://sheetdb.io/api/v1/b8bvlm2gypqd0';
-        
-        const params = new URLSearchParams(window.location.search);
-        const urlVideo = params.get('url');
-        const tituloVideo = params.get('titulo');
+  <script>
+// ==================== CONFIGURAÇÕES ====================
+const API_HISTORICO = 'https://sheetdb.io/api/v1/b8bvlm2gypqd0';
+const params = new URLSearchParams(window.location.search);
+const urlVideo = params.get('url');
+const tituloVideo = params.get('titulo');
 
-        let historicoSalvo = false;
-        let timeoutSalvar = null;
+const idUser = sessionStorage.getItem('idUsuario');
+let historicoSalvo = false;
+let intervaloSalvar = null;
 
-        // ==================== INICIALIZAÇÃO ====================
-        if (urlVideo) {
-            const frame = document.getElementById('video-frame');
-            const tituloElement = document.getElementById('video-title');
+if (urlVideo && idUser) {
+    document.getElementById('video-frame').src = decodeURIComponent(urlVideo);
+    document.getElementById('video-title').innerText = tituloVideo ? decodeURIComponent(tituloVideo) : 'Assistindo...';
 
-            frame.src = decodeURIComponent(urlVideo);
-            tituloElement.innerText = tituloVideo ? decodeURIComponent(tituloVideo) : 'Assistindo...';
+    // Salva a cada 30 segundos
+    intervaloSalvar = setInterval(() => {
+        salvarHistorico("Assistindo");
+    }, 30000);
 
-            // Salva o histórico apenas após 30 segundos de visualização
-            timeoutSalvar = setTimeout(() => {
-                salvarNoHistorico(decodeURIComponent(tituloVideo || 'Sem título'), urlVideo);
-            }, 30000);
-        }
+    // Salva também quando o usuário sair da página
+    window.addEventListener('beforeunload', () => {
+        if (intervaloSalvar) clearInterval(intervaloSalvar);
+        salvarHistorico("Parou de assistir");
+    });
+}
 
-        // ==================== FUNÇÃO DE HISTÓRICO ====================
-        async function salvarNoHistorico(titulo, url) {
-            if (historicoSalvo) return;
+// ==================== FUNÇÃO PRINCIPAL ====================
+async function salvarHistorico(status) {
+    if (!idUser) return;
 
-            const idUser = sessionStorage.getItem('idUsuario');
-            if (!idUser) {
-                console.warn("ID do usuário não encontrado no sessionStorage");
-                return;
-            }
-
-            try {
-                const response = await fetch(API_HISTORICO, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        data: [{
-                            "id_user": idUser,
-                            "titulo": titulo,
-                            "url_acesso": url,
-                            "data": new Date().toLocaleDateString('pt-BR'),
-                            "hora": new Date().toLocaleTimeString('pt-BR'),
-                            "tempo": "Assistido"
-                        }]
-                    })
-                });
-
-                if (response.ok) {
-                    historicoSalvo = true;
-                    console.log(`✅ Histórico salvo para usuário ${idUser}`);
-                } else {
-                    console.error("Erro na API SheetDB");
-                }
-            } catch (err) {
-                console.error("Erro ao salvar histórico:", err);
-            }
-        }
-
-        // ==================== CONTROLES DO PLAYER ====================
-        const controls = document.getElementById('controls');
-        const wrapper = document.getElementById('wrapper');
-        let timeoutControles;
-
-        function showControls() {
-            controls.style.opacity = '1';
-            controls.style.pointerEvents = 'auto';
-            
-            clearTimeout(timeoutControles);
-            timeoutControles = setTimeout(() => {
-                controls.style.opacity = '0';
-                controls.style.pointerEvents = 'none';
-            }, 3000);
-        }
-
-        wrapper.addEventListener('touchstart', showControls);
-        wrapper.addEventListener('mousemove', showControls);
-
-        function voltar() {
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.href = 'index.html';
-            }
-        }
-
-        // Limpeza ao sair da página
-        window.addEventListener('beforeunload', () => {
-            if (timeoutSalvar) clearTimeout(timeoutSalvar);
+    try {
+        await fetch(API_HISTORICO, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                data: [{
+                    "id_user": idUser,
+                    "titulo": decodeURIComponent(tituloVideo || ''),
+                    "url_acesso": decodeURIComponent(urlVideo || ''),
+                    "data": new Date().toLocaleDateString('pt-BR'),
+                    "tempo": new Date().toLocaleTimeString('pt-BR'),
+                    "status": status
+                }]
+            })
         });
-    </script>
+        
+        historicoSalvo = true;
+        console.log(`✅ Histórico salvo (${status})`);
+    } catch (err) {
+        console.error("Erro ao salvar histórico:", err);
+    }
+}
+
+// ==================== CONTROLES ====================
+const controls = document.getElementById('controls');
+const wrapper = document.getElementById('wrapper');
+let timeout;
+
+function showControls() {
+    controls.style.opacity = '1';
+    controls.style.pointerEvents = 'auto';
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        controls.style.opacity = '0';
+        controls.style.pointerEvents = 'none';
+    }, 3000);
+}
+
+wrapper.addEventListener('touchstart', showControls);
+wrapper.addEventListener('mousemove', showControls);
+
+function voltar() {
+    if (intervaloSalvar) clearInterval(intervaloSalvar);
+    salvarHistorico("Voltou");
+    setTimeout(() => {
+        window.history.back();
+    }, 300);
+}
+</script>
 </body>
 </html>
