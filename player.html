@@ -118,36 +118,37 @@
         </div>
     </div>
 
-  <script>
+<script>
 // ==================== CONFIGURAÇÕES ====================
 const API_HISTORICO = 'https://sheetdb.io/api/v1/b8bvlm2gypqd0';
+
 const params = new URLSearchParams(window.location.search);
 const urlVideo = params.get('url');
 const tituloVideo = params.get('titulo');
 
 const idUser = sessionStorage.getItem('idUsuario');
-let historicoSalvo = false;
+
+let ultimoRegistroId = null;     // Guarda o ID da linha para atualizar
 let intervaloSalvar = null;
 
+// ==================== INICIALIZAÇÃO DO PLAYER ====================
 if (urlVideo && idUser) {
     document.getElementById('video-frame').src = decodeURIComponent(urlVideo);
     document.getElementById('video-title').innerText = tituloVideo ? decodeURIComponent(tituloVideo) : 'Assistindo...';
 
-    // Salva a cada 30 segundos
+    // Salva a cada 30 segundos (atualizando a mesma linha)
     intervaloSalvar = setInterval(() => {
-        salvarHistorico("Assistindo");
+        salvarHistorico();
     }, 30000);
 
-    // Salva também quando o usuário sair da página
+    // Salva quando o usuário sair da página
     window.addEventListener('beforeunload', () => {
         if (intervaloSalvar) clearInterval(intervaloSalvar);
-        salvarHistorico("Parou de assistir");
+        salvarHistorico(); // Última atualização
     });
 }
 
-// ==================== FUNÇÃO PRINCIPAL ====================
-let ultimoRegistroId = null;   // Vamos guardar o ID da linha criada
-
+// ==================== FUNÇÃO PRINCIPAL - SALVAR / ATUALIZAR ====================
 async function salvarHistorico() {
     if (!idUser) return;
 
@@ -157,7 +158,7 @@ async function salvarHistorico() {
 
     try {
         if (ultimoRegistroId) {
-            // Atualiza a linha que já existe
+            // Atualiza a linha existente
             await fetch(`${API_HISTORICO}/id/${ultimoRegistroId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
@@ -168,10 +169,10 @@ async function salvarHistorico() {
                     }
                 })
             });
-            console.log("🔄 Linha atualizada - Tempo:", horaAtual);
+            console.log(`🔄 Atualizado - ${horaAtual}`);
         } 
         else {
-            // Primeira vez - cria a linha
+            // Cria a primeira linha
             const res = await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -189,8 +190,8 @@ async function salvarHistorico() {
 
             const resultado = await res.json();
             if (resultado.created && resultado.created.length > 0) {
-                ultimoRegistroId = resultado.created[0].id;  // Pega o ID gerado
-                console.log("✅ Nova linha criada com ID:", ultimoRegistroId);
+                ultimoRegistroId = resultado.created[0].id;
+                console.log("✅ Nova linha criada - ID:", ultimoRegistroId);
             }
         }
     } catch (err) {
@@ -198,7 +199,7 @@ async function salvarHistorico() {
     }
 }
 
-// ==================== CONTROLES ====================
+// ==================== CONTROLES DO PLAYER ====================
 const controls = document.getElementById('controls');
 const wrapper = document.getElementById('wrapper');
 let timeout;
@@ -218,10 +219,10 @@ wrapper.addEventListener('mousemove', showControls);
 
 function voltar() {
     if (intervaloSalvar) clearInterval(intervaloSalvar);
-    salvarHistorico("Voltou");
+    salvarHistorico();           // Última atualização antes de sair
     setTimeout(() => {
         window.history.back();
-    }, 300);
+    }, 400);
 }
 </script>
 </body>
