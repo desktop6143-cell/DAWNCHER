@@ -121,37 +121,67 @@
         </div>
     </div>
 
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        const url = params.get('url');
-        const titulo = params.get('titulo');
+   <script>
+    // 1. CONFIGURAÇÕES DA API DE HISTÓRICO
+    const API_HISTORICO = 'https://sheetdb.io/api/v1/b8bvlm2gypqd0';
+    const params = new URLSearchParams(window.location.search);
+    const url = params.get('url');
+    const titulo = params.get('titulo');
 
-        if (url) {
-            document.getElementById('video-frame').src = decodeURIComponent(url);
-            document.getElementById('video-title').innerText = titulo ? decodeURIComponent(titulo) : 'Assistindo';
+    if (url) {
+        document.getElementById('video-frame').src = decodeURIComponent(url);
+        document.getElementById('video-title').innerText = titulo ? decodeURIComponent(titulo) : 'Assistindo';
+        
+        // CHAMADA PARA SALVAR: Assim que o player carrega, ele registra no banco
+        salvarHistoricoSimplificado(decodeURIComponent(titulo), url);
+    }
+
+    // 2. FUNÇÃO PARA SALVAR NA PLANILHA
+    async function salvarHistoricoSimplificado(nomeTitulo, urlVideo) {
+        const idUser = sessionStorage.getItem('idUsuario'); // O ID 89 do Carlos
+        if (!idUser) return;
+
+        try {
+            await fetch(API_HISTORICO, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    data: [{
+                        "id_user": idUser,
+                        "titulo": nomeTitulo,
+                        "url_acesso": urlVideo, // Adicione essa coluna na planilha se quiser salvar o link
+                        "data": new Date().toLocaleDateString('pt-BR'),
+                        "tempo": "Assistindo..." // Como é iframe, marcamos como "em andamento"
+                    }]
+                })
+            });
+            console.log("Histórico atualizado para o usuário " + idUser);
+        } catch (err) {
+            console.error("Erro ao salvar histórico:", err);
         }
+    }
 
-        // Lógica para esconder os controles automaticamente no mobile
-        const controls = document.getElementById('controls');
-        const wrapper = document.getElementById('wrapper');
-        let timeout;
+    // --- Lógica de controles (seu código original mantido) ---
+    const controls = document.getElementById('controls');
+    const wrapper = document.getElementById('wrapper');
+    let timeout;
 
-        function showControls() {
-            controls.style.opacity = '1';
-            controls.style.pointerEvents = 'auto';
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                controls.style.opacity = '0';
-                controls.style.pointerEvents = 'none';
-            }, 3000); // Esconde após 3 segundos sem toque
-        }
+    function showControls() {
+        controls.style.opacity = '1';
+        controls.style.pointerEvents = 'auto';
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            controls.style.opacity = '0';
+            controls.style.pointerEvents = 'none';
+        }, 3000);
+    }
 
-        wrapper.addEventListener('touchstart', showControls);
-        wrapper.addEventListener('mousemove', showControls);
+    wrapper.addEventListener('touchstart', showControls);
+    wrapper.addEventListener('mousemove', showControls);
 
-        function voltar() {
-            window.history.length > 1 ? window.history.back() : window.location.href = 'index.html';
-        }
-    </script>
+    function voltar() {
+        window.history.length > 1 ? window.history.back() : window.location.href = 'index.html';
+    }
+</script>
 </body>
 </html>
