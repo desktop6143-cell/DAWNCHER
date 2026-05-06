@@ -131,20 +131,19 @@ const idUser = sessionStorage.getItem('idUsuario');
 const tituloLimpo = decodeURIComponent(tituloVideo || '');
 
 let intervaloSalvar = null;
-let tempoInicial = null;   // ← Mudança importante
+let tempoInicial = null;
 
 if (urlVideo && idUser) {
     document.getElementById('video-frame').src = decodeURIComponent(urlVideo);
     document.getElementById('video-title').innerText = tituloLimpo || 'Assistindo...';
 
-    // Define o tempo inicial APENAS uma vez
     tempoInicial = Date.now();
 
     intervaloSalvar = setInterval(salvarHistorico, 30000);
     window.addEventListener('beforeunload', salvarHistorico);
 }
 
-// ==================== FUNÇÃO CORRIGIDA ====================
+// ==================== FUNÇÃO MELHORADA ====================
 async function salvarHistorico() {
     if (!idUser || !tempoInicial) return;
 
@@ -157,7 +156,7 @@ async function salvarHistorico() {
 
         const hoje = new Date().toLocaleDateString('pt-BR');
 
-        if (registros && registros.length > 0) {
+        if (registros && registros.length > 0 && registros[0].id) {
             const idRegistro = registros[0].id;
 
             await fetch(`${API_HISTORICO}/id/${idRegistro}`, {
@@ -173,7 +172,8 @@ async function salvarHistorico() {
             });
             console.log(`🔄 Atualizado → ${tempoFormatado}`);
         } else {
-            await fetch(API_HISTORICO, {
+            // Cria novo
+            const res = await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -194,7 +194,7 @@ async function salvarHistorico() {
     }
 }
 
-// ==================== CONTROLES ====================
+// ==================== CONTROLES (mantido) ====================
 const controls = document.getElementById('controls');
 const wrapper = document.getElementById('wrapper');
 let timeout;
