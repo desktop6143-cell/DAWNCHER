@@ -32,11 +32,13 @@
 <script>
 // 1. CONFIGURAÇÕES E VERIFICAÇÃO DE LOGIN
 const API_ID = 'et92hg0rvu16i'; 
-const BASE_URL = `https://sheetdb.io{API_ID}`; // URL formatada corretamente
+const BASE_URL = `https://sheetdb.io{API_ID}`;
 const idUsuarioLogado = sessionStorage.getItem('idUsuario');
 
-if (sessionStorage.getItem('logado') !== 'true' || !idUsuarioLogado) {
-    window.location.href = "base/p1.html"; 
+// CORREÇÃO: Só expulsa se NÃO estiver logado. 
+// Se estiver logado, o código segue normalmente.
+if (sessionStorage.getItem('logado') !== 'true') {
+    window.location.href = "../index.html"; 
 }
 
 // 2. CARREGAR HISTÓRICO DA PLANILHA
@@ -44,24 +46,26 @@ async function carregarTudo() {
     const container = document.getElementById('lista-continuar');
     const secao = document.getElementById('secao-continuar');
 
+    // Se por algum motivo o ID for nulo, paramos aqui para não dar erro na URL
+    if (!idUsuarioLogado) return;
+
     try {
-        // Busca correta: BASE_URL + /search?id_user=...
         const resposta = await fetch(`${BASE_URL}/search?id_user=${idUsuarioLogado}`);
         
         if (!resposta.ok) throw new Error("Erro na resposta da API");
 
         const historico = await resposta.json();
 
-        // Se não tiver histórico ou der erro na busca, encerra
+        // Se não tiver histórico, apenas não mostramos a seção "Continuar Assistindo"
         if (!historico || historico.length === 0 || historico.error) {
-            console.log("Nenhum histórico encontrado para este usuário.");
+            console.log("Nenhum histórico encontrado.");
             return;
         }
 
         if(secao) secao.style.display = 'block';
         if(container) container.innerHTML = ''; 
 
-        // Inverte para mostrar o mais recente primeiro
+        // Inverte para o mais recente aparecer primeiro
         historico.reverse().forEach(item => {
             if(!item.titulo) return;
 
@@ -84,7 +88,7 @@ async function carregarTudo() {
             container.appendChild(card);
         });
     } catch (erro) {
-        console.error("Erro técnico ao carregar histórico:", erro);
+        console.error("Erro ao carregar histórico:", erro);
     }
 }
 
