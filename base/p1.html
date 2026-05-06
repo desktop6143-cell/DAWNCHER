@@ -33,39 +33,46 @@
 </div>
 
 <script>
+<script>
+// 1. CONFIGURAÇÕES E SEGURANÇA
 const API_ID = 'et92hg0rvu16i'; 
-const BASE_URL = `https://sheetdb.io{API_ID}`;
 
+// ATENÇÃO: Use a tecla ao lado do "P" (crase `) para que o ${} funcione!
+// Não use aspas simples (') nem aspas duplas (") nesta linha.
+const BASE_URL = `https://sheetdb.io{API_ID}`; 
+
+const idUsuarioLogado = sessionStorage.getItem('idUsuario');
+
+// Verifica se está logado
+if (sessionStorage.getItem('logado') !== 'true' || !idUsuarioLogado) {
+    window.location.href = "../index.html"; 
+}
+
+// 2. CARREGAR HISTÓRICO
 async function carregarTudo() {
-    // Pegamos o ID exatamente no momento que a função roda
-    const idUsuarioLogado = sessionStorage.getItem('idUsuario');
-    
     const container = document.getElementById('lista-continuar');
     const secao = document.getElementById('secao-continuar');
 
-    // Se o ID for null ou a string "null"
-    if (!idUsuarioLogado || idUsuarioLogado === "null") {
-        console.error("ID não encontrado. O login não salvou o ID corretamente.");
-        return; 
-    }
-
     try {
         console.log("Buscando histórico para o ID:", idUsuarioLogado);
+        
+        // Agora a URL será montada corretamente como: https://sheetdb.io
         const resposta = await fetch(`${BASE_URL}/search?id_user=${idUsuarioLogado}`);
         
-        if (!resposta.ok) throw new Error("Erro ao conectar com a planilha");
+        if (!resposta.ok) throw new Error("Erro na resposta da API");
 
         const historico = await resposta.json();
 
+        // Se não houver dados, encerra silenciosamente
         if (!historico || historico.length === 0 || historico.error) {
-            console.log("Nenhum histórico encontrado para o ID:", idUsuarioLogado);
+            console.log("Nenhum histórico encontrado para este usuário.");
             return;
         }
 
-        secao.style.display = 'block';
-        container.innerHTML = ''; 
+        if(secao) secao.style.display = 'block';
+        if(container) container.innerHTML = ''; 
 
-        // Inverte para mostrar o último assistido primeiro
+        // Mostra o mais recente primeiro
         historico.reverse().forEach(item => {
             if(!item.titulo) return;
 
@@ -79,11 +86,11 @@ async function carregarTudo() {
             };
 
             card.innerHTML = `
-                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">${item.titulo}</div>
-                <div class="progresso-bg">
-                    <div class="progresso-bar"></div>
+                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px; color: white;">${item.titulo}</div>
+                <div class="progresso-bg" style="background: #333; height: 4px; border-radius: 2px;">
+                    <div class="progresso-bar" style="background: #7c3aed; width: 100%; height: 100%;"></div>
                 </div>
-                <p style="font-size: 11px; color: #aaa; margin-top: 8px;">Visto em: ${item.data || '---'}</p>
+                <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data || 'Recentemente'}</p>
             `;
             container.appendChild(card);
         });
@@ -92,13 +99,12 @@ async function carregarTudo() {
     }
 }
 
-// 3. BOTÕES DA HOTBAR
+// 3. BOTÕES DA HOTBAR (Mantenha o seu mapeamento original)
 const acoesBotoes = {
     'btn-sair': () => { sessionStorage.clear(); window.location.href = "../index.html"; },
     'btnBL': () => window.location.href = "bl.html",
     'btnnt': () => window.location.href = "info.html",
-    'btnLP': () => window.location.href = "../sites/bar.html",
-    'btn-home': () => window.location.reload()
+    'btnLP': () => window.location.href = "../sites/bar.html"
 };
 
 Object.keys(acoesBotoes).forEach(id => {
@@ -107,6 +113,7 @@ Object.keys(acoesBotoes).forEach(id => {
 });
 
 window.onload = carregarTudo;
+</script>
 </script>
 
 </body>
