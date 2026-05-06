@@ -33,73 +33,62 @@
 </div>
 
 <script>
-// 1. URL COMPLETA E SEGURANÇA
-// ATENÇÃO: Verifique se este ID (b8bvlm2gypqd0) é o da sua planilha de HISTÓRICO
-const URL_FINAL_HISTORICO = 'https://sheetdb.io';
+// ==================== CONFIGURAÇÕES ====================
+const API_HISTORICO = 'https://sheetdb.io/api/v1/b8bvlm2gypqd0';
 const idUser = sessionStorage.getItem('idUsuario');
 
 if (sessionStorage.getItem('logado') !== 'true' || !idUser) {
-    window.location.href = "../index.html"; 
+    window.location.href = "../index.html";
 }
 
-// 2. FUNÇÃO DO HISTÓRICO
-async function carregarTudo() {
+// ==================== CARREGAR HISTÓRICO ====================
+async function carregarHistorico() {
     const container = document.getElementById('lista-continuar');
     const secao = document.getElementById('secao-continuar');
 
     try {
-        // Montamos a busca: URL + /search?id_user=...
-        const consulta = URL_FINAL_HISTORICO + '/search?id_user=' + idUser;
-        console.log("URL de Acesso:", consulta);
-
-        const resposta = await fetch(consulta);
+        const res = await fetch(`${API_HISTORICO}/search?sheet=Historico&id_user=${idUser}`);
         
-        // Se der 404, o ID b8bvlm2gypqd0 não existe no SheetDB
-        if (!resposta.ok) throw new Error("API não encontrada");
+        if (!res.ok) throw new Error("Erro ao buscar histórico");
 
-        const dados = await resposta.json();
+        const dados = await res.json();
 
-        if (dados && dados.length > 0 && !dados.error) {
+        if (dados && dados.length > 0) {
             secao.style.display = 'block';
             container.innerHTML = '';
-            
+
             dados.reverse().forEach(item => {
-                if(!item.titulo) return;
                 const card = document.createElement('div');
                 card.className = 'ep-card';
                 card.innerHTML = `
-                    <div style="font-weight: bold; color: white;">${item.titulo}</div>
+                    <div style="font-weight: bold;">${item.titulo}</div>
                     <div class="progresso-bg"><div class="progresso-bar" style="width: 100%;"></div></div>
-                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data || '---'}</p>
+                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data || ''}</p>
                 `;
                 card.onclick = () => {
                     const urlEnc = encodeURIComponent(item.url_acesso || "");
                     const titEnc = encodeURIComponent(item.titulo || "");
-                    window.location.href = 'player.html?url=' + urlEnc + '&titulo=' + titEnc;
+                    window.location.href = `player.html?url=${urlEnc}&titulo=${titEnc}`;
                 };
                 container.appendChild(card);
             });
         }
     } catch (err) {
-        console.error("Erro no histórico:", err);
+        console.error("Erro ao carregar histórico:", err);
     }
 }
 
-// 3. BOTÕES DA HOTBAR (REVISADOS)
-const botoesAcao = {
-    'btn-sair': () => { sessionStorage.clear(); window.location.href = "../index.html"; },
-    'btnBL': () => { window.location.href = "bl.html"; },
-    'btnnt': () => { window.location.href = "info.html"; },
-    'btnLP': () => { window.location.href = "../sites/bar.html"; }
+// ==================== BOTÕES DO RODAPÉ ====================
+document.getElementById('btn-home').onclick = () => window.location.href = "p1.html";
+document.getElementById('btnBL').onclick = () => window.location.href = "bl.html";
+document.getElementById('btnLP').onclick = () => window.location.href = "../sites/bar.html";
+document.getElementById('btnnt').onclick = () => window.location.href = "info.html";
+document.getElementById('btn-sair').onclick = () => {
+    sessionStorage.clear();
+    window.location.href = "../index.html";
 };
 
-Object.keys(botoesAcao).forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.onclick = botoesAcao[id];
-});
-
-window.onload = carregarTudo;
+window.onload = carregarHistorico;
 </script>
-
 </body>
 </html>
