@@ -146,39 +146,41 @@ if (urlVideo && idUser) {
 async function salvarHistorico() {
     if (!idUser) return;
 
-    const minutos = Math.floor((Date.now() - tempoInicial) / 60000);
-    const tempoFormatado = minutos + " minutos";
+    const minutosAssistidos = Math.floor((Date.now() - tempoInicial) / 60000);
+    const tempoFormatado = minutosAssistidos + " minutos";
 
     try {
-        if (ultimoRegistroId) {
-            await fetch(`${API_HISTORICO}/id/${ultimoRegistroId}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    data: { 
-                        "tempo": tempoFormatado,
-                        "status": "Assistindo"
-                    }
-                })
-            });
-            console.log("🔄 Atualizando tempo:", tempoFormatado);
-        } 
-        else {
-            const res = await fetch(API_HISTORICO, {
+        const resUpdate = await fetch(`${API_HISTORICO}/id_user/${idUser}?titulo=${encodeURIComponent(tituloLimpo)}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                data: {
+                    "titulo": tituloLimpo,
+                    "url_acesso": decodeURIComponent(urlVideo || ''),
+                    "data": new Date().toLocaleDateString('pt-BR'),
+                    "tempo": tempoFormatado,
+                    "status": "Assistindo"
+                }
+            })
+        });
+
+        const resultado = await resUpdate.json();
+
+        if (resultado.updated === 0) {
+            await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     data: [{
                         "id_user": idUser,
-                        "titulo": decodeURIComponent(tituloVideo || ''),
+                        "titulo": tituloLimpo,
                         "url_acesso": decodeURIComponent(urlVideo || ''),
                         "data": new Date().toLocaleDateString('pt-BR'),
                         "tempo": tempoFormatado,
-                        "status": "Iniciado"
-                    } 0]) {
-                ultimoRegistroId = resultado.created[0].id;
-                console.log("✅ Primeira linha salva - ID:", ultimoRegistroId);
-            }
+                        "status": "Assistindo"
+                    }]
+                })
+            });
         }
     } catch (err) {
         console.error("Erro ao salvar histórico:", err);
