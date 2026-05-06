@@ -33,77 +33,56 @@
 </div>
 
 <script>
-// 1. CONFIGURAÇÕES E SEGURANÇA (Declaramos apenas UMA vez)
-const API_ID = 'et92hg0rvu16i'; 
-const BASE_URL = `https://sheetdb.io{API_ID}`; // Use CRASE aqui
+// 1. URL FIXA (Evita o erro de "Name Not Resolved")
+const BASE_URL = 'https://sheetdb.io/api/v1/b8bvlm2gypqd0';
 const idUsuarioLogado = sessionStorage.getItem('idUsuario');
 
-// Verifica se está logado
-if (sessionStorage.getItem('logado') !== 'true') {
-    window.location.href = "../index.html"; 
-}
-
-// 2. CARREGAR HISTÓRICO
 async function carregarTudo() {
     const container = document.getElementById('lista-continuar');
     const secao = document.getElementById('secao-continuar');
 
-    if (!idUsuarioLogado || idUsuarioLogado === "null") {
-        console.error("ID não encontrado");
-        return;
-    }
+    if (!idUsuarioLogado) return;
 
     try {
-        // AQUI: Não use "const BASE_URL" de novo, apenas use a que já existe
+        // Monta a URL de busca de forma simples
         const urlBusca = `${BASE_URL}/search?id_user=${idUsuarioLogado}`;
-        console.log("Acessando:", urlBusca);
-
         const resposta = await fetch(urlBusca);
+        
         if (!resposta.ok) throw new Error("Erro na planilha");
 
         const historico = await resposta.json();
 
-        if (historico && historico.length > 0) {
-            secao.style.display = 'block';
-            container.innerHTML = '';
-            
-            historico.reverse().forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'ep-card';
-                card.innerHTML = `
-                    <div style="font-size: 14px; font-weight: bold;">${item.titulo}</div>
-                    <div class="progresso-bg"><div class="progresso-bar" style="width: 100%;"></div></div>
-                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data || '---'}</p>
-                `;
-                card.onclick = () => {
-                    const link = encodeURIComponent(item.url_acesso || "");
-                    const nome = encodeURIComponent(item.titulo || "");
-                    window.location.href = `player.html?url=${link}&titulo=${nome}`;
-                };
-                container.appendChild(card);
-            });
+        // VERIFICAÇÃO DE DADOS VAZIOS
+        if (!historico || historico.length === 0 || historico.error) {
+            console.warn("A planilha de histórico está vazia ou o ID não foi encontrado.");
+            return; // Sai da função sem dar erro
         }
+
+        // Se chegou aqui, há dados!
+        secao.style.display = 'block';
+        container.innerHTML = '';
+
+        historico.reverse().forEach(item => {
+            if(!item.titulo) return;
+            const card = document.createElement('div');
+            card.className = 'ep-card';
+            card.innerHTML = `
+                <div style="font-weight: bold; color: white;">${item.titulo}</div>
+                <div class="progresso-bg"><div class="progresso-bar" style="width: 100%;"></div></div>
+                <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data || '---'}</p>
+            `;
+            card.onclick = () => {
+                window.location.href = `player.html?url=${encodeURIComponent(item.url_acesso)}&titulo=${encodeURIComponent(item.titulo)}`;
+            };
+            container.appendChild(card);
+        });
+
     } catch (erro) {
-        console.error("Erro na API:", erro);
+        console.error("Erro ao carregar:", erro);
     }
 }
 
-// 3. BOTÕES DA HOTBAR (Mantenha o seu mapeamento)
-const acoesBotoes = {
-    'btn-sair': () => { sessionStorage.clear(); window.location.href = "../index.html"; },
-    'btnBL': () => window.location.href = "bl.html",
-    'btnnt': () => window.location.href = "info.html",
-    'btnLP': () => window.location.href = "../sites/bar.html"
-};
-
-Object.keys(acoesBotoes).forEach(id => {
-    const btn = document.getElementById(id);
-    if(btn) btn.addEventListener('click', acoesBotoes[id]);
-});
-
 window.onload = carregarTudo;
 </script>
-
-
 </body>
 </html>
