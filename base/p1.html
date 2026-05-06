@@ -33,10 +33,17 @@
 </div>
 
 <script>
-// 1. URL FIXA (Evita o erro de "Name Not Resolved")
-const BASE_URL = 'https://sheetdb.io/api/v1/b8bvlm2gypqd0';
+// 1. CONFIGURAÇÕES (Certifique-se de usar a URL do HISTÓRICO aqui)
+const API_ID_HISTORICO = 'b8bvlm2gypqd0'; 
+const BASE_URL = `https://sheetdb.io{API_ID_HISTORICO}`;
 const idUsuarioLogado = sessionStorage.getItem('idUsuario');
 
+// Proteção de segurança
+if (sessionStorage.getItem('logado') !== 'true') {
+    window.location.href = "../index.html"; 
+}
+
+// 2. FUNÇÃO DO HISTÓRICO
 async function carregarTudo() {
     const container = document.getElementById('lista-continuar');
     const secao = document.getElementById('secao-continuar');
@@ -44,43 +51,53 @@ async function carregarTudo() {
     if (!idUsuarioLogado) return;
 
     try {
-        // Monta a URL de busca de forma simples
-        const urlBusca = `${BASE_URL}/search?id_user=${idUsuarioLogado}`;
-        const resposta = await fetch(urlBusca);
-        
-        if (!resposta.ok) throw new Error("Erro na planilha");
-
+        const resposta = await fetch(`${BASE_URL}/search?id_user=${idUsuarioLogado}`);
         const historico = await resposta.json();
 
-        // VERIFICAÇÃO DE DADOS VAZIOS
-        if (!historico || historico.length === 0 || historico.error) {
-            console.warn("A planilha de histórico está vazia ou o ID não foi encontrado.");
-            return; // Sai da função sem dar erro
+        if (historico && historico.length > 0) {
+            secao.style.display = 'block';
+            container.innerHTML = '';
+            
+            historico.reverse().forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'ep-card';
+                card.innerHTML = `
+                    <div style="font-weight: bold; color: white;">${item.titulo}</div>
+                    <div class="progresso-bg"><div class="progresso-bar" style="width: 100%;"></div></div>
+                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data}</p>
+                `;
+                card.onclick = () => {
+                    const url = encodeURIComponent(item.url_acesso || "");
+                    const tit = encodeURIComponent(item.titulo || "");
+                    window.location.href = `player.html?url=${url}&titulo=${tit}`;
+                };
+                container.appendChild(card);
+            });
         }
-
-        // Se chegou aqui, há dados!
-        secao.style.display = 'block';
-        container.innerHTML = '';
-
-        historico.reverse().forEach(item => {
-            if(!item.titulo) return;
-            const card = document.createElement('div');
-            card.className = 'ep-card';
-            card.innerHTML = `
-                <div style="font-weight: bold; color: white;">${item.titulo}</div>
-                <div class="progresso-bg"><div class="progresso-bar" style="width: 100%;"></div></div>
-                <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data || '---'}</p>
-            `;
-            card.onclick = () => {
-                window.location.href = `player.html?url=${encodeURIComponent(item.url_acesso)}&titulo=${encodeURIComponent(item.titulo)}`;
-            };
-            container.appendChild(card);
-        });
-
     } catch (erro) {
-        console.error("Erro ao carregar:", erro);
+        console.error("Erro no histórico:", erro);
     }
 }
+
+// 3. BOTÕES DA HOTBAR (REVISADOS)
+// Verifique se os IDs no seu HTML são exatamente esses:
+const botoes = {
+    'btn-sair': () => { sessionStorage.clear(); window.location.href = "../index.html"; },
+    'btnBL': () => { window.location.href = "bl.html"; },
+    'btnnt': () => { window.location.href = "info.html"; },
+    'btnLP': () => { window.location.href = "../sites/bar.html"; }
+};
+
+// Vincula os cliques aos botões
+Object.keys(botoes).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.style.cursor = "pointer"; // Garante que mostre a "mãozinha"
+        el.onclick = botoes[id];
+    } else {
+        console.warn("Botão não encontrado no HTML: " + id);
+    }
+});
 
 window.onload = carregarTudo;
 </script>
