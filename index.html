@@ -31,7 +31,7 @@
 
 <script>
 // 1. Configurações Iniciais
-const API_URL = 'https://sheetdb.io/api/v1/et92hg0rvu16i';
+const API_URL = 'https://sheetdb.io';
 const loginForm = document.getElementById('loginForm');
 const btnEntrar = document.getElementById('btn-entrar');
 
@@ -50,21 +50,22 @@ loginForm.addEventListener('submit', async (e) => {
 
         const usuarios = await response.json();
 
-        // 2. BUSCA DO USUÁRIO (Definindo a variável corretamente)
+        // 2. BUSCA DO USUÁRIO
         const usuarioAchado = usuarios.find(u => {
+            // Verifica se as colunas na planilha são 'name' e 'senha'
             const nomePlanilha = u.name ? u.name.toString().trim() : "";
             const senhaPlanilha = u.senha ? u.senha.toString().trim() : "";
             return nomePlanilha === userField && senhaPlanilha === passField;
         });
 
-        // 3. SALVAMENTO (Dentro do bloco onde usuarioAchado existe)
+        // 3. SALVAMENTO (TUDO DEVE FICAR AQUI DENTRO)
         if (usuarioAchado) {
+            console.log("Usuário encontrado! ID:", usuarioAchado.id);
+            
             sessionStorage.setItem('logado', 'true');
-            sessionStorage.setItem('idUsuario', usuarioAchado.id); 
+            sessionStorage.setItem('idUsuario', usuarioAchado.id); // Salva o ID (Ex: 2 ou 89)
             sessionStorage.setItem('nomeUsuario', usuarioAchado.name); 
 
-            console.log("Login feito! ID:", usuarioAchado.id);
-            
             // Redireciona para a pasta base
             window.location.href = "base/p1.html";
         } else {
