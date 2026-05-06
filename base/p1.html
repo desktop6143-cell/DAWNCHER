@@ -33,55 +33,78 @@
 </div>
 
 <script>
-// 1. CONFIGURAÇÕES GLOBAIS
+// 1. CONFIGURAÇÕES FIXAS (Sem variáveis complexas para evitar erros de URL)
 const API_ID_HISTORICO = 'b8bvlm2gypqd0'; 
+const BASE_URL = 'https://sheetdb.io' + API_ID_HISTORICO; // Montagem ultra-segura
 
-// AQUI ESTAVA O ERRO: Use CRASE (tecla ao lado do P) e coloque o /api/v1/
-const BASE_URL = `https://sheetdb.io{API_ID_HISTORICO}`;
-
+// 2. VERIFICAÇÃO DE LOGIN
 const idUsuarioLogado = sessionStorage.getItem('idUsuario');
 
-// Segurança: Se não tiver ID, volta para o login
 if (sessionStorage.getItem('logado') !== 'true' || !idUsuarioLogado) {
     window.location.href = "../index.html"; 
 }
 
-// 2. FUNÇÃO DO HISTÓRICO
+// 3. FUNÇÃO PARA CARREGAR O HISTÓRICO
 async function carregarTudo() {
     const container = document.getElementById('lista-continuar');
     const secao = document.getElementById('secao-continuar');
 
     try {
-        // A URL final deve ser: https://sheetdb.io
-        const urlBusca = `${BASE_URL}/search?id_user=${idUsuarioLogado}`;
-        console.log("Acessando URL:", urlBusca); // Verifique se não tem chaves {} aqui no console
-
-        const resposta = await fetch(urlBusca);
-        if (!resposta.ok) throw new Error("Erro na planilha");
+        // Busca na planilha apenas as linhas do usuário logado
+        const resposta = await fetch(BASE_URL + '/search?id_user=' + idUsuarioLogado);
+        
+        if (!resposta.ok) throw new Error("Erro na conexão com a planilha");
 
         const historico = await resposta.json();
 
-        if (historico && historico.length > 0) {
+        // Se houver dados, exibe a seção
+        if (historico && historico.length > 0 && !historico.error) {
             secao.style.display = 'block';
             container.innerHTML = '';
+            
+            // Mostra o mais recente primeiro
             historico.reverse().forEach(item => {
+                if(!item.titulo) return;
                 const card = document.createElement('div');
                 card.className = 'ep-card';
                 card.innerHTML = `
                     <div style="font-weight: bold; color: white;">${item.titulo}</div>
                     <div class="progresso-bg"><div class="progresso-bar" style="width: 100%;"></div></div>
-                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data}</p>
+                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data || '---'}</p>
                 `;
                 card.onclick = () => {
-                    window.location.href = `player.html?url=${encodeURIComponent(item.url_acesso)}&titulo=${encodeURIComponent(item.titulo)}`;
+                    const urlEnc = encodeURIComponent(item.url_acesso || "");
+                    const titEnc = encodeURIComponent(item.titulo || "");
+                    window.location.href = `player.html?url=${urlEnc}&titulo=${titEnc}`;
                 };
                 container.appendChild(card);
             });
         }
     } catch (erro) {
-        console.error("Erro no histórico:", erro);
+        console.error("Erro no carregamento do histórico:", erro);
     }
 }
+
+// 4. CONFIGURAÇÃO DOS BOTÕES (Colocado FORA da função async para garantir o clique)
+const acoesBotoes = {
+    'btn-sair': () => { sessionStorage.clear(); window.location.href = "../index.html"; },
+    'btnBL': () => { window.location.href = "bl.html"; },
+    'btnnt': () => { window.location.href = "info.html"; },
+    'btnLP': () => { window.location.href = "../sites/bar.html"; }
+};
+
+// Vincula cada ID do HTML à sua função correspondente
+Object.keys(acoesBotoes).forEach(id => {
+    const elemento = document.getElementById(id);
+    if (elemento) {
+        elemento.onclick = acoesBotoes[id];
+        elemento.style.cursor = "pointer"; // Adiciona a mãozinha ao passar o mouse
+    }
+});
+
+// Inicializa a busca ao carregar a página
+window.onload = carregarTudo;
 </script>
+
 </body>
 </html>
