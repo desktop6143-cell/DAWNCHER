@@ -13,6 +13,9 @@ const bancoDeDados = {
     "dungeon ni deai"  : "ni_deai",
     "ni deai"  : "ni_deai",
     "dungeon"  : "ni_deai",
+    "Bleach"  : "bleach",
+    "bleach"  : "bleach",
+    "BLEACH"  : "bleach",
 
 
 
