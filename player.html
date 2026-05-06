@@ -146,27 +146,35 @@ if (urlVideo && idUser) {
 }
 
 // ==================== FUNÇÃO PRINCIPAL ====================
-async function salvarHistorico(status) {
+async function salvarHistorico() {
+    const idUser = sessionStorage.getItem('idUsuario');
     if (!idUser) return;
 
     try {
-        await fetch(API_HISTORICO, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                data: [{
-                    "id_user": idUser,
-                    "titulo": decodeURIComponent(tituloVideo || ''),
-                    "url_acesso": decodeURIComponent(urlVideo || ''),
-                    "data": new Date().toLocaleDateString('pt-BR'),
-                    "tempo": new Date().toLocaleTimeString('pt-BR'),
-                    "status": status
-                }]
-            })
-        });
-        
-        historicoSalvo = true;
-        console.log(`✅ Histórico salvo (${status})`);
+        // Primeiro verifica se já existe registro desse título HOJE
+        const check = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&titulo=${encodeURIComponent(tituloVideo)}&data=${new Date().toLocaleDateString('pt-BR')}`);
+        const existe = await check.json();
+
+        // Só salva se não existir registro hoje desse mesmo título
+        if (!existe || existe.length === 0) {
+            await fetch(API_HISTORICO, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    data: [{
+                        "id_user": idUser,
+                        "titulo": decodeURIComponent(tituloVideo || ''),
+                        "url_acesso": decodeURIComponent(urlVideo || ''),
+                        "data": new Date().toLocaleDateString('pt-BR'),
+                        "tempo": new Date().toLocaleTimeString('pt-BR'),
+                        "status": "Assistido"
+                    }]
+                })
+            });
+            console.log("✅ Histórico salvo com sucesso");
+        } else {
+            console.log("Registro de hoje já existe para este título");
+        }
     } catch (err) {
         console.error("Erro ao salvar histórico:", err);
     }
