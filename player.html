@@ -154,19 +154,21 @@ async function salvarHistorico() {
     }
 
     try {
-        // Busca o registro
-        const busca = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&titulo=${encodeURIComponent(tituloLimpo)}&data=${hoje}`);
+        // Busca TODOS os registros de HOJE do usuário (mais confiável)
+        const busca = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&data=${hoje}`);
         const registros = await busca.json();
 
-        console.log("Registros encontrados:", registros); // ← Para debug
+        console.log(`Registros encontrados hoje (${hoje}):`, registros.length);
 
-        if (registros && registros.length > 0 && registros[0].id) {
-            const idRegistro = registros[0].id;
+        // Filtra pelo título (mais seguro)
+        const registroExistente = registros.find(r => 
+            r.titulo && r.titulo.toLowerCase() === tituloLimpo.toLowerCase()
+        );
+
+        if (registroExistente && registroExistente.id) {
+            const idRegistro = registroExistente.id;
             
-            console.log("Atualizando ID:", idRegistro);
-
-            // Atualiza
-            const res = await fetch(`${API_HISTORICO}/id/${idRegistro}`, {
+            await fetch(`${API_HISTORICO}/id/${idRegistro}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -176,15 +178,9 @@ async function salvarHistorico() {
                     }
                 })
             });
-
-            if (res.ok) {
-                console.log(`✅ Atualizado com sucesso → ${tempoFinal}`);
-            } else {
-                console.error("Erro no PATCH, status:", res.status);
-            }
+            console.log(`🔄 ATUALIZADO → ${tempoFinal}`);
         } else {
-            // Cria novo registro
-            console.log("Nenhum registro encontrado, criando novo...");
+            // Cria novo
             await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -202,7 +198,7 @@ async function salvarHistorico() {
             console.log("✅ Nova linha criada");
         }
     } catch (err) {
-        console.error("Erro geral ao salvar histórico:", err);
+        console.error("Erro ao salvar histórico:", err);
     }
 }
 
