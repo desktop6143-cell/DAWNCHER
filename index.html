@@ -30,62 +30,56 @@
   </div>
 
 <script>
-   // 1. Configurações Iniciais
+// 1. Configurações Iniciais
 const API_URL = 'https://sheetdb.io/api/v1/et92hg0rvu16i';
 const loginForm = document.getElementById('loginForm');
 const btnEntrar = document.getElementById('btn-entrar');
 
 // 2. Evento de Envio do Formulário
 loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault(); // Impede o recarregamento da página
+    e.preventDefault(); 
 
-    // Captura os valores dos campos (id="name" e id="senha")
     const userField = document.getElementById('name').value.trim();
     const passField = document.getElementById('senha').value.trim();
 
-    // Inicia estado de carregamento no botão
     btnEntrar.innerText = "Verificando...";
     btnEntrar.disabled = true;
 
     try {
-        // Faz a chamada para a API do SheetDB
         const response = await fetch(API_URL);
         
-        if (!response.ok) {
-            throw new Error("Erro ao acessar a planilha");
-        }
+        if (!response.ok) throw new Error("Erro ao acessar a planilha");
 
         const usuarios = await response.json();
 
-        // 3. Validação Crucial
-        // Usamos 'u.name' porque na sua imagem a coluna está como "name"
-        const usuarioEncontrado = usuarios.find(u => {
+        // 3. Validação (Corrigida para usar 'u.name' e 'u.senha')
+        const usuarioAchado = usuarios.find(u => {
             const nomePlanilha = u.name ? u.name.toString().trim() : "";
             const senhaPlanilha = u.senha ? u.senha.toString().trim() : "";
-            
             return nomePlanilha === userField && senhaPlanilha === passField;
         });
 
-        if (usuarioEncontrado) {
-           // ... dentro do if (usuarioValido) ...
+        if (usuarioAchado) {
+            // AQUI ESTAVA O ERRO: Usamos 'usuarioAchado' em todos os campos
             sessionStorage.setItem('logado', 'true');
-            sessionStorage.setItem('idUsuario', usuarioValido.id); // SALVA O ID (Ex: 89)
-            sessionStorage.setItem('nomeUsuario', usuarioValido.name); 
+            sessionStorage.setItem('idUsuario', usuarioAchado.id); // Salva o ID (Ex: 89)
+            sessionStorage.setItem('nomeUsuario', usuarioAchado.name); 
 
-            console.log("ID salvo com sucesso:", usuarioValido.id); // Para você ver no console
-            window.location.href = "base/p1.html";
+            console.log("ID salvo:", usuarioAchado.id);
+            
+            // Pequeno delay para garantir que o navegador salvou os dados
+            setTimeout(() => {
+                window.location.href = "base/p1.html";
+            }, 100);
 
         } else {
-            // Falha: Dados incorretos
-            alert("Usuário ou senha incorretos! Tente novamente.");
+            alert("Usuário ou senha incorretos!");
         }
 
     } catch (error) {
-        // Trata erros de rede ou da API
         console.error("Erro na conexão:", error);
-        alert("Erro técnico: Não foi possível conectar ao banco de dados.");
+        alert("Erro ao conectar com o banco de dados. Verifique sua internet.");
     } finally {
-        // 4. Finalização (Impede o carregamento infinito)
         btnEntrar.innerText = "Login";
         btnEntrar.disabled = false;
     }
