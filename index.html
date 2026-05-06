@@ -36,9 +36,15 @@ const API_ID = 'et92hg0rvu16i';
 const BASE_URL = `https://sheetdb.io{API_ID}`; 
 const idUsuarioLogado = sessionStorage.getItem('idUsuario');
 
-if (sessionStorage.getItem('logado') !== 'true') {
-    window.location.href = ""; 
+if (usuarioAchado) {
+    sessionStorage.setItem('logado', 'true');
+    sessionStorage.setItem('idUsuario', usuarioAchado.id);
+    sessionStorage.setItem('nomeUsuario', usuarioAchado.name);
+
+    // Se o index está na raiz e o p1 dentro de base:
+    window.location.href = "base/p1.html"; 
 }
+
 
 // 2. CARREGAR HISTÓRICO
 async function carregarTudo() {
