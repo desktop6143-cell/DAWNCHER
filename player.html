@@ -2,96 +2,129 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Player de Vídeo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player de Vídeo Responsivo</title>
     <style>
+        * { box-sizing: border-box; }
+        
         body { 
             background: #000; 
             margin: 0; 
+            padding: 0;
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            justify-content: center; 
             min-height: 100vh; 
             color: white; 
-            font-family: sans-serif; 
-            padding: 20px;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            overflow-x: hidden;
         }
-        .video-container { 
-            width: 100%;       
-            max-width: 1100px; 
-            aspect-ratio: 16 / 9; 
-            background: #000; 
-            box-shadow: 0 0 50px rgba(0,0,0,0.8); 
-            border-radius: 10px;
-            overflow: hidden;
+
+        /* Cabeçalho compacto para mobile */
+        .header-area {
+            width: 100%;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
         }
-        /* Iframe ocupa tudo */
-        iframe { width: 100%; height: 100%; border: none; }
-        
+
         .voltar { 
-            position: absolute; 
-            top: 20px; 
-            left: 20px; 
             color: #fff; 
             text-decoration: none; 
-            background: rgba(255,255,255,0.1); 
-            padding: 10px 20px; 
-            border-radius: 50px; 
+            background: rgba(255,255,255,0.15); 
+            padding: 8px 16px; 
+            border-radius: 20px; 
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
-            z-index: 10;
             cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+            align-self: flex-start; /* Fica na esquerda */
         }
+
+        .voltar:active { transform: scale(0.95); background: rgba(255,255,255,0.3); }
+
         h2 { 
-            margin-top: 60px; 
-            margin-bottom: 20px; 
-            font-weight: 300; 
+            margin: 5px 0;
+            font-weight: 400; 
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            width: 90%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Corta o texto se for muito longo */
+        }
+
+        /* Container do Player */
+        .video-container { 
+            width: 100%;       
+            max-width: 1200px; 
+            aspect-ratio: 16 / 9; 
+            background: #000; 
+            position: relative;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        }
+
+        iframe { 
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+        }
+
+        /* Ajustes para telas pequenas (Celular) */
+        @media (max-width: 768px) {
+            .header-area { padding: 10px; }
+            h2 { font-size: 1rem; }
+            .voltar { font-size: 12px; padding: 6px 12px; }
+            
+            /* Se o celular estiver deitado, esconde o título para focar no vídeo */
+            @media (orientation: landscape) {
+                .header-area { display: none; }
+                .video-container { max-width: 100vw; height: 100vh; aspect-ratio: auto; }
+            }
         }
     </style>
 </head>
 <body>
-    <button onclick="voltarParaLista()" class="voltar">← Voltar para episódios</button>
-    <h2 id="display-titulo">Carregando...</h2>
+
+    <div class="header-area">
+        <button onclick="voltarParaLista()" class="voltar">← Voltar</button>
+        <h2 id="display-titulo">Carregando...</h2>
+    </div>
     
     <div class="video-container">
        <iframe id="meuVideo" src="" allowfullscreen allow="autoplay"></iframe>
     </div>
 
 <script>
-    // 1. PEGAR PARÂMETROS DA URL
     const params = new URLSearchParams(window.location.search);
     const titulo = decodeURIComponent(params.get('titulo') || 'Sem título');
     const videoUrl = decodeURIComponent(params.get('url'));
 
     const player = document.getElementById('meuVideo');
-    document.getElementById('display-titulo').innerText = titulo;
+    const titleElement = document.getElementById('display-titulo');
 
-    // 2. CARREGAR O VÍDEO NO IFRAME
     if (videoUrl) {
         player.src = videoUrl;
+        titleElement.innerText = titulo;
     } else {
-        document.getElementById('display-titulo').innerText = "Erro: Vídeo não encontrado.";
+        titleElement.innerText = "Erro: Vídeo não encontrado.";
     }
 
-    // 3. FUNÇÃO VOLTAR
     function voltarParaLista() {
-        // Se houver histórico, volta, senão vai para a home
         if (window.history.length > 1) {
             window.history.back();
         } else {
             window.location.href = "index.html";
         }
     }
-
-    /* 
-       AVISO: Funções de 'salvarTempo' e 'currentTime' foram removidas 
-       pois o Google Drive dentro de um <iframe> não permite que seu site 
-       saiba em que minuto o vídeo está por questões de segurança.
-    */
 </script>
 
 </body>
 </html>
-
