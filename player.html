@@ -118,6 +118,7 @@
         </div>
     </div>
 
+   
 <script>
 // ==================== CONFIGURAÇÕES ====================
 const API_HISTORICO = 'https://sheetdb.io/api/v1/b8bvlm2gypqd0';
@@ -136,14 +137,11 @@ if (urlVideo && idUser) {
     document.getElementById('video-frame').src = decodeURIComponent(urlVideo);
     document.getElementById('video-title').innerText = tituloLimpo || 'Assistindo...';
 
-    // Salva a cada 30 segundos
     intervaloSalvar = setInterval(salvarHistorico, 30000);
-
-    // Salva quando sair da página
     window.addEventListener('beforeunload', salvarHistorico);
 }
 
-// ==================== FUNÇÃO DE SALVAR HISTÓRICO ====================
+// ==================== FUNÇÃO CORRIGIDA ====================
 async function salvarHistorico() {
     if (!idUser) return;
 
@@ -151,25 +149,30 @@ async function salvarHistorico() {
     const tempoFormatado = minutosAssistidos + " minutos";
 
     try {
-        // Tenta atualizar primeiro
-        const resUpdate = await fetch(`${API_HISTORICO}/id_user/${idUser}?titulo=${encodeURIComponent(tituloLimpo)}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                data: {
-                    "titulo": tituloLimpo,
-                    "url_acesso": decodeURIComponent(urlVideo || ''),
-                    "data": new Date().toLocaleDateString('pt-BR'),
-                    "tempo": tempoFormatado,
-                    "status": "Assistindo"
-                }
-            })
-        });
+        // 1. Busca se já existe registro desse usuário + título hoje
+        const busca = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&titulo=${encodeURIComponent(tituloLimpo)}`);
+        const registros = await busca.json();
 
-        const resultado = await resUpdate.json();
+        const hoje = new Date().toLocaleDateString('pt-BR');
 
-        if (resultado.updated === 0) {
-            // Se não atualizou, cria nova linha
+        if (registros && registros.length > 0) {
+            // Atualiza o primeiro registro encontrado
+            const idRegistro = registros[0].id;
+
+            await fetch(`${API_HISTORICO}/id/${idRegistro}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    data: {
+                        "tempo": tempoFormatado,
+                        "url_acesso": decodeURIComponent(urlVideo || ''),
+                        "data": hoje
+                    }
+                })
+            });
+            console.log("🔄 Linha atualizada com sucesso");
+        } else {
+            // Cria novo registro
             await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -178,22 +181,20 @@ async function salvarHistorico() {
                         "id_user": idUser,
                         "titulo": tituloLimpo,
                         "url_acesso": decodeURIComponent(urlVideo || ''),
-                        "data": new Date().toLocaleDateString('pt-BR'),
+                        "data": hoje,
                         "tempo": tempoFormatado,
                         "status": "Assistindo"
                     }]
                 })
             });
             console.log("✅ Nova linha criada");
-        } else {
-            console.log("🔄 Linha atualizada");
         }
     } catch (err) {
         console.error("Erro ao salvar histórico:", err);
     }
 }
 
-// ==================== CONTROLES DO PLAYER ====================
+// ==================== CONTROLES ====================
 const controls = document.getElementById('controls');
 const wrapper = document.getElementById('wrapper');
 let timeout;
