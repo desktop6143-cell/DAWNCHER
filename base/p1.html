@@ -33,7 +33,7 @@
 </div>
 
 <script>
-// 1. URL FIXA E COMPLETA (Copie exatamente assim)
+// 1. URL COMPLETA E FIXA (Com o seu ID de histórico: b8bvlm2gypqd0)
 const BASE_URL = 'https://sheetdb.io';
 const idUsuarioLogado = sessionStorage.getItem('idUsuario');
 
@@ -48,12 +48,14 @@ async function carregarTudo() {
     const secao = document.getElementById('secao-continuar');
 
     try {
-        // Montagem manual da URL para evitar erros de símbolo
+        // A URL final deve ser: https://sheetdb.io/search?id_user=2
         const urlBusca = BASE_URL + '/search?id_user=' + idUsuarioLogado;
-        console.log("Acessando:", urlBusca);
+        console.log("Acessando URL Real:", urlBusca);
 
         const resposta = await fetch(urlBusca);
-        if (!resposta.ok) throw new Error("Erro na planilha");
+        
+        // Se der 404 aqui, significa que o ID b8bvlm2gypqd0 está incorreto no SheetDB
+        if (!resposta.ok) throw new Error("Erro na planilha ou ID da API inválido");
 
         const historico = await resposta.json();
 
@@ -79,11 +81,11 @@ async function carregarTudo() {
             });
         }
     } catch (erro) {
-        console.error("Erro no histórico:", erro);
+        console.error("Erro técnico no histórico:", erro);
     }
 }
 
-// 4. BOTÕES DA HOTBAR (REVISADOS)
+// 4. BOTÕES DA HOTBAR (Mantenha igual)
 const acoes = {
     'btn-sair': () => { sessionStorage.clear(); window.location.href = "../index.html"; },
     'btnBL': () => { window.location.href = "bl.html"; },
@@ -98,7 +100,5 @@ Object.keys(acoes).forEach(id => {
 
 window.onload = carregarTudo;
 </script>
-
-
 </body>
 </html>
