@@ -33,10 +33,10 @@
 </div>
 
 <script>
-// 1. CONFIGURAÇÕES E SEGURANÇA
+// 1. CONFIGURAÇÕES (Use CRASE ` para as variáveis funcionarem)
 const API_ID = 'et92hg0rvu16i'; 
-
-// ATENÇÃO: Verifique se usou a CRASE (tecla ao lado do P ou Shift + ´)
+const BASE_URL = `https://sheetdb.io{API_ID}`; 
+const idUsuarioLogado = sessionStorage.getItem('idUsuario');
 // Não use ' (aspas) nem " (aspas duplas) aqui!
 const BASE_URL = `https://sheetdb.io{API_ID}`; 
 
