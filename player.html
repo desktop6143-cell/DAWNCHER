@@ -2,70 +2,69 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player de Vídeo Responsivo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Player de Vídeo</title>
     <style>
-        * { box-sizing: border-box; }
-        
-        body { 
-            background: #000; 
-            margin: 0; 
+        /* Reseta margens e garante que o fundo ocupe a tela toda */
+        html, body {
+            margin: 0;
             padding: 0;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh; 
-            color: white; 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            overflow-x: hidden;
-        }
-
-        /* Cabeçalho compacto para mobile */
-        .header-area {
             width: 100%;
-            padding: 15px;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden; /* Impede scroll desnecessário */
             display: flex;
             flex-direction: column;
+            font-family: sans-serif;
+        }
+
+        /* Área superior com botão e título */
+        .header {
+            padding: 10px 15px;
+            display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
             z-index: 10;
         }
 
         .voltar { 
             color: #fff; 
             text-decoration: none; 
-            background: rgba(255,255,255,0.15); 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.1); 
+            padding: 8px 15px; 
+            border-radius: 8px; 
             border: 1px solid rgba(255,255,255,0.2);
             cursor: pointer;
             font-size: 14px;
-            transition: 0.3s;
-            align-self: flex-start; /* Fica na esquerda */
+            white-space: nowrap;
         }
-
-        .voltar:active { transform: scale(0.95); background: rgba(255,255,255,0.3); }
 
         h2 { 
-            margin: 5px 0;
-            font-weight: 400; 
-            text-align: center;
-            font-size: 1.1rem;
-            width: 90%;
+            color: #fff;
+            margin: 0; 
+            font-size: 16px;
+            font-weight: 400;
             white-space: nowrap;
             overflow: hidden;
-            text-overflow: ellipsis; /* Corta o texto se for muito longo */
+            text-overflow: ellipsis;
         }
 
-        /* Container do Player */
-        .video-container { 
+        /* Container que centraliza o vídeo no meio da tela */
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center; /* Centraliza verticalmente */
+            justify-content: center; /* Centraliza horizontalmente */
+            padding: 5px;
+        }
+
+        .video-wrapper { 
             width: 100%;       
-            max-width: 1200px; 
+            max-width: 100%; 
             aspect-ratio: 16 / 9; 
-            background: #000; 
             position: relative;
-            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+            background: #000;
         }
 
         iframe { 
@@ -77,29 +76,25 @@
             border: none; 
         }
 
-        /* Ajustes para telas pequenas (Celular) */
-        @media (max-width: 768px) {
-            .header-area { padding: 10px; }
-            h2 { font-size: 1rem; }
-            .voltar { font-size: 12px; padding: 6px 12px; }
-            
-            /* Se o celular estiver deitado, esconde o título para focar no vídeo */
-            @media (orientation: landscape) {
-                .header-area { display: none; }
-                .video-container { max-width: 100vw; height: 100vh; aspect-ratio: auto; }
-            }
+        /* Ajuste para quando o celular estiver deitado */
+        @media (orientation: landscape) {
+            .header { display: none; } /* Esconde o topo para focar no vídeo */
+            .main-content { padding: 0; }
+            .video-wrapper { height: 100vh; aspect-ratio: auto; }
         }
     </style>
 </head>
 <body>
 
-    <div class="header-area">
+    <div class="header">
         <button onclick="voltarParaLista()" class="voltar">← Voltar</button>
         <h2 id="display-titulo">Carregando...</h2>
     </div>
     
-    <div class="video-container">
-       <iframe id="meuVideo" src="" allowfullscreen allow="autoplay"></iframe>
+    <div class="main-content">
+        <div class="video-wrapper">
+           <iframe id="meuVideo" src="" allowfullscreen allow="autoplay"></iframe>
+        </div>
     </div>
 
 <script>
@@ -108,23 +103,6 @@
     const videoUrl = decodeURIComponent(params.get('url'));
 
     const player = document.getElementById('meuVideo');
-    const titleElement = document.getElementById('display-titulo');
+    document.getElementById('display-titulo').innerText = titulo;
 
     if (videoUrl) {
-        player.src = videoUrl;
-        titleElement.innerText = titulo;
-    } else {
-        titleElement.innerText = "Erro: Vídeo não encontrado.";
-    }
-
-    function voltarParaLista() {
-        if (window.history.length > 1) {
-            window.history.back();
-        } else {
-            window.location.href = "index.html";
-        }
-    }
-</script>
-
-</body>
-</html>
