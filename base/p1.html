@@ -30,65 +30,74 @@
 </div>
 
 <script>
-// 1. VERIFICAÇÃO DE LOGIN
+// 1. CONFIGURAÇÕES E VERIFICAÇÃO DE LOGIN
+const API_HISTORICO = 'https://sheetdb.io'; // Sua API do SheetDB
+const idUsuarioLogado = sessionStorage.getItem('idUsuario'); // O 89 do Carlos
+
 if (sessionStorage.getItem('logado') !== 'true') {
     window.location.href = "../index.html"; 
 }
 
-// 2. FUNÇÃO PRINCIPAL: CARREGAR HISTÓRICO DO SERVIDOR NODE
+// 2. CARREGAR HISTÓRICO DA PLANILHA (SheetDB)
 async function carregarTudo() {
     try {
-        // ATENÇÃO: Node está na 3000!
-        const resposta = await fetch('http://localhost:3000/historico');
+        // Buscamos na planilha apenas as linhas que pertencem ao ID do usuário logado
+        const resposta = await fetch(`${API_HISTORICO}/search?id_user=${idUsuarioLogado}`);
         const historico = await resposta.json();
 
-        if (historico.length === 0) return;
+        // Se não tiver nada no histórico, não mostra a seção
+        if (!historico || historico.length === 0) return;
 
         const container = document.getElementById('lista-continuar');
         const secao = document.getElementById('secao-continuar');
         
-        secao.style.display = 'block';
-        container.innerHTML = ''; 
+        if(secao) secao.style.display = 'block';
+        if(container) container.innerHTML = ''; 
 
-        historico.forEach(item => {
-            if(!item.titulo) return; // Pula registros vazios
+        // Mostra os itens do histórico (do mais recente para o mais antigo)
+        historico.reverse().forEach(item => {
+            if(!item.titulo) return;
 
             const card = document.createElement('div');
             card.className = 'ep-card';
             
+            // Quando clica, abre o player com a URL que salvamos na planilha
             card.onclick = () => {
-                // Aqui você deve passar a URL do vídeo se tiver, 
-                // ou o player.html deve saber carregar pelo ID
-                window.location.href = `player.html?id=${item.video_id}&titulo=${encodeURIComponent(item.titulo)}`;
+                const urlVideo = encodeURIComponent(item.url_acesso || "");
+                const nomeTitulo = encodeURIComponent(item.titulo);
+                window.location.href = `player.html?url=${urlVideo}&titulo=${nomeTitulo}`;
             };
 
             card.innerHTML = `
-                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">${item.titulo}</div>
-                <div class="progresso-bg">
-                    <div class="progresso-bar"></div>
+                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px; color: white;">${item.titulo}</div>
+                <div class="progresso-bg" style="background: #333; height: 4px; border-radius: 2px;">
+                    <div class="progresso-bar" style="background: #7c3aed; width: 100%; height: 100%;"></div>
                 </div>
-                <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Retomar vídeo</p>
+                <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Assistido em: ${item.data}</p>
             `;
             container.appendChild(card);
         });
     } catch (erro) {
-        console.error("Servidor Node (3000) não encontrado.");
+        console.error("Erro ao carregar histórico da planilha:", erro);
     }
 }
 
 // 3. BOTÕES DA HOTBAR
-document.getElementById('btn-sair').addEventListener('click', () => {
-    sessionStorage.removeItem('logado'); 
-    window.location.href = "../index.html"; 
-});
+const acoesBotoes = {
+    'btn-sair': () => { sessionStorage.clear(); window.location.href = "../index.html"; },
+    'btnBL': () => window.location.href = "bl.html",
+    'btnnt': () => window.location.href = "info.html",
+    'btnLP': () => window.location.href = "../sites/bar.html"
+};
 
-document.getElementById('btnBL').addEventListener('click', () => window.location.href = "bl.html");
-document.getElementById('btnnt').addEventListener('click', () => window.location.href = "info.html");
-document.getElementById('btnLP').addEventListener('click', () => window.location.href = "../sites/bar.html");
+// Aplica os eventos aos botões
+Object.keys(acoesBotoes).forEach(id => {
+    const btn = document.getElementById(id);
+    if(btn) btn.addEventListener('click', acoesBotoes[id]);
+});
 
 // Inicializa a página
 window.onload = carregarTudo;
-
 </script>
 </body>
 </html>
