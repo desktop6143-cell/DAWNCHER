@@ -131,7 +131,7 @@ const idUser = sessionStorage.getItem('idUsuario');
 const tituloLimpo = decodeURIComponent(tituloVideo || '');
 
 let intervaloSalvar = null;
-let tempoInicial = Date.now();   // Definido uma única vez
+const tempoInicial = Date.now();
 
 if (urlVideo && idUser) {
     document.getElementById('video-frame').src = decodeURIComponent(urlVideo);
@@ -141,36 +141,34 @@ if (urlVideo && idUser) {
     window.addEventListener('beforeunload', salvarHistorico);
 }
 
-// ==================== FUNÇÃO DE SALVAR ====================
+// ==================== NOVA LÓGICA ====================
 async function salvarHistorico() {
     if (!idUser) return;
 
     const minutosAssistidos = Math.floor((Date.now() - tempoInicial) / 60000);
     const tempoFormatado = minutosAssistidos + " minutos";
+    const hoje = new Date().toLocaleDateString('pt-BR');
 
     try {
-        const busca = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&titulo=${encodeURIComponent(tituloLimpo)}`);
+        // Busca se já tem registro HOJE deste título
+        const busca = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&data=${hoje}&titulo=${encodeURIComponent(tituloLimpo)}`);
         const registros = await busca.json();
 
-        const hoje = new Date().toLocaleDateString('pt-BR');
-
-        if (registros && registros.length > 0 && registros[0].id) {
+        if (registros && registros.length > 0) {
+            // Atualiza o registro de hoje
             const idRegistro = registros[0].id;
 
             await fetch(`${API_HISTORICO}/id/${idRegistro}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    data: {
-                        "tempo": tempoFormatado,
-                        "url_acesso": decodeURIComponent(urlVideo || ''),
-                        "data": hoje
-                    }
+                    data: { "tempo": tempoFormatado }
                 })
             });
             console.log(`🔄 Atualizado → ${tempoFormatado}`);
         } else {
-            const res = await fetch(API_HISTORICO, {
+            // Cria novo registro (só 1 por dia)
+            await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
