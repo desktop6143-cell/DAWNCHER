@@ -131,11 +131,14 @@ const idUser = sessionStorage.getItem('idUsuario');
 const tituloLimpo = decodeURIComponent(tituloVideo || '');
 
 let intervaloSalvar = null;
-const tempoInicial = Date.now();
+let tempoInicial = null;   // ← Mudança importante
 
 if (urlVideo && idUser) {
     document.getElementById('video-frame').src = decodeURIComponent(urlVideo);
     document.getElementById('video-title').innerText = tituloLimpo || 'Assistindo...';
+
+    // Define o tempo inicial APENAS uma vez
+    tempoInicial = Date.now();
 
     intervaloSalvar = setInterval(salvarHistorico, 30000);
     window.addEventListener('beforeunload', salvarHistorico);
@@ -143,20 +146,18 @@ if (urlVideo && idUser) {
 
 // ==================== FUNÇÃO CORRIGIDA ====================
 async function salvarHistorico() {
-    if (!idUser) return;
+    if (!idUser || !tempoInicial) return;
 
     const minutosAssistidos = Math.floor((Date.now() - tempoInicial) / 60000);
     const tempoFormatado = minutosAssistidos + " minutos";
 
     try {
-        // 1. Busca se já existe registro desse usuário + título hoje
         const busca = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&titulo=${encodeURIComponent(tituloLimpo)}`);
         const registros = await busca.json();
 
         const hoje = new Date().toLocaleDateString('pt-BR');
 
         if (registros && registros.length > 0) {
-            // Atualiza o primeiro registro encontrado
             const idRegistro = registros[0].id;
 
             await fetch(`${API_HISTORICO}/id/${idRegistro}`, {
@@ -170,9 +171,8 @@ async function salvarHistorico() {
                     }
                 })
             });
-            console.log("🔄 Linha atualizada com sucesso");
+            console.log(`🔄 Atualizado → ${tempoFormatado}`);
         } else {
-            // Cria novo registro
             await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
