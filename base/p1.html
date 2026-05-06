@@ -41,8 +41,7 @@ if (sessionStorage.getItem('logado') !== 'true' || !idUser) {
     window.location.href = "../index.html";
 }
 
-// ==================== CARREGAR HISTÓRICO ====================
-// ==================== CARREGAR HISTÓRICO - APENAS O MAIS RECENTE ====================
+// ==================== CARREGAR ÚLTIMO CARD ====================
 async function carregarHistorico() {
     const container = document.getElementById('lista-continuar');
     const secao = document.getElementById('secao-continuar');
@@ -58,38 +57,45 @@ async function carregarHistorico() {
             secao.style.display = 'block';
             container.innerHTML = '';
 
-            // Pega apenas o item mais recente (o primeiro depois de ordenar por data/hora)
+            // Pega o mais recente
             const maisRecente = dados.sort((a, b) => {
-                const dataA = new Date(a.data + ' ' + (a.tempo || '00:00'));
-                const dataB = new Date(b.data + ' ' + (b.tempo || '00:00'));
-                return dataB - dataA;
+                return new Date(b.data + " " + (b.tempo || "")) - new Date(a.data + " " + (a.tempo || ""));
             })[0];
 
             const card = document.createElement('div');
             card.className = 'ep-card';
             card.innerHTML = `
                 <div style="font-weight: bold;">${maisRecente.titulo}</div>
-                <div class="progresso-bg"><div class="progresso-bar" style="width: 65%;"></div></div>
-                <p style="font-size: 11px; color: #aaa; margin-top: 5px;">
-                    Visto em: ${maisRecente.data} às ${maisRecente.tempo || ''}
+                <div class="progresso-bg">
+                    <div class="progresso-bar" style="width: 70%;"></div>
+                </div>
+                <p style="font-size: 12px; color: #aaa; margin-top: 6px;">
+                    Último visto: ${maisRecente.data} • ${maisRecente.tempo || ''}
                 </p>
             `;
-            
+
             card.onclick = () => {
-                const urlEnc = encodeURIComponent(maisRecente.url_acesso || "");
-                const titEnc = encodeURIComponent(maisRecente.titulo || "");
-                window.location.href = `player.html?url=${urlEnc}&titulo=${titEnc}`;
+                if (maisRecente.url_acesso) {
+                    const urlEnc = encodeURIComponent(maisRecente.url_acesso);
+                    const titEnc = encodeURIComponent(maisRecente.titulo);
+                    window.location.href = `player.html?url=${urlEnc}&titulo=${titEnc}`;
+                } else {
+                    alert("URL do vídeo não encontrada.");
+                }
             };
-            
+
             container.appendChild(card);
+        } else {
+            secao.style.display = 'none';
         }
     } catch (err) {
         console.error("Erro ao carregar histórico:", err);
+        secao.style.display = 'none';
     }
 }
 
 // ==================== BOTÕES DA HOTBAR ====================
-document.getElementById('btn-home').onclick = () => window.location.reload(); // ou "p1.html"
+document.getElementById('btn-home').onclick = () => window.location.reload();
 document.getElementById('btnBL').onclick = () => window.location.href = "bl.html";
 document.getElementById('btnLP').onclick = () => window.location.href = "../sites/bar.html";
 document.getElementById('btnnt').onclick = () => window.location.href = "info.html";
@@ -98,7 +104,6 @@ document.getElementById('btn-sair').onclick = () => {
     window.location.href = "../index.html";
 };
 
-// Inicia ao carregar a página
 window.onload = carregarHistorico;
 </script>
 </body>
