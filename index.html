@@ -67,12 +67,14 @@ loginForm.addEventListener('submit', async (e) => {
         });
 
         if (usuarioEncontrado) {
-            // Sucesso: Salva a sessão e redireciona
+           // ... dentro do if (usuarioValido) ...
             sessionStorage.setItem('logado', 'true');
-            sessionStorage.setItem('nomeUsuario', usuarioEncontrado.name);
-            
-            alert("Login realizado com sucesso! Bem-vindo, " + usuarioEncontrado.name);
+            sessionStorage.setItem('idUsuario', usuarioValido.id); // SALVA O ID (Ex: 89)
+            sessionStorage.setItem('nomeUsuario', usuarioValido.name); 
+
+            console.log("ID salvo com sucesso:", usuarioValido.id); // Para você ver no console
             window.location.href = "base/p1.html";
+
         } else {
             // Falha: Dados incorretos
             alert("Usuário ou senha incorretos! Tente novamente.");
