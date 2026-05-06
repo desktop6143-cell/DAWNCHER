@@ -33,35 +33,45 @@
 </div>
 
 <script>
+// 1. CONFIGURAÇÕES GLOBAIS
 const API_ID_HISTORICO = 'b8bvlm2gypqd0'; 
 const BASE_URL = `https://sheetdb.io{API_ID_HISTORICO}`;
-// Proteção de segurança
-if (sessionStorage.getItem('logado') !== 'true') {
+
+// 2. VERIFICAÇÃO DE SEGURANÇA (Executa assim que a página abre)
+const usuarioLogadoStatus = sessionStorage.getItem('logado');
+const idUsuarioLogado = sessionStorage.getItem('idUsuario'); // Definida globalmente aqui
+
+if (usuarioLogadoStatus !== 'true' || !idUsuarioLogado) {
     window.location.href = "../index.html"; 
 }
 
-// 2. FUNÇÃO DO HISTÓRICO
+// 3. FUNÇÃO DO HISTÓRICO
 async function carregarTudo() {
     const container = document.getElementById('lista-continuar');
     const secao = document.getElementById('secao-continuar');
 
-    if (!idUsuarioLogado) return;
-
+    // Usando a variável global definida no passo 2
     try {
+        console.log("Buscando histórico para ID:", idUsuarioLogado);
         const resposta = await fetch(`${BASE_URL}/search?id_user=${idUsuarioLogado}`);
+        
+        if (!resposta.ok) throw new Error("Erro na conexão com a planilha");
+
         const historico = await resposta.json();
 
-        if (historico && historico.length > 0) {
+        if (historico && historico.length > 0 && !historico.error) {
             secao.style.display = 'block';
             container.innerHTML = '';
             
+            // Inverte para o mais recente aparecer primeiro
             historico.reverse().forEach(item => {
+                if(!item.titulo) return;
                 const card = document.createElement('div');
                 card.className = 'ep-card';
                 card.innerHTML = `
                     <div style="font-weight: bold; color: white;">${item.titulo}</div>
                     <div class="progresso-bg"><div class="progresso-bar" style="width: 100%;"></div></div>
-                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data}</p>
+                    <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Visto em: ${item.data || '---'}</p>
                 `;
                 card.onclick = () => {
                     const url = encodeURIComponent(item.url_acesso || "");
@@ -72,12 +82,11 @@ async function carregarTudo() {
             });
         }
     } catch (erro) {
-        console.error("Erro no histórico:", erro);
+        console.error("Erro no carregamento:", erro);
     }
 }
 
-// 3. BOTÕES DA HOTBAR (REVISADOS)
-// Verifique se os IDs no seu HTML são exatamente esses:
+// 4. BOTÕES DA HOTBAR (REVISADOS)
 const botoes = {
     'btn-sair': () => { sessionStorage.clear(); window.location.href = "../index.html"; },
     'btnBL': () => { window.location.href = "bl.html"; },
@@ -85,17 +94,15 @@ const botoes = {
     'btnLP': () => { window.location.href = "../sites/bar.html"; }
 };
 
-// Vincula os cliques aos botões
+// Vincula os cliques aos botões (Garante que o script não trave se um ID faltar)
 Object.keys(botoes).forEach(id => {
     const el = document.getElementById(id);
     if (el) {
-        el.style.cursor = "pointer"; // Garante que mostre a "mãozinha"
         el.onclick = botoes[id];
-    } else {
-        console.warn("Botão não encontrado no HTML: " + id);
     }
 });
 
+// Inicializa as funções
 window.onload = carregarTudo;
 </script>
 </body>
