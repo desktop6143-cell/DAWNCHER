@@ -30,93 +30,56 @@
   </div>
 
 <script>
-// 1. CONFIGURAÇÕES E SEGURANÇA
-const API_ID = 'et92hg0rvu16i'; 
-// AQUI ESTAVA O ERRO: Use crases (tecla ao lado do P ou Shift + ´) para o ${} funcionar
-const BASE_URL = `https://sheetdb.io{API_ID}`; 
-const idUsuarioLogado = sessionStorage.getItem('idUsuario');
+// 1. Configurações Iniciais
+const API_URL = 'https://sheetdb.io';
+const loginForm = document.getElementById('loginForm');
+const btnEntrar = document.getElementById('btn-entrar');
 
-if (usuarioAchado) {
-    sessionStorage.setItem('logado', 'true');
-    sessionStorage.setItem('idUsuario', usuarioAchado.id);
-    sessionStorage.setItem('nomeUsuario', usuarioAchado.name);
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); 
 
-    // Se o index está na raiz e o p1 dentro de base:
-    window.location.href = "base/p1.html"; 
-}
+    const userField = document.getElementById('name').value.trim();
+    const passField = document.getElementById('senha').value.trim();
 
-
-// 2. CARREGAR HISTÓRICO
-async function carregarTudo() {
-    const container = document.getElementById('lista-continuar');
-    const secao = document.getElementById('secao-continuar');
-
-    // Se o ID for nulo, paramos aqui
-    if (!idUsuarioLogado || idUsuarioLogado === "null") {
-        console.error("ID do usuário não encontrado.");
-        return;
-    }
+    btnEntrar.innerText = "Verificando...";
+    btnEntrar.disabled = true;
 
     try {
-        // Agora a URL será montada corretamente como: https://sheetdb.io
-        const urlFinal = `${BASE_URL}/search?id_user=${idUsuarioLogado}`;
-        console.log("Tentando acessar:", urlFinal); // Verifique isso no console!
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error("Erro ao acessar a planilha");
 
-        const resposta = await fetch(urlFinal);
-        
-        if (!resposta.ok) throw new Error("Erro ao conectar com a planilha");
+        const usuarios = await response.json();
 
-        const historico = await resposta.json();
+        // 2. BUSCA DO USUÁRIO (Definindo a variável corretamente)
+        const usuarioAchado = usuarios.find(u => {
+            const nomePlanilha = u.name ? u.name.toString().trim() : "";
+            const senhaPlanilha = u.senha ? u.senha.toString().trim() : "";
+            return nomePlanilha === userField && senhaPlanilha === passField;
+        });
 
-        if (!historico || historico.length === 0 || historico.error) {
-            console.log("Nenhum histórico para o usuário:", idUsuarioLogado);
-            return;
+        // 3. SALVAMENTO (Dentro do bloco onde usuarioAchado existe)
+        if (usuarioAchado) {
+            sessionStorage.setItem('logado', 'true');
+            sessionStorage.setItem('idUsuario', usuarioAchado.id); 
+            sessionStorage.setItem('nomeUsuario', usuarioAchado.name); 
+
+            console.log("Login feito! ID:", usuarioAchado.id);
+            
+            // Redireciona para a pasta base
+            window.location.href = "base/p1.html";
+        } else {
+            alert("Usuário ou senha incorretos!");
         }
 
-        secao.style.display = 'block';
-        container.innerHTML = ''; 
-
-        // Inverte para mostrar o último visto primeiro
-        historico.reverse().forEach(item => {
-            if(!item.titulo) return;
-
-            const card = document.createElement('div');
-            card.className = 'ep-card';
-            
-            card.onclick = () => {
-                const urlVideo = encodeURIComponent(item.url_acesso || "");
-                const nomeTitulo = encodeURIComponent(item.titulo);
-                window.location.href = `player.html?url=${urlVideo}&titulo=${nomeTitulo}`;
-            };
-
-            card.innerHTML = `
-                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">${item.titulo}</div>
-                <div class="progresso-bg">
-                    <div class="progresso-bar"></div>
-                </div>
-                <p style="font-size: 11px; color: #aaa; margin-top: 8px;">Visto em: ${item.data || '---'}</p>
-            `;
-            container.appendChild(card);
-        });
-    } catch (erro) {
-        console.error("Erro na API:", erro);
+    } catch (error) {
+        console.error("Erro técnico:", error);
+        alert("Erro ao conectar com o banco de dados.");
+    } finally {
+        btnEntrar.innerText = "Login";
+        btnEntrar.disabled = false;
     }
-}
-
-// 3. BOTÕES DA HOTBAR (Mantenha seu código original abaixo)
-const acoesBotoes = {
-    'btn-sair': () => { sessionStorage.clear(); window.location.href = "../index.html"; },
-    'btnBL': () => window.location.href = "bl.html",
-    'btnnt': () => window.location.href = "info.html",
-    'btnLP': () => window.location.href = "../sites/bar.html"
-};
-
-Object.keys(acoesBotoes).forEach(id => {
-    const btn = document.getElementById(id);
-    if(btn) btn.addEventListener('click', acoesBotoes[id]);
 });
 
-window.onload = carregarTudo;
 </script>
 
 </body>
