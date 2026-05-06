@@ -146,18 +146,33 @@ if (urlVideo && idUser) {
 }
 
 // ==================== FUNÇÃO PRINCIPAL ====================
+let ultimoRegistroId = null;   // Vamos guardar o ID da linha criada
+
 async function salvarHistorico() {
-    const idUser = sessionStorage.getItem('idUsuario');
     if (!idUser) return;
 
-    try {
-        // Primeiro verifica se já existe registro desse título HOJE
-        const check = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&titulo=${encodeURIComponent(tituloVideo)}&data=${new Date().toLocaleDateString('pt-BR')}`);
-        const existe = await check.json();
+    const agora = new Date();
+    const dataAtual = agora.toLocaleDateString('pt-BR');
+    const horaAtual = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-        // Só salva se não existir registro hoje desse mesmo título
-        if (!existe || existe.length === 0) {
-            await fetch(API_HISTORICO, {
+    try {
+        if (ultimoRegistroId) {
+            // Atualiza a linha que já existe
+            await fetch(`${API_HISTORICO}/id/${ultimoRegistroId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    data: {
+                        "tempo": horaAtual,
+                        "status": "Assistindo"
+                    }
+                })
+            });
+            console.log("🔄 Linha atualizada - Tempo:", horaAtual);
+        } 
+        else {
+            // Primeira vez - cria a linha
+            const res = await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -165,15 +180,18 @@ async function salvarHistorico() {
                         "id_user": idUser,
                         "titulo": decodeURIComponent(tituloVideo || ''),
                         "url_acesso": decodeURIComponent(urlVideo || ''),
-                        "data": new Date().toLocaleDateString('pt-BR'),
-                        "tempo": new Date().toLocaleTimeString('pt-BR'),
-                        "status": "Assistido"
+                        "data": dataAtual,
+                        "tempo": horaAtual,
+                        "status": "Iniciado"
                     }]
                 })
             });
-            console.log("✅ Histórico salvo com sucesso");
-        } else {
-            console.log("Registro de hoje já existe para este título");
+
+            const resultado = await res.json();
+            if (resultado.created && resultado.created.length > 0) {
+                ultimoRegistroId = resultado.created[0].id;  // Pega o ID gerado
+                console.log("✅ Nova linha criada com ID:", ultimoRegistroId);
+            }
         }
     } catch (err) {
         console.error("Erro ao salvar histórico:", err);
