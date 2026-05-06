@@ -30,47 +30,64 @@
   </div>
 
 <script>
-    const API_URL = 'https://sheetdb.io/api/v1/et92hg0rvu16i';
-    const loginForm = document.getElementById('loginForm');
-    const btnEntrar = document.getElementById('btn-entrar');
+   // 1. Configurações Iniciais
+const API_URL = 'https://docs.google.com/spreadsheets/d/1mbKJa_NhmlmO6i-wT7VWMkKQSbaFQe4nxr8G4w1O5mg/edit#gid=0';
+const loginForm = document.getElementById('loginForm');
+const btnEntrar = document.getElementById('btn-entrar');
 
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+// 2. Evento de Envio do Formulário
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Impede o recarregamento da página
+
+    // Captura os valores dos campos (id="name" e id="senha")
+    const userField = document.getElementById('name').value.trim();
+    const passField = document.getElementById('senha').value.trim();
+
+    // Inicia estado de carregamento no botão
+    btnEntrar.innerText = "Verificando...";
+    btnEntrar.disabled = true;
+
+    try {
+        // Faz a chamada para a API do SheetDB
+        const response = await fetch(API_URL);
         
-        // Desabilita o botão para evitar múltiplos cliques
-        btnEntrar.innerText = "Verificando...";
-        btnEntrar.disabled = true;
-
-        const userField = document.getElementById('name').value;
-        const passField = document.getElementById('senha').value;
-
-        try {
-            // Faz a requisição para a API do SheetDB
-            const response = await fetch(API_URL);
-            const usuarios = await response.json();
-
-            // Procura o usuário na planilha (colunas: nome e senha)
-            // Certifique-se que na sua planilha o topo das colunas seja "nome" e "senha"
-            const usuarioValido = usuarios.find(u => u.nome === userField && u.senha === passField);
-
-            if (usuarioValido) {
-                sessionStorage.setItem('logado', 'true');
-                // Salva o nome do usuário para usar na aba de informação depois
-                sessionStorage.setItem('nomeUsuario', usuarioValido.nome); 
-                
-                window.location.href = "base/p1.html";
-            } else {
-                alert("Usuário ou senha incorretos!");
-                btnEntrar.innerText = "Login";
-                btnEntrar.disabled = false;
-            }
-        } catch (error) {
-            console.error("Erro ao conectar com o banco:", error);
-            alert("Erro ao conectar com o servidor. Tente novamente.");
-            btnEntrar.innerText = "Login";
-            btnEntrar.disabled = false;
+        if (!response.ok) {
+            throw new Error("Erro ao acessar a planilha");
         }
-    });
+
+        const usuarios = await response.json();
+
+        // 3. Validação Crucial
+        // Usamos 'u.name' porque na sua imagem a coluna está como "name"
+        const usuarioEncontrado = usuarios.find(u => {
+            const nomePlanilha = u.name ? u.name.toString().trim() : "";
+            const senhaPlanilha = u.senha ? u.senha.toString().trim() : "";
+            
+            return nomePlanilha === userField && senhaPlanilha === passField;
+        });
+
+        if (usuarioEncontrado) {
+            // Sucesso: Salva a sessão e redireciona
+            sessionStorage.setItem('logado', 'true');
+            sessionStorage.setItem('nomeUsuario', usuarioEncontrado.name);
+            
+            alert("Login realizado com sucesso! Bem-vindo, " + usuarioEncontrado.name);
+            window.location.href = "base/p1.html";
+        } else {
+            // Falha: Dados incorretos
+            alert("Usuário ou senha incorretos! Tente novamente.");
+        }
+
+    } catch (error) {
+        // Trata erros de rede ou da API
+        console.error("Erro na conexão:", error);
+        alert("Erro técnico: Não foi possível conectar ao banco de dados.");
+    } finally {
+        // 4. Finalização (Impede o carregamento infinito)
+        btnEntrar.innerText = "Login";
+        btnEntrar.disabled = false;
+    }
+});
 </script>
 </body>
 </html>
