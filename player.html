@@ -136,11 +136,13 @@ if (urlVideo && idUser) {
     document.getElementById('video-frame').src = decodeURIComponent(urlVideo);
     document.getElementById('video-title').innerText = tituloVideo ? decodeURIComponent(tituloVideo) : 'Assistindo...';
 
-    intervaloSalvar = setInterval(salvarHistorico, 25000); // a cada 25 segundos
+    intervaloSalvar = setInterval(salvarHistorico, 30000);
     window.addEventListener('beforeunload', salvarHistorico);
+} else {
+    console.error("Faltando URL ou ID do usuário");
 }
 
-// ==================== FUNÇÃO CORRIGIDA ====================
+// ==================== FUNÇÃO DE HISTÓRICO ====================
 async function salvarHistorico() {
     if (!idUser) return;
 
@@ -149,7 +151,6 @@ async function salvarHistorico() {
 
     try {
         if (ultimoRegistroId) {
-            // Atualiza linha existente
             await fetch(`${API_HISTORICO}/id/${ultimoRegistroId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
@@ -160,10 +161,9 @@ async function salvarHistorico() {
                     }
                 })
             });
-            console.log("🔄 Atualizando linha ID:", ultimoRegistroId);
+            console.log("🔄 Atualizando tempo:", tempoFormatado);
         } 
         else {
-            // Cria a primeira linha
             const res = await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -177,11 +177,11 @@ async function salvarHistorico() {
                         "status": "Iniciado"
                     } 0]) {
                 ultimoRegistroId = resultado.created[0].id;
-                console.log("✅ Linha criada - ID:", ultimoRegistroId);
+                console.log("✅ Primeira linha salva - ID:", ultimoRegistroId);
             }
         }
     } catch (err) {
-        console.error("Erro ao salvar:", err);
+        console.error("Erro ao salvar histórico:", err);
     }
 }
 
@@ -206,7 +206,9 @@ wrapper.addEventListener('mousemove', showControls);
 function voltar() {
     if (intervaloSalvar) clearInterval(intervaloSalvar);
     salvarHistorico();
-    setTimeout(() => window.history.back(), 400);
+    setTimeout(() => {
+        window.history.back();
+    }, 400);
 }
 </script>
 </body>
