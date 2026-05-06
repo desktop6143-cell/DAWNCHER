@@ -15,7 +15,6 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Container Principal: Ocupa a tela toda */
         .main-wrapper {
             position: relative;
             width: 100vw;
@@ -25,11 +24,9 @@
             justify-content: center;
         }
 
-        /* Iframe ocupa 100% da viewport ou mantém o aspect ratio no desktop */
         .video-container {
             width: 100%;
             height: 100%;
-            max-width: 100%;
             background: #000;
             position: relative;
             z-index: 1;
@@ -41,7 +38,6 @@
             border: none;
         }
 
-        /* Overlay de Controles Flutuantes (Auto-hide) */
         .floating-controls {
             position: absolute;
             top: 0;
@@ -54,11 +50,10 @@
             align-items: center;
             gap: 20px;
             transition: opacity 0.4s ease, transform 0.4s ease;
-            opacity: 0; /* Começa invisível */
+            opacity: 0;
             pointer-events: none;
         }
 
-        /* Quando o usuário interage, os controles aparecem */
         .main-wrapper:active .floating-controls,
         .main-wrapper:hover .floating-controls {
             opacity: 1;
@@ -80,7 +75,10 @@
             transition: 0.3s;
         }
 
-        .back-circle:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
+        .back-circle:active { 
+            transform: scale(0.9); 
+            background: rgba(255,255,255,0.3); 
+        }
 
         .video-info {
             color: white;
@@ -96,7 +94,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Ajuste para Mobile Landscape (Deitado) */
         @media (orientation: landscape) {
             .video-container { height: 100vh; }
         }
@@ -121,67 +118,99 @@
         </div>
     </div>
 
-   <script>
-    // 1. CONFIGURAÇÕES DA API DE HISTÓRICO
-    const API_HISTORICO = 'https://sheetdb.io/api/v1/b8bvlm2gypqd0';
-    const params = new URLSearchParams(window.location.search);
-    const url = params.get('url');
-    const titulo = params.get('titulo');
-
-    if (url) {
-        document.getElementById('video-frame').src = decodeURIComponent(url);
-        document.getElementById('video-title').innerText = titulo ? decodeURIComponent(titulo) : 'Assistindo';
+    <script>
+        // ==================== CONFIGURAÇÕES ====================
+        const API_HISTORICO = 'https://sheetdb.io/api/v1/b8bvlm2gypqd0';
         
-        // CHAMADA PARA SALVAR: Assim que o player carrega, ele registra no banco
-        salvarHistoricoSimplificado(decodeURIComponent(titulo), url);
-    }
+        const params = new URLSearchParams(window.location.search);
+        const urlVideo = params.get('url');
+        const tituloVideo = params.get('titulo');
 
-    // 2. FUNÇÃO PARA SALVAR NA PLANILHA
-    async function salvarHistoricoSimplificado(nomeTitulo, urlVideo) {
-        const idUser = sessionStorage.getItem('idUsuario'); // O ID 89 do Carlos
-        if (!idUser) return;
+        let historicoSalvo = false;
+        let timeoutSalvar = null;
 
-        try {
-            await fetch(API_HISTORICO, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    data: [{
-                        "id_user": idUser,
-                        "titulo": nomeTitulo,
-                        "url_acesso": urlVideo, // Adicione essa coluna na planilha se quiser salvar o link
-                        "data": new Date().toLocaleDateString('pt-BR'),
-                        "tempo": "Assistindo..." // Como é iframe, marcamos como "em andamento"
-                    }]
-                })
-            });
-            console.log("Histórico atualizado para o usuário " + idUser);
-        } catch (err) {
-            console.error("Erro ao salvar histórico:", err);
+        // ==================== INICIALIZAÇÃO ====================
+        if (urlVideo) {
+            const frame = document.getElementById('video-frame');
+            const tituloElement = document.getElementById('video-title');
+
+            frame.src = decodeURIComponent(urlVideo);
+            tituloElement.innerText = tituloVideo ? decodeURIComponent(tituloVideo) : 'Assistindo...';
+
+            // Salva o histórico apenas após 30 segundos de visualização
+            timeoutSalvar = setTimeout(() => {
+                salvarNoHistorico(decodeURIComponent(tituloVideo || 'Sem título'), urlVideo);
+            }, 30000);
         }
-    }
 
-    // --- Lógica de controles (seu código original mantido) ---
-    const controls = document.getElementById('controls');
-    const wrapper = document.getElementById('wrapper');
-    let timeout;
+        // ==================== FUNÇÃO DE HISTÓRICO ====================
+        async function salvarNoHistorico(titulo, url) {
+            if (historicoSalvo) return;
 
-    function showControls() {
-        controls.style.opacity = '1';
-        controls.style.pointerEvents = 'auto';
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            controls.style.opacity = '0';
-            controls.style.pointerEvents = 'none';
-        }, 3000);
-    }
+            const idUser = sessionStorage.getItem('idUsuario');
+            if (!idUser) {
+                console.warn("ID do usuário não encontrado no sessionStorage");
+                return;
+            }
 
-    wrapper.addEventListener('touchstart', showControls);
-    wrapper.addEventListener('mousemove', showControls);
+            try {
+                const response = await fetch(API_HISTORICO, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        data: [{
+                            "id_user": idUser,
+                            "titulo": titulo,
+                            "url_acesso": url,
+                            "data": new Date().toLocaleDateString('pt-BR'),
+                            "hora": new Date().toLocaleTimeString('pt-BR'),
+                            "tempo": "Assistido"
+                        }]
+                    })
+                });
 
-    function voltar() {
-        window.history.length > 1 ? window.history.back() : window.location.href = 'index.html';
-    }
-</script>
+                if (response.ok) {
+                    historicoSalvo = true;
+                    console.log(`✅ Histórico salvo para usuário ${idUser}`);
+                } else {
+                    console.error("Erro na API SheetDB");
+                }
+            } catch (err) {
+                console.error("Erro ao salvar histórico:", err);
+            }
+        }
+
+        // ==================== CONTROLES DO PLAYER ====================
+        const controls = document.getElementById('controls');
+        const wrapper = document.getElementById('wrapper');
+        let timeoutControles;
+
+        function showControls() {
+            controls.style.opacity = '1';
+            controls.style.pointerEvents = 'auto';
+            
+            clearTimeout(timeoutControles);
+            timeoutControles = setTimeout(() => {
+                controls.style.opacity = '0';
+                controls.style.pointerEvents = 'none';
+            }, 3000);
+        }
+
+        wrapper.addEventListener('touchstart', showControls);
+        wrapper.addEventListener('mousemove', showControls);
+
+        function voltar() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Limpeza ao sair da página
+        window.addEventListener('beforeunload', () => {
+            if (timeoutSalvar) clearTimeout(timeoutSalvar);
+        });
+    </script>
 </body>
 </html>
