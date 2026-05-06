@@ -141,36 +141,50 @@ if (urlVideo && idUser) {
     window.addEventListener('beforeunload', salvarHistorico);
 }
 
-// ==================== NOVA LÓGICA ====================
+// ==================== historico  ====================
 async function salvarHistorico() {
     if (!idUser) return;
 
     const minutosAssistidos = Math.floor((Date.now() - tempoInicial) / 60000);
     const hoje = new Date().toLocaleDateString('pt-BR');
-
+    
     let tempoFinal = minutosAssistidos + " minutos";
-
-    // Se passou de 15 minutos, considera como Assistido
     if (minutosAssistidos >= 15) {
         tempoFinal = "Assistido";
     }
 
     try {
+        // Busca o registro
         const busca = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&titulo=${encodeURIComponent(tituloLimpo)}&data=${hoje}`);
         const registros = await busca.json();
 
-        if (registros && registros.length > 0) {
-            const idRegistro = registros[0].id;
+        console.log("Registros encontrados:", registros); // ← Para debug
 
-            await fetch(`${API_HISTORICO}/id/${idRegistro}`, {
+        if (registros && registros.length > 0 && registros[0].id) {
+            const idRegistro = registros[0].id;
+            
+            console.log("Atualizando ID:", idRegistro);
+
+            // Atualiza
+            const res = await fetch(`${API_HISTORICO}/id/${idRegistro}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    data: { "tempo": tempoFinal }
+                    data: { 
+                        "tempo": tempoFinal,
+                        "url_acesso": decodeURIComponent(urlVideo || '')
+                    }
                 })
             });
-            console.log(`🔄 Atualizado → ${tempoFinal}`);
+
+            if (res.ok) {
+                console.log(`✅ Atualizado com sucesso → ${tempoFinal}`);
+            } else {
+                console.error("Erro no PATCH, status:", res.status);
+            }
         } else {
+            // Cria novo registro
+            console.log("Nenhum registro encontrado, criando novo...");
             await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -185,10 +199,10 @@ async function salvarHistorico() {
                     }]
                 })
             });
-            console.log("✅ Registro criado");
+            console.log("✅ Nova linha criada");
         }
     } catch (err) {
-        console.error("Erro ao salvar histórico:", err);
+        console.error("Erro geral ao salvar histórico:", err);
     }
 }
 
