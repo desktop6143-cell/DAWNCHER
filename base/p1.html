@@ -43,21 +43,32 @@ if (sessionStorage.getItem('logado') !== 'true' || !idUser) {
 
 // ==================== CARREGAR ÚLTIMO CARD ====================
 async function carregarHistorico() {
-    const container = document.getElementById('lista-continuar');
-    const secao = document.getElementById('secao-continuar');
+    if (!idUser) return;
 
     try {
-        const res = await fetch(`${API_HISTORICO}/search?id_user=${idUser}`);
-        
-        if (!res.ok) throw new Error("Erro na API");
+        const resp = await fetch(`${API_HISTORICO}/search?id_user=${idUser}`);
 
-        let dados = await res.json();
+        if (resp.status === 429) {
+            console.warn("⏳ Aguarde 30 segundos - Rate limit do SheetDB");
+            return;
+        }
 
-        if (dados && dados.length > 0) {
-            secao.style.display = 'block';
-            container.innerHTML = '';
+        if (!resp.ok) {
+            throw new Error("Erro na API");
+        }
 
-            // Pega o mais recente
+        let dados = await resp.json();
+
+        if (!Array.isArray(dados)) dados = [];
+
+        // Aqui você usa os dados para preencher a tabela
+        console.log("Histórico carregado:", dados);
+        // ... seu código para renderizar a tabela
+
+    } catch (err) {
+        console.error("Erro ao carregar histórico:", err);
+    }
+}   // Pega o mais recente
             const maisRecente = dados.sort((a, b) => {
                 return new Date(b.data + " " + (b.tempo || "")) - new Date(a.data + " " + (a.tempo || ""));
             })[0];
