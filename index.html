@@ -31,49 +31,59 @@
 
 <script>
 // ==================== CONFIGURAÇÕES ====================
-const API_URL = 'https://script.google.com/macros/s/AKfycbw1W1HeUz8Hi5WA_KWdoYRUHVdekm18IOFk5NIRlc4Ee6DOczxcgZFmON9M5SP70FMq/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyEHBrGRHLS-x_vEBXKXwaiIr1zmDPN0F-AoRtAhDNpuehXnUZPdPPagMF-z959pF8v/exec';
 
 const loginForm = document.getElementById('loginForm');
 const btnEntrar = document.getElementById('btn-entrar');
 
 loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
 
-    const userField = document.getElementById('name').value.trim();
-    const passField = document.getElementById('senha').value.trim();
+    const usuario = document.getElementById('name').value.trim();
+    const senha = document.getElementById('senha').value.trim();
+
+    if (!usuario || !senha) {
+        alert("Por favor, preencha usuário e senha!");
+        return;
+    }
 
     btnEntrar.innerText = "Verificando...";
     btnEntrar.disabled = true;
 
     try {
-        const response = await fetch(API_URL);
-        
-        if (!response.ok) throw new Error("Erro ao acessar o banco");
-
-        const usuarios = await response.json();
-
-        // Busca do usuário
-        const usuarioAchado = usuarios.find(u => {
-            const nomePlanilha = (u.name || u.usuario || "").toString().trim();
-            const senhaPlanilha = (u.senha || u.password || "").toString().trim();
-            return nomePlanilha === userField && senhaPlanilha === passField;
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: "login",
+                usuario: usuario,
+                senha: senha
+            })
         });
 
-        if (usuarioAchado) {
-            console.log("✅ Login bem-sucedido! ID:", usuarioAchado.id);
-            
+        if (!response.ok) throw new Error("Erro na resposta do servidor");
+
+        const resultado = await response.json();
+
+        if (resultado.status === "success") {
+            const usuarioAchado = resultado.usuario;
+
+            console.log("✅ Login bem-sucedido!", usuarioAchado);
+
             sessionStorage.setItem('logado', 'true');
             sessionStorage.setItem('idUsuario', usuarioAchado.id);
             sessionStorage.setItem('nomeUsuario', usuarioAchado.name || usuarioAchado.usuario);
 
             window.location.href = "base/p1.html";
         } else {
-            alert("Usuário ou senha incorretos!");
+            alert(resultado.message || "Usuário ou senha incorretos!");
         }
 
     } catch (error) {
         console.error("Erro técnico:", error);
-        alert("Erro ao conectar com o servidor. Tente novamente.");
+        alert("Erro ao conectar com o servidor. Tente novamente mais tarde.");
     } finally {
         btnEntrar.innerText = "Login";
         btnEntrar.disabled = false;
