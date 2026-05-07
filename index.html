@@ -31,8 +31,8 @@
 
 <script>
 // ==================== CONFIGURAÇÕES ====================
-const API_URL = 'https://script.google.com/macros/s/AKfycbzLj6dR13D447_GmMuXAH37C5org6qictOg6qnMfCO9wO4EqQmDa28X_IrHAwn9bIk6/exec';
-
+const API_URL = 'https://script.google.com/macros/s/AKfycbz80YTbLREd9RkdyEoqjSvOFqJMDzA3NHiydliTTAgWyH8vdK4tm0A5nicsEqb-RXvR/exec';
+// nova api
 const loginForm = document.getElementById('loginForm');
 const btnEntrar = document.getElementById('btn-entrar');
 
@@ -54,7 +54,7 @@ loginForm.addEventListener('submit', async (e) => {
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'text/plain;charset=utf-8'   // ← Mudança principal
             },
             body: JSON.stringify({
                 action: "login",
@@ -68,13 +68,10 @@ loginForm.addEventListener('submit', async (e) => {
         const resultado = await response.json();
 
         if (resultado.status === "success") {
-            const usuarioAchado = resultado.usuario;
-
-            console.log("✅ Login bem-sucedido!", usuarioAchado);
-
+            const u = resultado.usuario;
             sessionStorage.setItem('logado', 'true');
-            sessionStorage.setItem('idUsuario', usuarioAchado.id);
-            sessionStorage.setItem('nomeUsuario', usuarioAchado.name || usuarioAchado.usuario);
+            sessionStorage.setItem('idUsuario', u.id);
+            sessionStorage.setItem('nomeUsuario', u.name || u.usuario);
 
             window.location.href = "base/p1.html";
         } else {
@@ -83,7 +80,7 @@ loginForm.addEventListener('submit', async (e) => {
 
     } catch (error) {
         console.error("Erro técnico:", error);
-        alert("Erro ao conectar com o servidor. Tente novamente mais tarde.");
+        alert("Erro ao conectar com o servidor. Tente novamente.");
     } finally {
         btnEntrar.innerText = "Login";
         btnEntrar.disabled = false;
