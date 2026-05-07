@@ -154,16 +154,17 @@ async function salvarHistorico() {
     }
 
     try {
-        // Busca TODOS os registros de HOJE do usuário (mais confiável)
         const busca = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&data=${hoje}`);
         const registros = await busca.json();
 
         console.log(`Registros encontrados hoje (${hoje}):`, registros.length);
 
-        // Filtra pelo título (mais seguro)
-        const registroExistente = registros.find(r => 
-            r.titulo && r.titulo.toLowerCase() === tituloLimpo.toLowerCase()
-        );
+        // Busca o registro com título similar (mais tolerante)
+        const registroExistente = registros.find(r => {
+            if (!r.titulo) return false;
+            return r.titulo.toLowerCase().includes(tituloLimpo.toLowerCase()) ||
+                   tituloLimpo.toLowerCase().includes(r.titulo.toLowerCase());
+        });
 
         if (registroExistente && registroExistente.id) {
             const idRegistro = registroExistente.id;
@@ -178,9 +179,8 @@ async function salvarHistorico() {
                     }
                 })
             });
-            console.log(`🔄 ATUALIZADO → ${tempoFinal}`);
+            console.log(`🔄 ATUALIZADO COM SUCESSO → ${tempoFinal}`);
         } else {
-            // Cria novo
             await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
