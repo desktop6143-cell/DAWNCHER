@@ -151,41 +151,36 @@ async function salvarHistorico() {
     let tempoFinal = minutosAssistidos >= 15 ? "Assistido" : minutosAssistidos + " minutos";
 
     try {
-        // Busca registros de hoje
+        // Busca todos os registros de hoje do usuário
         const busca = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&data=${hoje}`);
         const registros = await busca.json();
 
-        // Procura o registro do episódio atual
-        const registroExistente = registros.find(r => 
-            r.titulo && r.titulo.toLowerCase() === tituloLimpo.toLowerCase()
-        );
+        console.log(`Registros encontrados hoje: ${registros.length}`);
+
+        // Procura por título (comparação mais tolerante)
+        const registroExistente = registros.find(r => {
+            if (!r.titulo) return false;
+            const tituloSalvo = r.titulo.toLowerCase().trim();
+            const tituloAtual = tituloLimpo.toLowerCase().trim();
+            return tituloSalvo.includes(tituloAtual) || tituloAtual.includes(tituloSalvo);
+        });
 
         if (registroExistente && registroExistente.id) {
-            // Já existe → vamos comparar o tempo
-            const tempoSalvo = registroExistente.tempo || "0 minutos";
-            
-            // Extrai número do tempo salvo (ex: "12 minutos" → 12)
-            const minutosSalvos = parseInt(tempoSalvo) || 0;
-
-            if (minutosAssistidos > minutosSalvos) {
-                // Atualiza só se o tempo atual for maior
-                await fetch(`${API_HISTORICO}/id/${registroExistente.id}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        data: { 
-                            "tempo": tempoFinal,
-                            "url_acesso": decodeURIComponent(urlVideo || '')
-                        }
-                    })
-                });
-                console.log(`🔄 ATUALIZADO → ${tempoFinal} (era ${tempoSalvo})`);
-            } else {
-                console.log(`⏭️ Ignorado (tempo atual menor ou igual)`);
-            }
+            // Atualiza o registro existente
+            await fetch(`${API_HISTORICO}/id/${registroExistente.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    data: { 
+                        "tempo": tempoFinal,
+                        "url_acesso": decodeURIComponent(urlVideo || '')
+                    }
+                })
+            });
+            console.log(`🔄 ATUALIZADO → ${tempoFinal}`);
         } 
         else {
-            // Não existe → cria novo registro
+            // Cria novo registro
             await fetch(API_HISTORICO, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
