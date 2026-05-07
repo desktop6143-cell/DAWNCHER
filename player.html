@@ -142,60 +142,68 @@ if (urlVideo && idUser) {
 }
 
 // ==================== historico  ====================
+// ====================== HISTÓRICO ======================
+const INTERVALO_SALVAMENTO = 60000; // 60 segundos
+
+// Inicia o player e o salvamento
+if (urlVideo && idUser) {
+    document.getElementById('video-frame').src = decodeURIComponent(urlVideo);
+    document.getElementById('video-title').innerText = tituloLimpo || 'Assistindo...';
+
+    // Salva o histórico a cada 60 segundos
+    intervaloSalvar = setInterval(salvarHistorico, INTERVALO_SALVAMENTO);
+    
+    // Salva quando o usuário sair da página
+    window.addEventListener('beforeunload', () => {
+        salvarHistorico();
+    });
+}
+
+// Função principal de salvamento
 async function salvarHistorico() {
     if (!idUser) return;
 
     const minutosAssistidos = Math.floor((Date.now() - tempoInicial) / 60000);
     const hoje = new Date().toLocaleDateString('pt-BR');
-    let tempoFinal = minutosAssistidos >= 15 ? "Assistido" : minutosAssistidos + " minutos";
+    let tempoFinal = minutosAssistidos >= 15 ? "Assistido" : minutosAssistidos + " min";
 
     try {
-        // 1. Procuramos se já existe uma linha com esse ID de usuário E esse título
-        // A sintaxe do SheetDB para múltiplos filtros na URL é assim:
-        const busca = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&titulo=${encodeURIComponent(tituloLimpo)}`);
-        const registros = await busca.json();
+        const resp = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&data=${hoje}`);
+        const registros = await resp.json();
 
-        // 2. Se encontrou algo e a data for a de hoje, vamos atualizar a PRIMEIRA ocorrência
-        if (registros.length > 0) {
-            // Filtramos para garantir que estamos mexendo no registro de hoje
-            const registroHoje = registros.find(r => r.data === hoje);
+        const registroExistente = registros.find(r => 
+            r.titulo && r.titulo.toLowerCase().trim() === tituloLimpo.toLowerCase().trim()
+        );
 
-            if (registroHoje) {
-                // No SheetDB, para atualizar sem uma coluna ID, usamos a rota de busca no PATCH
-                // Vamos atualizar baseando-se no id_user e titulo (que são únicos para essa sessão)
-                await fetch(`${API_HISTORICO}/id_user/${idUser}`, { // Usamos id_user como chave
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        condition: { "titulo": tituloLimpo, "data": hoje }, // Critérios extras
-                        data: { 
-                            "tempo": tempoFinal,
-                            "url_acesso": decodeURIComponent(urlVideo || '')
-                        }
-                    })
-                });
-                console.log(`🔄 ATUALIZADO → ${tempoFinal}`);
-                return; // Sai da função para não criar duplicata
-            }
+        if (registroExistente && registroExistente.id) {
+            await fetch(`${API_HISTORICO}/id/${registroExistente.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    data: { 
+                        "tempo": tempoFinal,
+                        "url_acesso": decodeURIComponent(urlVideo || '')
+                    }
+                })
+            });
+            console.log(`🔄 ATUALIZADO → ${tempoFinal}`);
+        } else {
+            await fetch(API_HISTORICO, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    data: [{
+                        "id_user": idUser,
+                        "titulo": tituloLimpo,
+                        "url_acesso": decodeURIComponent(urlVideo || ''),
+                        "data": hoje,
+                        "tempo": tempoFinal,
+                        "status": "Assistindo"
+                    }]
+                })
+            });
+            console.log(`✅ Nova linha criada → ${tempoFinal}`);
         }
-
-        // 3. Se não encontrou (ou não é de hoje), CRIA novo registro
-        await fetch(API_HISTORICO, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                data: [{
-                    "id_user": idUser,
-                    "titulo": tituloLimpo,
-                    "url_acesso": decodeURIComponent(urlVideo || ''),
-                    "data": hoje,
-                    "tempo": tempoFinal,
-                    "status": "Assistindo"
-                }]
-            })
-        });
-        console.log(`✅ Nova linha criada → ${tempoFinal}`);
-
     } catch (err) {
         console.error("Erro ao salvar histórico:", err);
     }
