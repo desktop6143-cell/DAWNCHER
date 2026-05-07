@@ -118,34 +118,10 @@
         </div>
     </div>
 
-   
-<script>
-// ==================== CONFIGURAÇÕES ====================
-const API_HISTORICO = 'https://sheetdb.io/api/v1/b8bvlm2gypqd0';
+   <script>
+const API_URL = "https://script.google.com/macros/s/AKfycby_9taGHbp8yR_uUmnOtAl2CkuNtLFkYYG3OyUcoSLLR8q4MmKBdDrH7q81Og6IYZ1K/exec";
 
-const params = new URLSearchParams(window.location.search);
-const urlVideo = params.get('url');
-const tituloVideo = params.get('titulo');
-
-const idUser = sessionStorage.getItem('idUsuario');
-const tituloLimpo = decodeURIComponent(tituloVideo || '');
-
-const tempoInicial = Date.now();
-let intervaloSalvar = null;
-
-// ==================== INICIALIZAÇÃO ====================
-if (urlVideo && idUser) {
-    document.getElementById('video-frame').src = decodeURIComponent(urlVideo);
-    document.getElementById('video-title').innerText = tituloLimpo || 'Assistindo...';
-
-    // Salva a cada 60 segundos
-    intervaloSalvar = setInterval(salvarHistorico, 60000);
-    
-    // Salva quando sair da página
-    window.addEventListener('beforeunload', salvarHistorico);
-}
-
-// ==================== FUNÇÃO CORRIGIDA ====================
+// ==================== FUNÇÃO ATUALIZADA ====================
 async function salvarHistorico() {
     if (!idUser) return;
 
@@ -154,48 +130,40 @@ async function salvarHistorico() {
     const tempoFinal = minutosAssistidos >= 15 ? "Assistido" : minutosAssistidos + " min";
 
     try {
-        const resp = await fetch(`${API_HISTORICO}/search?id_user=${idUser}&data=${hoje}`);
+        // Buscar registro existente
+        const resp = await fetch(`${API_URL}?id_user=${idUser}&data=${hoje}`);
+        const result = await resp.json();
         
-        if (!resp.ok) {
-            if (resp.status === 429) console.warn("⏳ Rate limit do SheetDB");
-            return;
-        }
-
-        let registros = await resp.json();
+        let registros = result.data || [];
         
-        // Proteção contra resposta inválida
-        if (!Array.isArray(registros)) {
-            registros = [];
-        }
-
         const registroExistente = registros.find(r => 
             r.titulo && r.titulo.toLowerCase().trim() === tituloLimpo.toLowerCase().trim()
         );
 
-        if (registroExistente && registroExistente.id) {
-            await fetch(`${API_HISTORICO}/id/${registroExistente.id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    data: { 
-                        "tempo": tempoFinal,
-                        "url_acesso": decodeURIComponent(urlVideo || '')
-                    }
-                })
-            });
-        } else {
-            await fetch(API_HISTORICO, {
+        if (registroExistente) {
+            // Atualizar
+            await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    data: [{
-                        "id_user": idUser,
-                        "titulo": tituloLimpo,
-                        "url_acesso": decodeURIComponent(urlVideo || ''),
-                        "data": hoje,
-                        "tempo": tempoFinal,
-                        "status": "Assistindo"
-                    }]
+                    action: "update",
+                    id: registroExistente.id,        // precisa ter coluna "id"
+                    tempo: tempoFinal,
+                    url_acesso: decodeURIComponent(urlVideo || '')
+                })
+            });
+        } else {
+            // Criar novo
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id_user: idUser,
+                    titulo: tituloLimpo,
+                    url_acesso: decodeURIComponent(urlVideo || ''),
+                    data: hoje,
+                    tempo: tempoFinal,
+                    status: "Assistindo"
                 })
             });
         }
@@ -203,13 +171,6 @@ async function salvarHistorico() {
         console.error("Erro ao salvar histórico:", err);
     }
 }
-
-// ==================== BOTÃO VOLTAR ====================
-function voltar() {
-    if (intervaloSalvar) clearInterval(intervaloSalvar);
-    salvarHistorico();
-    setTimeout(() => window.history.back(), 300);
-}
-</script>
+   </script>      
 </body>
 </html>
