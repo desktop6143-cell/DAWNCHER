@@ -31,8 +31,8 @@
 
 <script>
 // ==================== CONFIGURAÇÕES ====================
-const API_URL = 'https://script.google.com/macros/s/AKfycbz80YTbLREd9RkdyEoqjSvOFqJMDzA3NHiydliTTAgWyH8vdK4tm0A5nicsEqb-RXvR/exec';
-// nova api
+const API_URL = 'https://script.google.com/macros/s/AKfycbzwXlMfmT6WLL-AtejTZbKOjY3jOp25kf_lMI0WllQoaWQQa_4pkosp1GkZDozHcgk2/exec';
+
 const loginForm = document.getElementById('loginForm');
 const btnEntrar = document.getElementById('btn-entrar');
 
@@ -43,7 +43,7 @@ loginForm.addEventListener('submit', async (e) => {
     const senha = document.getElementById('senha').value.trim();
 
     if (!usuario || !senha) {
-        alert("Por favor, preencha usuário e senha!");
+        alert("Preencha usuário e senha!");
         return;
     }
 
@@ -54,7 +54,7 @@ loginForm.addEventListener('submit', async (e) => {
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'text/plain;charset=utf-8'   // ← Mudança principal
+                'Content-Type': 'text/plain;charset=utf-8'   // ← Isso evita o CORS
             },
             body: JSON.stringify({
                 action: "login",
@@ -62,8 +62,6 @@ loginForm.addEventListener('submit', async (e) => {
                 senha: senha
             })
         });
-
-        if (!response.ok) throw new Error("Erro na resposta do servidor");
 
         const resultado = await response.json();
 
@@ -87,6 +85,5 @@ loginForm.addEventListener('submit', async (e) => {
     }
 });
 </script>
-
 </body>
 </html>
