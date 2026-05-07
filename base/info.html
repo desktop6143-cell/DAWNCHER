@@ -15,12 +15,7 @@
             --text-sec: #94a3b8;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
 
         body {
             background: #0f172a url('../pngs/png3.jpg') no-repeat center center fixed;
@@ -49,30 +44,14 @@
             to { transform: translate(20%, 20%); }
         }
 
-        main {
-            flex: 1;
-            padding: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-            padding-bottom: 120px;
-        }
-
-        h1 {
-            font-weight: 300;
-            margin-bottom: 30px;
-            font-size: 2.2rem;
-        }
-        h1 span { font-weight: 800; color: var(--accent); }
+        main { flex: 1; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; padding-bottom: 130px; }
 
         .downloads-section {
             margin-top: 40px;
-        }
-
-        .downloads-section h2 {
-            margin-bottom: 20px;
-            color: var(--accent);
-            font-size: 1.5rem;
+            padding: 25px;
+            background: var(--glass);
+            border-radius: 20px;
+            border: 1px solid var(--border);
         }
 
         .btn-download {
@@ -80,56 +59,18 @@
             align-items: center;
             gap: 15px;
             padding: 18px 24px;
-            background: var(--glass);
-            backdrop-filter: blur(16px);
+            background: rgba(30, 30, 40, 0.8);
             border: 1px solid var(--border);
             border-radius: 16px;
             color: white;
             text-decoration: none;
-            font-size: 1.1rem;
-            margin-bottom: 16px;
-            transition: all 0.3s;
-        }
-
-        .btn-download:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-            box-shadow: 0 10px 25px var(--accent-glow);
-        }
-
-        .btn-download i {
-            font-size: 1.8rem;
-        }
-
-        /* Hotbar */
-        .hotbar-container {
-            position: fixed;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            padding: 10px;
-            border-radius: 20px;
-            display: flex;
-            gap: 12px;
-            border: 1px solid var(--border);
-            backdrop-filter: blur(12px);
-            z-index: 1000;
-        }
-        .hotbar-item {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            background-color: rgba(255, 255, 255, 0.05);
-            background-size: 24px;
-            background-repeat: no-repeat;
-            background-position: center;
-            cursor: pointer;
+            margin: 12px 0;
             transition: 0.3s;
         }
-        .hotbar-item:hover {
-            background-color: var(--accent);
-            transform: translateY(-5px) scale(1.05);
+        .btn-download:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
+            border-color: white;
         }
     </style>
 </head>
@@ -148,15 +89,40 @@
 
     <main>
         <header>
-            <h1>Informações <span>&amp; Downloads</span></h1>
+            <h1>Bem-vindo, <span>Fórum do DEV</span></h1>
         </header>
 
+        <section class="grid">
+            <div class="card">
+                <span class="stat-label"><i class="fas fa-code-branch"></i> Versão Atual 1.0.5</span>
+                <p class="stat-desc">Filmeteca, segurança, banco de dados, API de gerenciamento, histórico e tempo de play.</p>
+            </div>
+            <div class="card">
+                <span class="stat-label"><i class="fas fa-chart-line"></i> Progressão</span>
+                <div class="stat-value">13.5%</div>
+                <p class="stat-desc">Trabalhando duro para finalizar este projeto.</p>
+            </div>
+            <div class="card">
+                <span class="stat-label" style="color: #fb7185;"><i class="fas fa-bell"></i> Alertas (03)</span>
+                <p class="stat-desc">Animes sem episódios; implementar livrioteca, audioteca e monitor de uso.</p>
+            </div>
+            <div class="card">
+                <span class="stat-label"><i class="fas fa-stopwatch"></i> Tempo de Uso Total</span>
+                <div id="tempo-display" class="stat-value">0d 00:00:00</div>
+            </div>
+            <div class="card card-main">
+                <span class="stat-label"><i class="fas fa-history"></i> Histórico</span>
+                <p class="stat-desc">Seu histórico de atividades aparecerá aqui em breve.</p>
+            </div>
+        </section>
+
+        <!-- === DOWNLOADS === -->
         <section class="downloads-section">
-            <h2><i class="fas fa-download"></i> Downloads do Dawncher</h2>
+            <h2><i class="fas fa-download"></i> Downloads Dawncher</h2>
             
             <a href="https://www.mediafire.com/file/aj8epr782z3c3vs/Dawncher_Celular.apk/file" 
                class="btn-download" target="_blank">
-                <i class="fas fa-mobile-alt"></i>
+                <i class="fas fa-mobile-alt fa-2x"></i>
                 <div>
                     <strong>APK - Celular</strong><br>
                     <small>Dawncher para Smartphone</small>
@@ -165,7 +131,7 @@
 
             <a href="https://www.mediafire.com/file/4we1xqa6tilt034/Dawncher_Tv.apk/file" 
                class="btn-download" target="_blank">
-                <i class="fas fa-tv"></i>
+                <i class="fas fa-tv fa-2x"></i>
                 <div>
                     <strong>APK - TV Box</strong><br>
                     <small>Dawncher para Smart TV / TV Box</small>
@@ -175,17 +141,12 @@
     </main>
 
     <script>
-        // Segurança
         if (sessionStorage.getItem('logado') !== 'true') {
             window.location.href = "../index.html";
         }
 
-        // Navegação Hotbar
         const rotas = {
-            'btn-exit': () => {
-                sessionStorage.removeItem('logado');
-                window.location.href = "../index.html";
-            },
+            'btn-exit': () => { sessionStorage.removeItem('logado'); window.location.href = "../index.html"; },
             'btn-library': () => window.location.href = "bl.html",
             'btn-home': () => window.location.href = "p1.html",
             'btn-search': () => window.location.href = "../sites/bar.html"
@@ -195,6 +156,25 @@
             const botao = document.getElementById(id);
             if (botao) botao.addEventListener('click', rotas[id]);
         });
+
+        // Cronômetro
+        let dataInicio = localStorage.getItem('data_inicio_uso');
+        if (!dataInicio) {
+            dataInicio = Date.now();
+            localStorage.setItem('data_inicio_uso', dataInicio);
+        }
+        const display = document.getElementById('tempo-display');
+        function atualizarTempoReal() {
+            const agora = Date.now();
+            const diferencaEmSegundos = Math.floor((agora - dataInicio) / 1000);
+            const dias = Math.floor(diferencaEmSegundos / 86400);
+            const horas = Math.floor((diferencaEmSegundos % 86400) / 3600).toString().padStart(2, '0');
+            const minutos = Math.floor((diferencaEmSegundos % 3600) / 60).toString().padStart(2, '0');
+            const segundos = (diferencaEmSegundos % 60).toString().padStart(2, '0');
+            display.innerText = `${dias}d ${horas}:${minutos}:${segundos}`;
+        }
+        setInterval(atualizarTempoReal, 1000);
+        atualizarTempoReal();
     </script>
 </body>
 </html>
