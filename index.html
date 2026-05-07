@@ -30,8 +30,9 @@
   </div>
 
 <script>
-// 1. Configurações Iniciais
-const API_URL = 'https://sheetdb.io/api/v1/et92hg0rvu16i';
+// ==================== CONFIGURAÇÕES ====================
+const API_URL = 'https://script.google.com/macros/s/AKfycbyWrAn7elgz8N4cTky97X60g3T2l3TY_7Yc5CSptzMqmvlWKWVlr8Qjv8gIiqyCVQNd/exec';
+
 const loginForm = document.getElementById('loginForm');
 const btnEntrar = document.getElementById('btn-entrar');
 
@@ -46,27 +47,25 @@ loginForm.addEventListener('submit', async (e) => {
 
     try {
         const response = await fetch(API_URL);
-        if (!response.ok) throw new Error("Erro ao acessar a planilha");
+        
+        if (!response.ok) throw new Error("Erro ao acessar o banco");
 
         const usuarios = await response.json();
 
-        // 2. BUSCA DO USUÁRIO
+        // Busca do usuário
         const usuarioAchado = usuarios.find(u => {
-            // Verifica se as colunas na planilha são 'name' e 'senha'
-            const nomePlanilha = u.name ? u.name.toString().trim() : "";
-            const senhaPlanilha = u.senha ? u.senha.toString().trim() : "";
+            const nomePlanilha = (u.name || u.usuario || "").toString().trim();
+            const senhaPlanilha = (u.senha || u.password || "").toString().trim();
             return nomePlanilha === userField && senhaPlanilha === passField;
         });
 
-        // 3. SALVAMENTO (TUDO DEVE FICAR AQUI DENTRO)
         if (usuarioAchado) {
-            console.log("Usuário encontrado! ID:", usuarioAchado.id);
+            console.log("✅ Login bem-sucedido! ID:", usuarioAchado.id);
             
             sessionStorage.setItem('logado', 'true');
-            sessionStorage.setItem('idUsuario', usuarioAchado.id); // Salva o ID (Ex: 2 ou 89)
-            sessionStorage.setItem('nomeUsuario', usuarioAchado.name); 
+            sessionStorage.setItem('idUsuario', usuarioAchado.id);
+            sessionStorage.setItem('nomeUsuario', usuarioAchado.name || usuarioAchado.usuario);
 
-            // Redireciona para a pasta base
             window.location.href = "base/p1.html";
         } else {
             alert("Usuário ou senha incorretos!");
@@ -74,13 +73,12 @@ loginForm.addEventListener('submit', async (e) => {
 
     } catch (error) {
         console.error("Erro técnico:", error);
-        alert("Erro ao conectar com o banco de dados.");
+        alert("Erro ao conectar com o servidor. Tente novamente.");
     } finally {
         btnEntrar.innerText = "Login";
         btnEntrar.disabled = false;
     }
 });
-
 </script>
 
 </body>
