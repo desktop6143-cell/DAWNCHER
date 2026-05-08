@@ -10,7 +10,7 @@ body {
     overflow-x: hidden;
 
     /* FUNDO */
-    background: #1a1a1a url('../pngs/capa88.avif') no-repeat center center fixed;
+    background: #1a1a1a url('../pngs/capa88.png') no-repeat center center fixed;
     background-size: cover;
 
     /* ALINHAMENTO */
