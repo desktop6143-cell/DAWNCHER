@@ -92,15 +92,16 @@
 
 <script>
 // ==================== CONFIGURAÇÕES ====================
-const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbwfogiAwtuRTgogCtGX6yoc0irLDh2aajBOkpJxrf5T5JAneXvvvpUefRaOMZa8Qzer0w/exec';
+const API_HISTORICO = 'https://script.google.com/macros/s/AKfycby9NAoshp94IRIq-lx66zsjQQqJk--dp9WA-Rlx8igETrqriCMMXFrtt32iiPpUylgvRw/exec';
 const idUser = sessionStorage.getItem('idUsuario');
-// URL FIM
+ // url ds
 // Pegar parâmetros da URL
 const urlParams = new URLSearchParams(window.location.search);
 const videoUrl = urlParams.get('url');
-const titulo = urlParams.get('titulo') || "Vídeo sem título";
+const tituloBruto = urlParams.get('titulo') || "Vídeo sem título";
+const tituloFormatado = decodeURIComponent(tituloBruto);
 
-document.getElementById('video-title').textContent = decodeURIComponent(titulo);
+document.getElementById('video-title').textContent = tituloFormatado;
 
 // Carregar vídeo no iframe
 if (videoUrl) {
@@ -109,24 +110,38 @@ if (videoUrl) {
     document.getElementById('video-title').textContent = "URL do vídeo não encontrada!";
 }
 
+// Tenta extrair o número do episódio do título (Ex: "Naruto - Episódio 12" -> "12")
+let episodioAtual = "1";
+const matchEp = tituloFormatado.match(/Epis[óo]dio\s*(\d+)/i);
+if (matchEp) {
+    episodioAtual = matchEp[1];
+}
+
 // ==================== SALVAR NO HISTÓRICO ====================
 async function salvarNoHistorico() {
     if (!idUser) return;
 
+    // ATENÇÃO: toLocaleTimeString pega a hora do PC (ex: 15:30). 
+    // Idealmente, aqui deveria ser o tempo real do vídeo (ex: "00:12:45")
+    const tempoAssistido = new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit', second: '2-digit'});
+
     try {
-        await fetch(API_HISTORICO, {
+        const response = await fetch(API_HISTORICO, {
             method: 'POST',
+            redirect: 'follow',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
                 action: "salvar",
                 id_user: idUser,
-                titulo: decodeURIComponent(titulo),
-                url_acesso: window.location.href,   // ou o link original do vídeo
-                episodio: "",                       // pode preencher depois
-                tempo: new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})
+                titulo: tituloFormatado,
+                url_acesso: window.location.href, // Salva o link da sua página player com os parâmetros
+                episodio: episodioAtual, 
+                tempo: tempoAssistido
             })
         });
-        console.log("✅ Histórico salvo com sucesso");
+        
+        const resultado = await response.json();
+        console.log("✅ API Respondeu:", resultado.message);
     } catch (err) {
         console.error("Erro ao salvar histórico:", err);
     }
@@ -137,14 +152,23 @@ function voltar() {
     window.history.back();
 }
 
-// Salvar histórico quando carregar a página e quando sair
-window.onload = () => {
+// ==================== GATILHOS DE SALVAMENTO ====================
+// Salva quando a página termina de carregar
+window.addEventListener('load', () => {
     salvarNoHistorico();
-};
+});
 
-window.onbeforeunload = () => {
+// Tenta salvar quando o usuário fechar a aba ou sair da página
+window.addEventListener('beforeunload', () => {
     salvarNoHistorico();
-};
+});
+
+// BÔNUS: Salva o histórico a cada 2 minutos (120000 ms) automaticamente 
+// caso o usuário fique muito tempo assistindo sem fechar a página
+setInterval(() => {
+    salvarNoHistorico();
+}, 120000); 
+
 </script>
 </body>
 </html>
