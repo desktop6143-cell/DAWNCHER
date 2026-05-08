@@ -41,56 +41,60 @@ if (sessionStorage.getItem('logado') !== 'true' || !idUser) {
     window.location.href = "../index.html";
 }
 
-// ==================== CARREGAR HISTÓRICO COM DEBUG ====================
-async function carregarHistorico() {
-    const secao = document.getElementById('secao-continuar');
-    const container = document.getElementById('lista-continuar');
-
-    try {
-        const response = await fetch(API_HISTORICO, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({
-                action: "buscar",
-                id_user: idUser
-            })
-        });
-
-        const dados = await response.json();
-        
-        console.log("📊 Dados retornados pela API:", dados);   // ← DEBUG
-
-        if (Array.isArray(dados) && dados.length > 0) {
-            const ultimo = dados[0];
-            console.log("Último item:", ultimo);
-
-            const card = document.createElement('div');
-            card.className = 'ep-card';
-            card.style.minWidth = '280px';   // ← Evita esticar demais
-            card.innerHTML = `
-                <div style="font-weight: bold; margin-bottom: 8px;">${ultimo.titulo || 'Sem título'}</div>
-                <div class="progresso-bg">
-                    <div class="progresso-bar" style="width: 70%;"></div>
-                </div>
-                <p style="font-size: 13px; color: #bbb; margin-top: 8px;">
-                    ${ultimo.data || ''} • ${ultimo.tempo || ''}
-                </p>
-            `;
-
-            card.onclick = () => {
-                if (ultimo.url_acesso) window.location.href = ultimo.url_acesso;
-            };
-
-            container.innerHTML = '';
-            container.appendChild(card);
-            secao.style.display = 'block';
-        } else {
-            secao.style.display = 'none';
-        }
-    } catch (err) {
-        console.error("Erro ao carregar histórico:", err);
-        secao.style.display = 'none';
+// ====================== BUSCAR (CORRIGIDA) ======================
+function buscarHistorico(id_user) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (!ss) throw new Error("Não foi possível encontrar a planilha ativa. O script está vinculado?");
+    
+    const aba = ss.getSheetByName("historico");
+    
+    // Se a aba não existe ou está vazia
+    if (!aba || aba.getLastRow() < 2) {
+      return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
     }
+
+    const valores = aba.getDataRange().getValues();
+    const headers = valores[0].map(h => h.toString().toLowerCase().trim());
+    
+    // Localiza os índices das colunas de forma segura
+    const idxId = headers.indexOf("id_user");
+    const idxTitulo = headers.indexOf("titulo");
+    const idxUrl = headers.indexOf("url_acesso");
+    const idxData = headers.indexOf("data");
+    const idxTempo = headers.indexOf("tempo");
+    const idxEpi = headers.indexOf("episodio");
+    const idxTime = headers.indexOf("timestamp");
+
+    const historico = [];
+
+    for (let i = 1; i < valores.length; i++) {
+      const linha = valores[i];
+      
+      // Verifica se o ID do usuário bate
+      if (String(linha[idxId]) === String(id_user)) {
+        historico.push({
+          id_user: linha[idxId],
+          titulo: linha[idxTitulo],
+          url_acesso: linha[idxUrl],
+          data: linha[idxData],
+          tempo: linha[idxTempo],
+          episodio: linha[idxEpi],
+          timestamp: linha[idxTime] || 0 // ADICIONADO: Necessário para o sort funcionar
+        });
+      }
+    }
+
+    // Ordena pelo timestamp (mais recente primeiro)
+    historico.sort((a, b) => b.timestamp - a.timestamp);
+
+    return ContentService.createTextOutput(JSON.stringify(historico))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (e) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: e.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 // ==================== BOTÕES ====================
