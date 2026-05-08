@@ -1,0 +1,67 @@
+<div class="conteudo-principal">
+<div class="anime-header">
+    <LINK rel="stylesheet" href="all_animes.css"></LINK>
+    <img src="../pngs/capas/capa6.jpg" class="poster"> <!-- Coloque o poster aqui -->
+    <div class="info">
+        <h1>Death Note</h1>
+        <p class="ano">2006</p>
+        <div class="rating">⭐ 8.3</div>
+        <div class="tags">
+            <span>Ação</span> <span>romance</span> <span>Fantasia</span> <span>Aventura</span> <span>Mecha</span> <span>Ficção científica</span>
+        </div>
+        <p class="sinopse">
+        Light Yagami é um genial estudante entediado com a vida que leva. Mas tudo está prestes a mudar. Light encontra um misterioso caderno chamado Death Note e descobre que com ele é possível matar quem quiser. O rapaz então decide varrer a escória da sociedade do planeta. Dotado de grande senso de justiça, ele começa a usar o caderno maldito para eliminar criminosos do mundo inteiro e começa a ganhar notoriedade na internet e nos demais meios de comunicação. Os atos do estudante são vistos com bons olhos por muitas pessoas que, sem saber sua identidade, passam a chamá-lo de Kira, do inglês “Killer” (assassino). Mas Light também chama a atenção das autoridades mundiais. Entra em cena o exótico detetive L. O confronto intelectual entre os dois é intenso até que Light, manipulando a todos, consegue tirar seu oponente de seu caminho. No entanto, o legado de L é herdado por seus sucessores Mello (M) e Near (N). Até onde Kira irá conseguir ir com seus planos de criar um novo mundo sem crimes? </div>
+
+    <!-- 2. CONTAINER DE EPISÓDIOS -->
+    <div class="episodios-container">
+        <div class="temporada-btn">Temporada 1</div>
+        
+        <div id="lista-episodios">
+            <!-- O JS vai gerar os .ep-card aqui dentro -->
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('lista-episodios');
+        const pastaThumb = "death_note"; // Nome da pasta das suas miniaturas
+        const nomeAnime = "death_note";
+
+     const idsGoogleDrive = {
+      
+     };
+ 
+        const totalepisodios = 37;
+
+        for (let i = 1; i <= totalepisodios; i++) {
+            const div = document.createElement('div');
+            div.className = 'ep-card';
+            
+            div.onclick = () => {
+                const idDrive = idsGoogleDrive[i];
+                
+                if (!idDrive || idDrive === "ID_AQUI") {
+                    alert("Este episódio ainda não está disponível!");
+                    return;
+                }
+
+                // Link de Preview do Drive (Funciona com o <iframe> do seu player)
+                const urlVideoParaOPlayer = `https://drive.google.com/file/d/${idDrive}/preview`;
+                const idUnico = `Death Note{i}`;
+                const caminhoPlayer = "../player.html";
+                const nomeepisodio = `${nomeAnime} - Episódio ${i}`;
+
+                window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(nomeepisodio)}`;
+            };
+
+            // Estrutura interna do card para combinar com o CSS
+            div.innerHTML = `
+                <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${i}.jpg');">
+                </div>
+                <p>Episódio ${i}</p>
+            `;
+
+            container.appendChild(div);
+        }
+    </script>
+</body>
+</html>
