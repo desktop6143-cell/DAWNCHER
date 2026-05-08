@@ -36,18 +36,18 @@
 // ==================== CONFIGURAÇÕES ====================
 const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbwWHgy2oHdmZyHZxd-OTUyWPXog5y6jtwrw65KQz7WnEiq50LomYSxW327On6onElJLqQ/exec';
 const idUser = sessionStorage.getItem('idUsuario');
-
+ // url kl
+// Proteção
 if (sessionStorage.getItem('logado') !== 'true' || !idUser) {
     window.location.href = "../index.html";
 }
 
-// ==================== CARREGAR ÚLTIMO ASSISTIDO ====================
+// ==================== CARREGAR "CONTINUAR ASSISTINDO" ====================
 async function carregarHistorico() {
-    const container = document.getElementById('historico-container'); // ← Mude se seu ID for diferente
-    if (!container) {
-        console.error("Container do histórico não encontrado! Verifique o ID no HTML.");
-        return;
-    }
+    const secao = document.getElementById('secao-continuar');
+    const container = document.getElementById('lista-continuar');
+
+    if (!secao || !container) return;
 
     try {
         const response = await fetch(API_HISTORICO, {
@@ -59,18 +59,23 @@ async function carregarHistorico() {
             })
         });
 
-        const dados = await response.json();
+        if (!response.ok) throw new Error("Erro na API");
+
+        let dados = await response.json();
 
         if (Array.isArray(dados) && dados.length > 0) {
-            const ultimo = dados[0]; // mais recente
+            // Pega o mais recente
+            const ultimo = dados[0];
 
             const card = document.createElement('div');
             card.className = 'ep-card';
             card.innerHTML = `
-                <div style="font-weight: bold; color: #fff;">Continuar assistindo</div>
-                <div style="margin: 8px 0; font-size: 15px;">${ultimo.titulo}</div>
-                <p style="font-size: 13px; color: #aaa;">
-                    ${ultimo.data} • ${ultimo.tempo || ''} ${ultimo.episodio ? '• ' + ultimo.episodio : ''}
+                <div style="font-weight: bold;">${ultimo.titulo || 'Sem título'}</div>
+                <div class="progresso-bg">
+                    <div class="progresso-bar" style="width: 65%;"></div>
+                </div>
+                <p style="font-size: 13px; color: #ccc; margin-top: 8px;">
+                    ${ultimo.data || ''} • ${ultimo.tempo || ''} ${ultimo.episodio ? '• ' + ultimo.episodio : ''}
                 </p>
             `;
 
@@ -78,23 +83,24 @@ async function carregarHistorico() {
                 if (ultimo.url_acesso) {
                     window.location.href = ultimo.url_acesso;
                 } else {
-                    alert("Link não encontrado.");
+                    alert("Link do episódio não encontrado.");
                 }
             };
 
             container.innerHTML = '';
             container.appendChild(card);
+            secao.style.display = 'block';   // Mostra a seção
         } else {
-            container.innerHTML = '<p style="color:#888; text-align:center;">Nenhum vídeo assistido ainda.</p>';
+            secao.style.display = 'none';    // Esconde se não tiver histórico
         }
 
     } catch (err) {
         console.error("Erro ao carregar histórico:", err);
-        container.innerHTML = '<p style="color:red;">Erro ao carregar histórico.</p>';
+        secao.style.display = 'none';
     }
 }
 
-// ==================== BOTÕES ====================
+// ==================== BOTÕES DA HOTBAR ====================
 document.getElementById('btn-home').onclick = () => window.location.reload();
 document.getElementById('btnBL').onclick = () => window.location.href = "bl.html";
 document.getElementById('btnLP').onclick = () => window.location.href = "../sites/bar.html";
@@ -104,6 +110,7 @@ document.getElementById('btn-sair').onclick = () => {
     window.location.href = "../index.html";
 };
 
+// Carrega ao abrir a página
 window.onload = carregarHistorico;
 </script>
 </body>
