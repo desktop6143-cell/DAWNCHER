@@ -34,9 +34,9 @@
 
 <script>
 // ==================== CONFIGURAÇÕES ====================
-const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbwfogiAwtuRTgogCtGX6yoc0irLDh2aajBOkpJxrf5T5JAneXvvvpUefRaOMZa8Qzer0w/exec';
+const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbwFKtWreXGmTHuA7r4p7vfU0TQJ-iYqUF9ZlFLbMYl33eJZqOTOQTNGIztqXbDvvWKxag/exec';
 const idUser = sessionStorage.getItem('idUsuario');
-
+//url vdd
 // Proteção de Login
 if (sessionStorage.getItem('logado') !== 'true' || !idUser) {
     window.location.href = "../index.html";
@@ -52,7 +52,6 @@ async function carregarHistorico() {
     try {
         const response = await fetch(API_HISTORICO, {
             method: 'POST',
-            // Usamos text/plain para evitar problemas de CORS com Google Apps Script
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
                 action: "buscar",
@@ -65,67 +64,79 @@ async function carregarHistorico() {
         const dados = await response.json();
         console.log("📊 Dados retornados pela API:", dados);
 
-        // Se o retorno for um erro do servidor (que tratamos no catch do Apps Script)
         if (dados.status === "error") {
             console.error("Erro no Servidor:", dados.message);
             return;
         }
 
         if (Array.isArray(dados) && dados.length > 0) {
-            const ultimo = dados[0]; // Pega o mais recente após o sort do script
+            const ultimo = dados[0]; // Pega o mais recente
 
             const card = document.createElement('div');
             card.className = 'ep-card';
             card.style.minWidth = '280px';
+            
             card.innerHTML = `
-                <div style="font-weight: bold; margin-bottom: 8px;">${ultimo.titulo || 'Sem título'}</div>
+                <div style="font-weight: bold; font-size: 16px; margin-bottom: 4px; color: #fff;">
+                    ${ultimo.titulo || 'Sem título'}
+                </div>
+                <div style="font-size: 13px; color: #7c3aed; font-weight: bold; margin-bottom: 10px;">
+                    Episódio: ${ultimo.episodio || '1'}
+                </div>
                 <div class="progresso-bg">
                     <div class="progresso-bar" style="width: 100%;"></div>
                 </div>
-                <p style="font-size: 13px; color: #bbb; margin-top: 8px;">
-                    ${ultimo.data || ''} • ${ultimo.tempo || ''}
-                </p>
+                <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 11px; color: #888;">
+                    <span>${ultimo.data || ''}</span>
+                    <span>${ultimo.tempo || ''}</span>
+                </div>
             `;
 
             card.onclick = () => {
-                if (ultimo.url_acesso) window.location.href = ultimo.url_acesso;
+                if (ultimo.url_acesso) {
+                    window.location.href = ultimo.url_acesso;
+                } else {
+                    alert("URL de acesso não encontrada.");
+                }
             };
 
             container.innerHTML = '';
             container.appendChild(card);
             secao.style.display = 'block';
         } else {
-            console.log("Nenhum histórico encontrado para este usuário.");
+            console.log("Nenhum histórico para o ID:", idUser);
             secao.style.display = 'none';
         }
     } catch (err) {
-        console.error("Erro ao carregar histórico no Catch:", err);
+        console.error("Erro ao carregar histórico:", err);
         secao.style.display = 'none';
     }
 }
 
-// ==================== BOTÕES E INICIALIZAÇÃO ====================
-// Definindo os eventos após o carregamento do DOM
+// ==================== INICIALIZAÇÃO ÚNICA ====================
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // Configura os botões
-    const btnHome = document.getElementById('btn-home');
-    if(btnHome) btnHome.onclick = () => window.location.reload();
+    // 1. Carrega os dados da planilha
+    carregarHistorico();
 
-    const btnBL = document.getElementById('btnBL');
-    if(btnBL) btnBL.onclick = () => window.location.href = "bl.html";
-
-    const btnLP = document.getElementById('btnLP');
-    if(btnLP) btnLP.onclick = () => window.location.href = "../sites/bar.html";
-
-    const btnSair = document.getElementById('btn-sair');
-    if(btnSair) btnSair.onclick = () => {
-        sessionStorage.clear();
-        window.location.href = "../index.html";
+    // 2. Configura todos os botões de uma vez
+    const configuracoesBotoes = {
+        'btn-home': () => window.location.reload(),
+        'btnBL':   () => window.location.href = "bl.html",
+        'btnLP':   () => window.location.href = "../sites/bar.html",
+        'btnnt':   () => window.location.href = "info.html",
+        'btn-sair': () => { 
+            sessionStorage.clear(); 
+            window.location.href = "../index.html"; 
+        }
     };
 
-    // Chama a função principal
-    carregarHistorico();
+    // Aplica os cliques apenas se o elemento existir no HTML
+    Object.keys(configuracoesBotoes).forEach(id => {
+        const elemento = document.getElementById(id);
+        if (elemento) {
+            elemento.onclick = configuracoesBotoes[id];
+        }
+    });
 });
 </script>
 </body>
