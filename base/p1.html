@@ -36,78 +36,97 @@
 // ==================== CONFIGURAÇÕES ====================
 const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbwfogiAwtuRTgogCtGX6yoc0irLDh2aajBOkpJxrf5T5JAneXvvvpUefRaOMZa8Qzer0w/exec';
 const idUser = sessionStorage.getItem('idUsuario');
- // url FIM
+
+// Proteção de Login
 if (sessionStorage.getItem('logado') !== 'true' || !idUser) {
     window.location.href = "../index.html";
 }
 
-// ====================== BUSCAR (CORRIGIDA) ======================
-function buscarHistorico(id_user) {
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    if (!ss) throw new Error("Não foi possível encontrar a planilha ativa. O script está vinculado?");
-    
-    const aba = ss.getSheetByName("historico");
-    
-    // Se a aba não existe ou está vazia
-    if (!aba || aba.getLastRow() < 2) {
-      return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
-    }
+// ==================== FUNÇÃO CARREGAR HISTÓRICO ====================
+async function carregarHistorico() {
+    const secao = document.getElementById('secao-continuar');
+    const container = document.getElementById('lista-continuar');
 
-    const valores = aba.getDataRange().getValues();
-    const headers = valores[0].map(h => h.toString().toLowerCase().trim());
-    
-    // Localiza os índices das colunas de forma segura
-    const idxId = headers.indexOf("id_user");
-    const idxTitulo = headers.indexOf("titulo");
-    const idxUrl = headers.indexOf("url_acesso");
-    const idxData = headers.indexOf("data");
-    const idxTempo = headers.indexOf("tempo");
-    const idxEpi = headers.indexOf("episodio");
-    const idxTime = headers.indexOf("timestamp");
+    console.log("Iniciando busca de histórico para o ID:", idUser);
 
-    const historico = [];
-
-    for (let i = 1; i < valores.length; i++) {
-      const linha = valores[i];
-      
-      // Verifica se o ID do usuário bate
-      if (String(linha[idxId]) === String(id_user)) {
-        historico.push({
-          id_user: linha[idxId],
-          titulo: linha[idxTitulo],
-          url_acesso: linha[idxUrl],
-          data: linha[idxData],
-          tempo: linha[idxTempo],
-          episodio: linha[idxEpi],
-          timestamp: linha[idxTime] || 0 // ADICIONADO: Necessário para o sort funcionar
+    try {
+        const response = await fetch(API_HISTORICO, {
+            method: 'POST',
+            // Usamos text/plain para evitar problemas de CORS com Google Apps Script
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+                action: "buscar",
+                id_user: idUser
+            })
         });
-      }
+
+        if (!response.ok) throw new Error("Erro na resposta da rede");
+
+        const dados = await response.json();
+        console.log("📊 Dados retornados pela API:", dados);
+
+        // Se o retorno for um erro do servidor (que tratamos no catch do Apps Script)
+        if (dados.status === "error") {
+            console.error("Erro no Servidor:", dados.message);
+            return;
+        }
+
+        if (Array.isArray(dados) && dados.length > 0) {
+            const ultimo = dados[0]; // Pega o mais recente após o sort do script
+
+            const card = document.createElement('div');
+            card.className = 'ep-card';
+            card.style.minWidth = '280px';
+            card.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 8px;">${ultimo.titulo || 'Sem título'}</div>
+                <div class="progresso-bg">
+                    <div class="progresso-bar" style="width: 100%;"></div>
+                </div>
+                <p style="font-size: 13px; color: #bbb; margin-top: 8px;">
+                    ${ultimo.data || ''} • ${ultimo.tempo || ''}
+                </p>
+            `;
+
+            card.onclick = () => {
+                if (ultimo.url_acesso) window.location.href = ultimo.url_acesso;
+            };
+
+            container.innerHTML = '';
+            container.appendChild(card);
+            secao.style.display = 'block';
+        } else {
+            console.log("Nenhum histórico encontrado para este usuário.");
+            secao.style.display = 'none';
+        }
+    } catch (err) {
+        console.error("Erro ao carregar histórico no Catch:", err);
+        secao.style.display = 'none';
     }
-
-    // Ordena pelo timestamp (mais recente primeiro)
-    historico.sort((a, b) => b.timestamp - a.timestamp);
-
-    return ContentService.createTextOutput(JSON.stringify(historico))
-      .setMimeType(ContentService.MimeType.JSON);
-
-  } catch (e) {
-    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: e.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
 }
 
-// ==================== BOTÕES ====================
-document.getElementById('btn-home').onclick = () => window.location.reload();
-document.getElementById('btnBL').onclick = () => window.location.href = "bl.html";
-document.getElementById('btnLP').onclick = () => window.location.href = "../sites/bar.html";
-document.getElementById('btnnt').onclick = () => window.location.href = "info.html";
-document.getElementById('btn-sair').onclick = () => {
-    sessionStorage.clear();
-    window.location.href = "../index.html";
-};
+// ==================== BOTÕES E INICIALIZAÇÃO ====================
+// Definindo os eventos após o carregamento do DOM
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Configura os botões
+    const btnHome = document.getElementById('btn-home');
+    if(btnHome) btnHome.onclick = () => window.location.reload();
 
-window.onload = carregarHistorico;
+    const btnBL = document.getElementById('btnBL');
+    if(btnBL) btnBL.onclick = () => window.location.href = "bl.html";
+
+    const btnLP = document.getElementById('btnLP');
+    if(btnLP) btnLP.onclick = () => window.location.href = "../sites/bar.html";
+
+    const btnSair = document.getElementById('btn-sair');
+    if(btnSair) btnSair.onclick = () => {
+        sessionStorage.clear();
+        window.location.href = "../index.html";
+    };
+
+    // Chama a função principal
+    carregarHistorico();
+});
 </script>
 </body>
 </html>
