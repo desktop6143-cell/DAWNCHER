@@ -1,0 +1,102 @@
+<div class="conteudo-principal">
+<div class="anime-header">
+    <LINK rel="stylesheet" href="all_animes.css"></LINK>
+    <img src="../pngs/capas/capa21.jpg" class="poster"> <!-- Coloque o poster aqui -->
+    <div class="info">
+        <h1>Dandadan</h1>
+        <p class="ano">2024</p>
+        <div class="rating">⭐ 0</div>
+        <div class="tags">  </div>
+        <p class="sinopse">
+ Esta é uma história sobre Momo, uma garota do ensino médio que vem de uma família de médiuns espirituais, e seu colega de classe Okarun, um garoto fanático pelo ocultismo. Depois que Momo resgata Okarun de uns valentões, eles começam a conversar… No entanto, surge uma discussão entre eles, já que Momo acredita em fantasmas, mas nega a existência de alienígenas, e Okarun acredita em alienígenas, mas nega a existência de fantasmas. Visando provar que o que acreditam é real, Momo vai a um hospital abandonado onde um OVNI foi avistado e Okarun vai a um túnel que dizem ser assombrado. Para surpresa deles, cada um se depara com atividades paranormais avassaladoras que transcendem a compreensão. Em meio a isso tudo, Momo desperta seu poder oculto e Okarun ganha o poder de uma maldição para superar esses novos perigos! Será que o amor deles destinado também começa aqui!?       </div>
+</div>
+
+<div class="episodios-container">
+    <h2>Temporadas e Episódios</h2>
+    <P></P>
+    
+    
+<div id="lista-episodios" class="container-cards">
+    <!-- O JavaScript vai preencher aqui automaticamente -->
+</div>
+<script>
+const container = document.getElementById('lista-episodios');
+
+// 1. ADICIONE OS IDs DO GOOGLE DRIVE AQUI (Mapeados pelo número global do episódio)
+const idsGoogleDrive = {
+    1: "ID_DO_EPISODIO_1"
+};
+
+// CONFIGURAÇÃO MANUAL DAS TEMPORADAS
+const configTemporadas = [
+    { nome: "Temporada 1", eps: 12 },
+    { nome: "Temporada 2", eps: 12 },
+];
+
+const pastaAnime = "dandadan"; 
+const pastaThumb = "dandadan";
+const nomeAnime = "Dandadan"; 
+
+let contadorGlobal = 1; 
+
+configTemporadas.forEach((temp) => {
+    if (temp.nome !== "") {
+        const linhaTitulo = document.createElement('div');
+        linhaTitulo.style.width = "100%";
+        linhaTitulo.style.display = "flex";
+        linhaTitulo.style.justifyContent = "flex-start";
+        linhaTitulo.style.margin = "35px 0 15px 0";
+
+        const tituloBtn = document.createElement('div');
+        tituloBtn.innerText = temp.nome;
+        
+        // ESTILIZAÇÃO
+        tituloBtn.style.backgroundColor = "#e74c3c";
+        tituloBtn.style.color = "#ffffff";
+        tituloBtn.style.width = "210px";        
+        tituloBtn.style.padding = "12px 18px";
+        tituloBtn.style.textAlign = "left";
+        tituloBtn.style.fontSize = "19px";      
+        tituloBtn.style.fontWeight = "700";
+        tituloBtn.style.borderRadius = "6px";
+        tituloBtn.style.boxShadow = "2px 2px 5px rgba(0,0,0,0.2)";
+
+        linhaTitulo.appendChild(tituloBtn);
+        container.appendChild(linhaTitulo);
+    }
+
+    for (let i = 1; i <= temp.eps; i++) {
+        const numeroEP = contadorGlobal; // Este é o número usado para pegar o ID no Drive
+        const div = document.createElement('div');
+        div.className = 'ep-card';
+        
+        div.onclick = () => {
+            const idDrive = idsGoogleDrive[numeroEP];
+            
+            // Verifica se o ID existe no objeto acima
+            if (!idDrive || idDrive === "ID_AQUI") {
+                alert("Este episódio ainda não está disponível no Google Drive!");
+                return;
+            }
+
+            // Link de Preview do Drive (Igual ao seu primeiro código)
+            const urlVideoParaOPlayer = `https://drive.google.com/file/d/${idDrive}/preview`;
+            const idUnico = `${pastaAnime}_EP${numeroEP}`;
+            const caminhoPlayer = "../player.html";
+            const tituloCompleto = `${nomeAnime} - EP ${numeroEP}`;
+
+            window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(tituloCompleto)}`;
+        };
+
+        div.innerHTML = `
+            <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${numeroEP}.jpg'); background-size: cover; background-position: center;">
+                ${numeroEP}
+            </div>
+            <p>Episódio ${numeroEP}</p>
+        `;
+
+        container.appendChild(div);
+        contadorGlobal++; // Incrementa para o próximo episódio
+    }
+});
+</script>
