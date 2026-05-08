@@ -1,0 +1,103 @@
+<div class="conteudo-principal">
+<div class="anime-header">
+    <LINK rel="stylesheet" href="all_animes.css"></LINK>
+    <img src="../pngs/capas/capa15.jpg" class="poster"> <!-- Coloque o poster aqui -->
+    <div class="info">
+        <h1>Solo Leveling</h1>
+        <p class="ano">2024</p>
+        <div class="rating">⭐ 0</div>
+        <div class="tags">  </div>
+        <p class="sinopse">
+           Há mais de uma década, surgiu uma misteriosa passagem chamada “portal”, que conecta este mundo a uma dimensão diferente, o que fez com que pessoas despertassem poderes únicos… e essas pessoas são chamadas de “caçadores”. Os caçadores usam seus poderes sobre-humanos para conquistar masmorras dentro dos portais e assim ganhar a vida. Sung Jinwoo, um caçador de nível baixo, é considerado o caçador mais fraco de toda a humanidade. Certo dia, ele se depara com uma “masmorra dupla”, que tem uma masmorra de nível alto escondida dentro de uma masmorra de nível baixo. Diante de um Jinwoo gravemente ferido, surge uma misteriosa missão! À beira da morte, Jinwoo decide aceitar essa missão, tornando-se assim a única pessoa capaz de subir de nível!
+       </div>
+</div>
+
+<div class="episodios-container">
+    <h2>Temporadas e Episódios</h2>
+    <P></P>
+    
+    
+<div id="lista-episodios" class="container-cards">
+    <!-- O JavaScript vai preencher aqui automaticamente -->
+</div>
+<script>
+const container = document.getElementById('lista-episodios');
+
+// 1. ADICIONE OS IDs DO GOOGLE DRIVE AQUI (Mapeados pelo número global do episódio)
+const idsGoogleDrive = {
+    1: "ID_DO_EPISODIO_1"
+};
+
+// CONFIGURAÇÃO MANUAL DAS TEMPORADAS
+const configTemporadas = [
+    { nome: "Temporada 1", eps: 12 },
+    { nome: "Temporada 2", eps: 13 },
+];
+
+const pastaAnime = "solo-leveling"; 
+const pastaThumb = "solo-leveling";
+const nomeAnime = "Solo Leveling"; 
+
+let contadorGlobal = 1; 
+
+configTemporadas.forEach((temp) => {
+    if (temp.nome !== "") {
+        const linhaTitulo = document.createElement('div');
+        linhaTitulo.style.width = "100%";
+        linhaTitulo.style.display = "flex";
+        linhaTitulo.style.justifyContent = "flex-start";
+        linhaTitulo.style.margin = "35px 0 15px 0";
+
+        const tituloBtn = document.createElement('div');
+        tituloBtn.innerText = temp.nome;
+        
+        // ESTILIZAÇÃO
+        tituloBtn.style.backgroundColor = "#e74c3c";
+        tituloBtn.style.color = "#ffffff";
+        tituloBtn.style.width = "210px";        
+        tituloBtn.style.padding = "12px 18px";
+        tituloBtn.style.textAlign = "left";
+        tituloBtn.style.fontSize = "19px";      
+        tituloBtn.style.fontWeight = "700";
+        tituloBtn.style.borderRadius = "6px";
+        tituloBtn.style.boxShadow = "2px 2px 5px rgba(0,0,0,0.2)";
+
+        linhaTitulo.appendChild(tituloBtn);
+        container.appendChild(linhaTitulo);
+    }
+
+    for (let i = 1; i <= temp.eps; i++) {
+        const numeroEP = contadorGlobal; // Este é o número usado para pegar o ID no Drive
+        const div = document.createElement('div');
+        div.className = 'ep-card';
+        
+        div.onclick = () => {
+            const idDrive = idsGoogleDrive[numeroEP];
+            
+            // Verifica se o ID existe no objeto acima
+            if (!idDrive || idDrive === "ID_AQUI") {
+                alert("Este episódio ainda não está disponível no Google Drive!");
+                return;
+            }
+
+            // Link de Preview do Drive (Igual ao seu primeiro código)
+            const urlVideoParaOPlayer = `https://drive.google.com/file/d/${idDrive}/preview`;
+            const idUnico = `${pastaAnime}_EP${numeroEP}`;
+            const caminhoPlayer = "../player.html";
+            const tituloCompleto = `${nomeAnime} - EP ${numeroEP}`;
+
+            window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(tituloCompleto)}`;
+        };
+
+        div.innerHTML = `
+            <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${numeroEP}.jpg'); background-size: cover; background-position: center;">
+                ${numeroEP}
+            </div>
+            <p>Episódio ${numeroEP}</p>
+        `;
+
+        container.appendChild(div);
+        contadorGlobal++; // Incrementa para o próximo episódio
+    }
+});
+</script>
