@@ -12,7 +12,7 @@ body {
     /* FUNDO */
     background: #1a1a1a url('../pngs/capa88.png') no-repeat center center fixed;
     background-size: cover;
-
+/* foto nova */
     /* ALINHAMENTO */
     display: flex;
     flex-direction: column;
