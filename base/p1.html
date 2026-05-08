@@ -34,83 +34,67 @@
 
 <script>
 // ==================== CONFIGURAÇÕES ====================
-const API_HISTORICO = 'https://script.google.com/macros/s/AKfycby30O1AeA99QnSpRUWt3S7L7VwOJEUn2XE2U25s1FADwG0x9w4sfJrYCInt4KYZx1V42w/exec';
+const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbwWHgy2oHdmZyHZxd-OTUyWPXog5y6jtwrw65KQz7WnEiq50LomYSxW327On6onElJLqQ/exec';
 const idUser = sessionStorage.getItem('idUsuario');
 
-// Proteção de acesso
 if (sessionStorage.getItem('logado') !== 'true' || !idUser) {
     window.location.href = "../index.html";
 }
 
-// ==================== CARREGAR HISTÓRICO ====================
+// ==================== CARREGAR ÚLTIMO ASSISTIDO ====================
 async function carregarHistorico() {
-    const container = document.getElementById('historico-container'); // ← mude o ID se for diferente
-    const secao = document.getElementById('secao-historico');         // ← mude o ID se for diferente
-
+    const container = document.getElementById('historico-container'); // ← Mude se seu ID for diferente
     if (!container) {
-        console.error("Container do histórico não encontrado!");
+        console.error("Container do histórico não encontrado! Verifique o ID no HTML.");
         return;
     }
 
     try {
-        const resp = await fetch(`${API_HISTORICO}/search?id_user=${idUser}`);
+        const response = await fetch(API_HISTORICO, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+                action: "buscar",
+                id_user: idUser
+            })
+        });
 
-        if (resp.status === 429) {
-            console.warn("⏳ Rate limit do SheetDB. Aguarde alguns segundos.");
-            return;
-        }
+        const dados = await response.json();
 
-        if (!resp.ok) throw new Error("Erro ao buscar histórico");
-
-        let dados = await resp.json();
-        if (!Array.isArray(dados)) dados = [];
-
-        console.log("Histórico carregado:", dados);
-
-        if (dados.length > 0) {
-            // Pegar o mais recente
-            const maisRecente = dados.sort((a, b) => {
-                const dataA = new Date(a.data + " " + (a.tempo || ""));
-                const dataB = new Date(b.data + " " + (b.tempo || ""));
-                return dataB - dataA;
-            })[0];
+        if (Array.isArray(dados) && dados.length > 0) {
+            const ultimo = dados[0]; // mais recente
 
             const card = document.createElement('div');
             card.className = 'ep-card';
             card.innerHTML = `
-                <div style="font-weight: bold;">${maisRecente.titulo || 'Sem título'}</div>
-                <div class="progresso-bg">
-                    <div class="progresso-bar" style="width: 70%;"></div>
-                </div>
-                <p style="font-size: 12px; color: #aaa; margin-top: 6px;">
-                    Último visto: ${maisRecente.data || ''} • ${maisRecente.tempo || ''}
+                <div style="font-weight: bold; color: #fff;">Continuar assistindo</div>
+                <div style="margin: 8px 0; font-size: 15px;">${ultimo.titulo}</div>
+                <p style="font-size: 13px; color: #aaa;">
+                    ${ultimo.data} • ${ultimo.tempo || ''} ${ultimo.episodio ? '• ' + ultimo.episodio : ''}
                 </p>
             `;
 
             card.onclick = () => {
-                if (maisRecente.url_acesso) {
-                    const urlEnc = encodeURIComponent(maisRecente.url_acesso);
-                    const titEnc = encodeURIComponent(maisRecente.titulo || '');
-                    window.location.href = `player.html?url=${urlEnc}&titulo=${titEnc}`;
+                if (ultimo.url_acesso) {
+                    window.location.href = ultimo.url_acesso;
                 } else {
-                    alert("URL do vídeo não encontrada.");
+                    alert("Link não encontrado.");
                 }
             };
 
-            container.innerHTML = ''; // limpa antes de adicionar
+            container.innerHTML = '';
             container.appendChild(card);
-            if (secao) secao.style.display = 'block';
         } else {
-            if (secao) secao.style.display = 'none';
+            container.innerHTML = '<p style="color:#888; text-align:center;">Nenhum vídeo assistido ainda.</p>';
         }
 
     } catch (err) {
         console.error("Erro ao carregar histórico:", err);
-        if (secao) secao.style.display = 'none';
+        container.innerHTML = '<p style="color:red;">Erro ao carregar histórico.</p>';
     }
 }
 
-// ==================== BOTÕES DA HOTBAR ====================
+// ==================== BOTÕES ====================
 document.getElementById('btn-home').onclick = () => window.location.reload();
 document.getElementById('btnBL').onclick = () => window.location.href = "bl.html";
 document.getElementById('btnLP').onclick = () => window.location.href = "../sites/bar.html";
@@ -120,7 +104,6 @@ document.getElementById('btn-sair').onclick = () => {
     window.location.href = "../index.html";
 };
 
-// Carregar histórico ao abrir a página
 window.onload = carregarHistorico;
 </script>
 </body>
