@@ -70,7 +70,6 @@ loginForm.addEventListener('submit', async (e) => {
             sessionStorage.setItem('idUsuario', u.id);
             sessionStorage.setItem('nomeUsuario', u.name);
 
-            alert("Login realizado com sucesso!"); // opcional
             window.location.href = "base/p1.html";
         } else {
             alert(resultado.message || "Usuário ou senha incorretos!");
