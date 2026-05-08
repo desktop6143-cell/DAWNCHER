@@ -34,9 +34,9 @@
 
 <script>
 // ==================== CONFIGURAÇÕES ====================
-const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbwFKtWreXGmTHuA7r4p7vfU0TQJ-iYqUF9ZlFLbMYl33eJZqOTOQTNGIztqXbDvvWKxag/exec';
+const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbzIp-l5tjnJgmDVDYejfUNsJprl6itVxEpdZKQGoNf9wWrrylQk0wcNivMqbkJjunXmNA/exec';
 const idUser = sessionStorage.getItem('idUsuario');
-//url vdd
+//url fk
 // Proteção de Login
 if (sessionStorage.getItem('logado') !== 'true' || !idUser) {
     window.location.href = "../index.html";
@@ -50,8 +50,9 @@ async function carregarHistorico() {
     console.log("Iniciando busca de histórico para o ID:", idUser);
 
     try {
-        const response = await fetch(API_HISTORICO, {
+       const response = await fetch(API_HISTORICO, {
             method: 'POST',
+            redirect: 'follow', // Adicione esta linha
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
                 action: "buscar",
