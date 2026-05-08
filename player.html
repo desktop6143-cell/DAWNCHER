@@ -91,83 +91,106 @@
     </div>
 
 <script>
-// ==================== CONFIGURAÇÕES ====================
-const API_HISTORICO = 'https://script.google.com/macros/s/AKfycby9NAoshp94IRIq-lx66zsjQQqJk--dp9WA-Rlx8igETrqriCMMXFrtt32iiPpUylgvRw/exec';
-const idUser = sessionStorage.getItem('idUsuario');
- // url ds
-// Pegar parâmetros da URL
-const urlParams = new URLSearchParams(window.location.search);
-const videoUrl = urlParams.get('url');
-const tituloBruto = urlParams.get('titulo') || "Vídeo sem título";
-const tituloFormatado = decodeURIComponent(tituloBruto);
+// ==================== 1. CONFIGURAÇÕES E VARIÁVEIS GLOBAIS ====================
+const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbwe7k3THvlFrsfvSpAl3JfyF7FqRNaTzoxSfK5S12PzPaS6JZmIK89LCgyWczmgCf7VCQ/exec';
+const idUser        = sessionStorage.getItem('idUsuario');
 
+// Parâmetros da URL e Formatação de Título
+const urlParams       = new URLSearchParams(window.location.search);
+const videoUrl        = urlParams.get('url');
+const tituloFormatado = decodeURIComponent(urlParams.get('titulo') || "Vídeo sem título");
+
+// Elementos da Interface
 document.getElementById('video-title').textContent = tituloFormatado;
 
-// Carregar vídeo no iframe
 if (videoUrl) {
     document.getElementById('video-frame').src = decodeURIComponent(videoUrl);
 } else {
     document.getElementById('video-title').textContent = "URL do vídeo não encontrada!";
 }
 
-// Tenta extrair o número do episódio do título (Ex: "Naruto - Episódio 12" -> "12")
+// Extração do Número do Episódio (Ex: "Anime - Episódio 05" -> "05")
 let episodioAtual = "1";
 const matchEp = tituloFormatado.match(/Epis[óo]dio\s*(\d+)/i);
 if (matchEp) {
     episodioAtual = matchEp[1];
 }
 
-// ==================== SALVAR NO HISTÓRICO ====================
+
+// ==================== 2. FUNÇÕES DE TEMPO E FORMATAÇÃO ====================
+
+/**
+ * Gera o horário atual no formato HH:mm:ss (24h)
+ * Essencial para que a comparação de "progresso maior" funcione na planilha.
+ */
+function obterTempoFormatado() {
+    return new Date().toLocaleTimeString('pt-BR', {
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit',
+        hour12: false 
+    });
+}
+
+
+// ==================== 3. FUNÇÃO SALVAR HISTÓRICO ====================
+
+/**
+ * Envia os dados de progresso para o Google Apps Script.
+ * Verifica o ID do usuário e envia o tempo formatado.
+ */
 async function salvarNoHistorico() {
     if (!idUser) return;
 
-    // ATENÇÃO: toLocaleTimeString pega a hora do PC (ex: 15:30). 
-    // Idealmente, aqui deveria ser o tempo real do vídeo (ex: "00:12:45")
-    const tempoAssistido = new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit', second: '2-digit'});
+    const tempoAssistido = obterTempoFormatado();
+
+    const dados = {
+        action: "salvar",
+        id_user: idUser,
+        titulo: tituloFormatado,
+        url_acesso: window.location.href,
+        episodio: episodioAtual, 
+        tempo: tempoAssistido
+    };
 
     try {
         const response = await fetch(API_HISTORICO, {
             method: 'POST',
             redirect: 'follow',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({
-                action: "salvar",
-                id_user: idUser,
-                titulo: tituloFormatado,
-                url_acesso: window.location.href, // Salva o link da sua página player com os parâmetros
-                episodio: episodioAtual, 
-                tempo: tempoAssistido
-            })
+            body: JSON.stringify(dados)
         });
         
         const resultado = await response.json();
-        console.log("✅ API Respondeu:", resultado.message);
+        console.log(`[${tempoAssistido}] ✅ API Respondeu: ${resultado.message}`);
     } catch (err) {
-        console.error("Erro ao salvar histórico:", err);
+        console.error("❌ Erro ao salvar histórico:", err);
     }
 }
 
-// Voltar para página anterior
+
+// ==================== 4. GATILHOS E EVENTOS ====================
+
+// Ação de Voltar
 function voltar() {
     window.history.back();
 }
 
-// ==================== GATILHOS DE SALVAMENTO ====================
-// Salva quando a página termina de carregar
+// Evento: Quando a página termina de carregar
 window.addEventListener('load', () => {
     salvarNoHistorico();
 });
 
-// Tenta salvar quando o usuário fechar a aba ou sair da página
+// Evento: Salvamento Automático a cada 30 segundos
+setInterval(() => {
+    console.log("⏱️ Iniciando salvamento automático...");
+    salvarNoHistorico();
+}, 30000);
+
+// Evento: Quando o usuário fecha a aba ou sai da página
 window.addEventListener('beforeunload', () => {
     salvarNoHistorico();
 });
-
-// BÔNUS: Salva o histórico a cada 2 minutos (120000 ms) automaticamente 
-// caso o usuário fique muito tempo assistindo sem fechar a página
-setInterval(() => {
-    salvarNoHistorico();
-}, 120000); 
 
 </script>
 </body>
