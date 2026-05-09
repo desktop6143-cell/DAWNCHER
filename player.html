@@ -2,152 +2,148 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Player AnimeFire Original</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Player AnimeFire Fix</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root { --af-blue: #00aeef; --af-bg: #1A1A1A; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Quicksand', sans-serif; }
         body, html { width: 100%; height: 100%; background-color: #000; overflow: hidden; }
 
-        .af-player-container {
+        .player-container {
             position: relative;
             width: 100vw; height: 100vh;
-            background: #000; display: flex; flex-direction: column; justify-content: center;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        /* Camada do Vídeo */
-        .video-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-        iframe { width: 100%; height: 100%; border: none; pointer-events: auto; }
+        /* Camada do Vídeo - Z-INDEX BAIXO */
+        .video-wrapper {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+        iframe { width: 100%; height: 100%; border: none; }
 
-        /* Interface Overlay */
-        .af-ui-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.8) 100%);
+        /* Camada da Interface - Z-INDEX ALTO */
+        .ui-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 10;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.7) 100%);
             display: flex; flex-direction: column; justify-content: space-between;
-            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+            pointer-events: none; opacity: 0; transition: opacity 0.3s;
         }
 
-        .af-player-container.active .af-ui-overlay { opacity: 1; pointer-events: auto; }
+        .player-container.active .ui-overlay { opacity: 1; pointer-events: auto; }
 
-        /* Barra Superior */
-        .af-header { padding: 20px; display: flex; align-items: center; gap: 15px; }
-        .af-btn-back { cursor: pointer; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 50%; }
-        .af-title { color: #fff; font-size: 1.1rem; }
-
-        /* Barra de Progresso TOP (A que você gostou) */
-        .af-progress-wrapper { padding: 0 20px; width: 100%; margin-bottom: 10px; }
-        .af-progress-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.2); border-radius: 10px; cursor: pointer; position: relative; }
-        .af-progress-filled { width: 0%; height: 100%; background: var(--af-blue); border-radius: 10px; box-shadow: 0 0 12px rgba(0, 174, 239, 0.6); position: relative; }
-        .af-progress-filled::after { content: ''; position: absolute; right: -6px; top: -4px; width: 13px; height: 13px; background: #fff; border-radius: 50%; }
-
-        /* Controles Inferiores */
-        .af-controls { padding: 0 25px 25px; display: flex; justify-content: space-between; align-items: center; }
-        .af-controls-left, .af-controls-right { display: flex; align-items: center; gap: 25px; }
-        .af-icon { width: 26px; height: 26px; fill: #fff; cursor: pointer; }
-        .af-time { color: #fff; font-size: 0.9rem; }
-
-        /* Menu Config */
-        .af-menu-pop {
-            position: absolute; bottom: 80px; right: 20px; background: var(--af-bg);
-            border-radius: 5px; width: 240px; display: none; flex-direction: column;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 20;
+        /* Área de toque central: se clicar nela, os controles aparecem */
+        .touch-area {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 5;
         }
-        .af-menu-item { padding: 15px; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; cursor: pointer; }
-        
-        /* Área de clique central para mostrar menu */
-        .click-handler { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
+
+        /* HEADER */
+        .header { padding: 20px; display: flex; align-items: center; gap: 15px; color: white; }
+        .btn-back { cursor: pointer; width: 35px; height: 35px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        /* PROGRESS BAR TOP (O que você curtiu) */
+        .progress-area { padding: 0 20px; margin-bottom: 10px; }
+        .bar-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 10px; position: relative; }
+        .bar-fill { 
+            width: 0%; height: 100%; background: var(--af-blue); 
+            box-shadow: 0 0 10px var(--af-blue); border-radius: 10px; 
+        }
+
+        /* CONTROLES */
+        .controls { padding: 0 20px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .group { display: flex; align-items: center; gap: 20px; }
+        .icon { width: 24px; height: 24px; fill: white; cursor: pointer; }
+        .time { color: white; font-size: 0.85rem; }
     </style>
 </head>
-<body onclick="showUI()">
+<body>
 
-    <div class="af-player-container" id="mainPlayer">
-        <div class="click-handler"></div>
+    <div class="player-container" id="pContainer">
+        <div class="touch-area" onclick="handleTouch()"></div>
 
-        <div class="video-canvas">
-            <iframe id="iframePlayer" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        <div class="video-wrapper">
+            <iframe id="vIframe" allow="autoplay; fullscreen"></iframe>
         </div>
 
-        <div class="af-ui-overlay" id="uiOverlay">
-            <div class="af-header">
-                <div class="af-btn-back" onclick="window.history.back()">
-                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="white" stroke-width="2.5" fill="none"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <div class="ui-overlay">
+            <div class="header">
+                <div class="btn-back" onclick="window.history.back()">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="white" stroke-width="2" fill="none"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 </div>
-                <div class="af-title" id="video-title">Carregando...</div>
+                <span id="vTitulo">Carregando...</span>
             </div>
 
-            <div class="af-footer-area">
-                <div class="af-progress-wrapper">
-                    <div class="af-progress-bar">
-                        <div class="af-progress-filled" id="progressFill"></div>
+            <div class="footer">
+                <div class="progress-area">
+                    <div class="bar-bg">
+                        <div class="bar-fill" id="vBar"></div>
                     </div>
                 </div>
-                <div class="af-controls">
-                    <div class="af-controls-left">
-                        <svg class="af-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        <div class="af-time" id="timeDisplay">00:00 / 00:00</div>
+                <div class="controls">
+                    <div class="group">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <span class="time">00:00 / --:--</span>
                     </div>
-                    <div class="af-controls-right">
-                        <svg class="af-icon" onclick="toggleMenu(event)" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                        <svg class="af-icon" onclick="toggleFS()" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                    <div class="group">
+                        <svg class="icon" onclick="toggleFS()" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
                     </div>
                 </div>
-            </div>
-
-            <div class="af-menu-pop" id="qualityMenu">
-                <div class="af-menu-item"><span>Velocidade</span> <span>Normal</span></div>
-                <div class="af-menu-item"><span>Qualidade</span> <span>Auto</span></div>
             </div>
         </div>
     </div>
 
     <script>
-        const player = document.getElementById('mainPlayer');
-        const menu = document.getElementById('qualityMenu');
-        let uiTimer;
+        const container = document.getElementById('pContainer');
+        const iframe = document.getElementById('vIframe');
+        const bar = document.getElementById('vBar');
+        let timer;
 
-        function showUI() {
-            player.classList.add('active');
-            clearTimeout(uiTimer);
-            uiTimer = setTimeout(() => player.classList.remove('active'), 4000);
+        // Função para mostrar interface
+        function handleTouch() {
+            container.classList.add('active');
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                container.classList.remove('active');
+            }, 3000);
         }
 
-        function toggleMenu(e) {
-            e.stopPropagation();
-            menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
-        }
-
+        // Função Tela Cheia corrigida
         function toggleFS() {
             if (!document.fullscreenElement) {
-                player.requestFullscreen().catch(err => alert("Erro ao entrar em tela cheia"));
+                container.requestFullscreen().catch(e => {});
             } else {
                 document.exitFullscreen();
             }
         }
 
-        // Lógica de URL e Correção do Google Drive
-        const params = new URLSearchParams(window.location.search);
-        let url = params.get('url');
-        document.getElementById('video-title').innerText = decodeURIComponent(params.get('titulo') || "Anime");
+        // Lógica de URL
+        const p = new URLSearchParams(window.location.search);
+        let videoUrl = p.get('url');
+        document.getElementById('vTitulo').innerText = decodeURIComponent(p.get('titulo') || "Anime");
 
-        if (url) {
-            url = decodeURIComponent(url);
-            // Se for link do Drive, garante o formato /preview
-            if (url.includes('drive.google.com') && !url.includes('/preview')) {
-                const id = url.split('/d/')[1]?.split('/')[0] || url.split('id=')[1]?.split('&')[0];
-                url = `https://drive.google.com/file/d/${id}/preview`;
+        if (videoUrl) {
+            videoUrl = decodeURIComponent(videoUrl);
+            
+            // CORREÇÃO CRUCIAL PARA GOOGLE DRIVE
+            if (videoUrl.includes('drive.google.com')) {
+                let id = videoUrl.split('/d/')[1]?.split('/')[0] || videoUrl.split('id=')[1]?.split('&')[0];
+                // Usamos o link de preview que é o único que funciona em players externos
+                videoUrl = `https://drive.google.com/file/d/${id}/preview`;
             }
-            document.getElementById('iframePlayer').src = url;
+            
+            iframe.src = videoUrl;
         }
 
-        // Simulação da barra de progresso azul neon
-        let progress = 0;
-        setInterval(() => {
-            if(progress < 100) {
-                progress += 0.05;
-                document.getElementById('progressFill').style.width = progress + "%";
-            }
-        }, 1000);
+        // Remover a barra que se movia sozinha se o vídeo não estiver carregado
+        // A barra só deve se mover se você tiver o controle real do vídeo (via API)
+        // Por enquanto, deixaremos ela estática em 0% até o vídeo iniciar no Drive.
     </script>
 </body>
 </html>
