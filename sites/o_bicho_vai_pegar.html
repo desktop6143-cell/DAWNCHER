@@ -70,50 +70,47 @@
 </div>
 
 <script>
-    // ==================== CONFIGURAÇÃO GOOGLE DRIVE ====================
-    const idsGoogleDrive = {
-        1: "1Z4TzjtdzDiopUl2cdMOuY67PSqDkbWOz",
-        2: "SEU_ID_DO_GOOGLE_DRIVE_AQUI_2",
-        3: "SEU_ID_DO_GOOGLE_DRIVE_AQUI_3",
-        4: "SEU_ID_DO_GOOGLE_DRIVE_AQUI_4"
-    };
+// ==================== CONFIGURAÇÃO MEGA ====================
+const idsMega = {
+    1: {
+        id: "ABC123xyz",           // ← cole o File ID aqui
+        key: "K9dL2mPqRsTuVwXyZ1234567890abcdef"  // ← cole a Key aqui
+    },
+    2: {
+        id: "SEU_ID_MEGA_2",
+        key: "SUA_KEY_MEGA_2"
+    },
+    3: {
+        id: "SEU_ID_MEGA_3",
+        key: "SUA_KEY_MEGA_3"
+    },
+    4: {
+        id: "SEU_ID_MEGA_4",
+        key: "SUA_KEY_MEGA_4"
+    }
+};
 
-    // ==================== PARÂMETROS DA URL ====================
-    const params = new URLSearchParams(window.location.search);
-    const numFilme = params.get('f') || "1";
-
-    const nomesFilmes = {
-        "1": "O Bicho Vai Pegar 1",
-        "2": "O Bicho Vai Pegar 2",
-        "3": "O Bicho Vai Pegar 3",
-        "4": "O Bicho Vai Pegar 4"
-    };
-
-    // Atualiza título e poster conforme o filme da URL
-    if (nomesFilmes[numFilme]) {
-        document.querySelector('.title').innerText = nomesFilmes[numFilme];
-        document.querySelector('.poster-card img').src = `../pngs/capas/tela${numFilme}.jpg`;
+// ==================== FUNÇÃO PARA ASSISTIR (MEGA) ====================
+function assistirFilme(numero, titulo) {
+    const mega = idsMega[numero];
+    
+    if (!mega || !mega.id || mega.id === "SEU_ID_MEGA_" + numero) {
+        alert("Este filme ainda não está disponível no MEGA!");
+        return;
     }
 
-    // ==================== FUNÇÃO PARA ASSISTIR ====================
-    function assistirFilme(numero, titulo) {
-        const idDrive = idsGoogleDrive[numero];
+    // Link de embed do MEGA (melhor forma para player)
+    const urlVideoParaOPlayer = `https://mega.nz/embed/${mega.id}#${mega.key}`;
 
-        if (!idDrive || idDrive === "SEU_ID_DO_GOOGLE_DRIVE_AQUI_" + numero) {
-            alert("Este filme ainda não está disponível no Google Drive!");
-            return;
-        }
+    const idUnico = `FILME_OBVP_${numero}`;
+    const caminhoPlayer = "../player.html";
+    const tituloCompleto = titulo;
 
-        const urlVideoParaOPlayer = `https://drive.google.com/file/d/${idDrive}/preview`;
-        const idUnico = `FILME_OBVP_${numero}`;
-        const caminhoPlayer = "../player.html";
-        const tituloCompleto = titulo;
+    window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(tituloCompleto)}`;
+}
 
-        window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(tituloCompleto)}`;
-    }
-
-    // Clique do botão principal
-    document.querySelector('#play-button').onclick = () => {
-        assistirFilme(numFilme, nomesFilmes[numFilme]);
-    };
+// Clique do botão principal
+document.querySelector('#play-button').onclick = () => {
+    assistirFilme(numFilme, nomesFilmes[numFilme]);
+};
 </script>
