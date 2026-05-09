@@ -175,13 +175,16 @@ async function salvarNoHistorico() {
     };
 
     try {
-        const response = await fetch(API_HISTORICO, {
+        await fetch(API_HISTORICO, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            mode: 'no-cors', // <--- ISSO resolve o erro de CORS
+            headers: {
+                'Content-Type': 'text/plain', // Usar text/plain evita o preflight OPTIONS
+            },
             body: JSON.stringify(dados)
         });
-        const resultado = await response.json();
-        console.log(`[${dados.tempo}] ✅ Histórico salvo`);
+        
+        console.log(`[${dados.tempo}] ✅ Tentativa de salvamento enviada`);
     } catch (err) {
         console.error("❌ Erro ao salvar histórico:", err);
     }
