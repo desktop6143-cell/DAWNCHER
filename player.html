@@ -244,13 +244,9 @@
     const menu = document.getElementById('qualityMenu');
     let uiTimer;
 
-    // Função para ligar/desligar UI
     function toggleUI() {
-        if (player.classList.contains('active')) {
-            hideUI();
-        } else {
-            showUI();
-        }
+        if (player.classList.contains('active')) { hideUI(); } 
+        else { showUI(); }
     }
 
     function showUI() {
@@ -264,44 +260,37 @@
         menu.style.display = 'none';
     }
 
-    function toggleMenu() {
-        menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
-        clearTimeout(uiTimer); // Mantém o menu aberto
-    }
-
-    // Tela Cheia
-    function toggleFS() {
-        if (!document.fullscreenElement) {
-            player.requestFullscreen().catch(err => {});
-        } else {
-            document.exitFullscreen();
-        }
-    }
-
-    // Lógica de URL e Iframe
+    // PEGAR E CORRIGIR URL DO GOOGLE DRIVE
     const urlParams = new URLSearchParams(window.location.search);
-    const videoUrl = urlParams.get('url');
-    const titulo = urlParams.get('titulo') || "Youjo Senki - Episódio 1";
+    let videoUrl = urlParams.get('url');
+    const titulo = urlParams.get('titulo') || "Anime Online";
 
     document.getElementById('video-title').textContent = decodeURIComponent(titulo);
 
     if (videoUrl) {
-        let finalUrl = decodeURIComponent(videoUrl);
-        // Adicionando parâmetros para tentar remover controles originais e dar autoplay
-        const params = "autoplay=1&controls=0&modestbranding=1&rel=0";
-        finalUrl += (finalUrl.includes('?') ? '&' : '?') + params;
-        document.getElementById('iframePlayer').src = finalUrl;
+        videoUrl = decodeURIComponent(videoUrl);
+
+        // Se o link for do Google Drive, converte para um formato que aceita IFRAME
+        if (videoUrl.includes('drive.google.com')) {
+            // Extrai o ID do arquivo
+            let driveID = videoUrl.split('/d/')[1]?.split('/')[0] || videoUrl.split('id=')[1]?.split('&')[0];
+            if (driveID) {
+                // Novo link que o Google permite incorporar (preview)
+                videoUrl = `https://drive.google.com/file/d/${driveID}/preview`;
+            }
+        }
+        
+        document.getElementById('iframePlayer').src = videoUrl;
     }
 
-    // Movimentação da barra (apenas visual para esta demonstração)
-    let p = 45;
+    // Simulação da barra de progresso azul
+    let p = 0;
     setInterval(() => {
-        if(p < 100) {
+        if(p < 99) {
             p += 0.05;
             document.getElementById('progressFill').style.width = p + "%";
         }
     }, 1000);
-
 </script>
 </body>
 </html>
