@@ -90,7 +90,7 @@ function assistirFilme(numero, titulo) {
         urlMega = urlMega.replace("mega.nz/file/", "mega.nz/embed/");
     }
 
-    const caminhoPlayer = "player_mega.html"; // Verifique se o caminho está correto
+    const caminhoPlayer = "../player_mega.html"; // Verifique se o caminho está correto
 
     window.location.href = `${caminhoPlayer}?url=${encodeURIComponent(urlMega)}&titulo=${encodeURIComponent(titulo)}`;
 }
