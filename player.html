@@ -3,315 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Ultra Cinematic Player - Pro</title>
+    <title>Player Estilo AnimeFire</title>
     <style>
-        /* ================= RESET E BASE ================= */
+        /* ================= ESTILO BASE ================= */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body, html {
-            width: 100%;
-            height: 100%;
-            background-color: #050505; /* Fundo levemente mais suave que o preto puro */
+            width: 100%; height: 100%;
+            background-color: #000;
             overflow: hidden;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            position: fixed;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
-        .main-wrapper {
+        .main-container {
             position: relative;
             width: 100vw;
             height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             background: #000;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* ================= CONTAINER DO VÍDEO ================= */
-        .video-container {
-            width: 100%;
-            height: 100%;
+        /* ================= VÍDEO (IFRAME) ================= */
+        .video-wrapper {
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: 1;
-            background: #000;
         }
 
         iframe {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             border: none;
-            display: block;
-            opacity: 0; /* Começa invisível para transição suave */
-            transition: opacity 0.8s ease-in-out;
         }
 
-        iframe.loaded {
-            opacity: 1;
-        }
-
-        /* ================= TELA DE CARREGAMENTO (SPINNER) ================= */
-        .loader-container {
+        /* ================= CAMADA DE TOQUE (O SEGREDO) ================= */
+        /* Essa camada detecta o toque mas "deixa passar" o clique para o vídeo quando o menu some */
+        .ui-overlay {
             position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            transition: opacity 0.5s ease;
+            pointer-events: none; /* Deixa clicar no vídeo por padrão */
+            transition: background 0.3s ease;
         }
 
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-left-color: #ffffff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .ui-overlay.active {
+            pointer-events: auto; /* Bloqueia o vídeo para você clicar nos SEUS botões */
+            background: rgba(0, 0, 0, 0.4); /* Efeito de escurecer suave ao abrir o menu */
         }
 
-        .loader-text {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ================= CAMADAS E CONTROLES (UX) ================= */
-        .click-overlay {
+        /* Área invisível para detectar o toque de abrir o menu */
+        .touch-detector {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
-            cursor: pointer;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 3;
         }
 
-        .floating-controls {
+        /* ================= CABEÇALHO (IGUAL FOTO 3) ================= */
+        .player-header {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: calc(env(safe-area-inset-top) + 20px) 25px 30px 25px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+            top: 0; left: 0; width: 100%;
+            padding: calc(env(safe-area-inset-top) + 15px) 20px 40px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            color: white;
             z-index: 10;
             display: flex;
             align-items: center;
-            gap: 18px;
-            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(-15px);
+            gap: 15px;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
         }
 
-        .floating-controls.active {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0);
-        }
+        .player-header.show { transform: translateY(0); }
 
-        /* Estilo Premium para o Botão Voltar (Glassmorphism) */
-        .back-circle {
-            width: 48px;
-            height: 48px;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+        .btn-back {
+            background: rgba(255,255,255,0.1);
             border-radius: 50%;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+        }
+
+        .video-title {
+            font-size: 1rem;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        /* ================= BARRA INFERIOR (ESTILO ANIMEFIRE) ================= */
+        .player-footer {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%;
+            padding: 20px 20px calc(env(safe-area-inset-bottom) + 10px);
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            z-index: 10;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .player-footer.show { transform: translateY(0); }
+
+        /* Barra de Progresso Fictícia (Visual) */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            margin-bottom: 15px;
+            border-radius: 2px;
+            position: relative;
+        }
+        .progress-bar {
+            width: 30%; /* Exemplo */
+            height: 100%;
+            background: #00aeef; /* Azul AnimeFire */
+            border-radius: 2px;
+        }
+
+        .controls-row {
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: #fff;
-            flex-shrink: 0;
-            transition: background 0.3s, transform 0.2s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            justify-content: space-between;
+            color: white;
         }
 
-        .back-circle:active {
-            transform: scale(0.92);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .video-info {
+        .left-controls, .right-controls {
             display: flex;
-            flex-direction: column;
-            gap: 4px;
+            align-items: center;
+            gap: 20px;
         }
 
-        .video-info h2 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #ffffff;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 65vw;
+        .icon-btn {
+            width: 24px; height: 24px;
+            cursor: pointer;
+            opacity: 0.9;
+        }
+        .icon-btn:hover { opacity: 1; }
+
+        .time-display {
+            font-size: 0.85rem;
+            font-family: monospace;
         }
 
-        .video-info span {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 400;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-        }
     </style>
 </head>
 <body>
 
-    <div class="main-wrapper" id="wrapper">
+    <div class="main-container" id="mainContainer">
         
-        <div class="loader-container" id="loader">
-            <div class="spinner"></div>
-            <div class="loader-text">Conectando...</div>
-        </div>
+        <div class="touch-detector" id="touchArea"></div>
 
-        <div class="click-overlay" id="overlay"></div>
-
-        <div class="floating-controls" id="controls">
-            <div class="back-circle" onclick="voltar()" title="Voltar">
-                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m-7 7h18"/>
-                </svg>
+        <div class="player-header" id="header">
+            <div class="btn-back" onclick="window.history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             </div>
-            <div class="video-info">
-                <h2 id="video-title">Carregando...</h2>
-                <span id="video-subtitle">Preparando player</span>
+            <div class="video-title" id="display-title">Carregando...</div>
+        </div>
+
+        <div class="ui-overlay" id="uiOverlay"></div>
+
+        <div class="player-footer" id="footer">
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+            </div>
+            <div class="controls-row">
+                <div class="left-controls">
+                    <div class="icon-btn"> <svg viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                    <div class="icon-btn"> <svg viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                    </div>
+                    <div class="time-display">00:00 / --:--</div>
+                </div>
+                <div class="right-controls">
+                    <div class="icon-btn"> <svg viewBox="0 0 24 24" fill="white"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/></svg>
+                    </div>
+                    <div class="icon-btn"> <svg viewBox="0 0 24 24" fill="white"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                    </div>
+                    <div class="icon-btn"> <svg viewBox="0 0 24 24" fill="white"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="video-container">
-            <iframe 
-                id="video-frame" 
-                src="" 
-                allowfullscreen 
-                webkitallowfullscreen 
-                mozallowfullscreen
-                allow="autoplay; fullscreen; encrypted-media; picture-in-picture">
-            </iframe>
+        <div class="video-wrapper">
+            <iframe id="video-frame" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
         </div>
+
     </div>
 
 <script>
-// ==================== 1. INTERFACE E ANIMAÇÕES ====================
-const controls = document.getElementById('controls');
-const overlay = document.getElementById('overlay');
-const iframe = document.getElementById('video-frame');
-const loader = document.getElementById('loader');
-let hideTimer;
+    const header = document.getElementById('header');
+    const footer = document.getElementById('footer');
+    const overlay = document.getElementById('uiOverlay');
+    const touchArea = document.getElementById('touchArea');
+    let timer;
 
-// Gerencia a exibição do menu ao tocar na tela
-function toggleControls() {
-    controls.classList.add('active');
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(() => {
-        controls.classList.remove('active');
-    }, 3500); // Esconde após 3.5 segundos
-}
-
-overlay.addEventListener('click', toggleControls);
-overlay.addEventListener('touchstart', toggleControls);
-
-// Esconde o spinner suavemente quando o iframe termina de carregar
-iframe.addEventListener('load', () => {
-    loader.style.opacity = '0';
-    setTimeout(() => {
-        loader.style.display = 'none';
-        iframe.classList.add('loaded'); // Faz o vídeo aparecer suavemente (Fade-in)
-        document.getElementById('video-subtitle').textContent = "Reproduzindo";
-    }, 500);
-});
-
-
-// ==================== 2. LÓGICA DE URL E AUTOPLAY ====================
-const urlParams = new URLSearchParams(window.location.search);
-const videoUrl = urlParams.get('url');
-const tituloFormatado = decodeURIComponent(urlParams.get('titulo') || "Vídeo sem título");
-
-document.getElementById('video-title').textContent = tituloFormatado;
-
-// Extração de Episódio para a UI
-let episodioAtual = "1";
-const matchEp = tituloFormatado.match(/Epis[óo]dio\s*(\d+)/i);
-if (matchEp) { 
-    episodioAtual = matchEp[1]; 
-    document.getElementById('video-subtitle').textContent = `Episódio ${episodioAtual}`;
-}
-
-// Configuração do Iframe com Autoplay Forçado
-if (videoUrl) {
-    let finalUrl = decodeURIComponent(videoUrl);
-    
-    /* PARÂMETROS ESSENCIAIS PARA FUNCIONAR NO CELULAR:
-       playsinline=1 -> Impede o iPhone de abrir em tela cheia sozinho.
-       autoplay=1 -> Tenta iniciar automaticamente.
-       mute=1 & muted=1 -> Obriga o vídeo a começar mudo, única forma do autoplay não ser bloqueado.
-    */
-    const parametrosPlayer = "playsinline=1&autoplay=1&mute=1&muted=1&modestbranding=1";
-    
-    if(finalUrl.includes('?')) {
-        finalUrl += "&" + parametrosPlayer;
-    } else {
-        finalUrl += "?" + parametrosPlayer;
+    // Função para mostrar/esconder controles
+    function toggleUI() {
+        const isShowing = header.classList.contains('show');
+        
+        if (isShowing) {
+            hideUI();
+        } else {
+            showUI();
+        }
     }
-    
-    iframe.src = finalUrl;
-} else {
-    document.getElementById('video-title').textContent = "Erro na URL";
-    document.getElementById('video-subtitle').textContent = "Nenhum vídeo fornecido.";
-    loader.style.display = 'none';
-}
 
+    function showUI() {
+        header.classList.add('show');
+        footer.classList.add('show');
+        overlay.classList.add('active');
+        
+        clearTimeout(timer);
+        timer = setTimeout(hideUI, 4000); // Esconde após 4 segundos
+    }
 
-// ==================== 3. API E HISTÓRICO ====================
-const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbwe7k3THvlFrsfvSpAl3JfyF7FqRNaTzoxSfK5S12PzPaS6JZmIK89LCgyWczmgCf7VCQ/exec';
-const idUser = sessionStorage.getItem('idUsuario');
+    function hideUI() {
+        header.classList.remove('show');
+        footer.classList.remove('show');
+        overlay.classList.remove('active');
+    }
 
-function obterTempoFormatado() {
-    return new Date().toLocaleTimeString('pt-BR', {
-        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
-    });
-}
+    // Eventos de toque
+    touchArea.addEventListener('click', toggleUI);
 
-async function salvarNoHistorico() {
-    if (!idUser) return;
-    const dados = {
-        action: "salvar",
-        id_user: idUser,
-        titulo: tituloFormatado,
-        url_acesso: window.location.href,
-        episodio: episodioAtual, 
-        tempo: obterTempoFormatado()
-    };
+    // ==================== LÓGICA DO VÍDEO & AUTOPLAY ====================
+    const urlParams = new URLSearchParams(window.location.search);
+    const videoUrl = urlParams.get('url');
+    const titulo = decodeURIComponent(urlParams.get('titulo') || "Vídeo");
 
-    try {
-        await fetch(API_HISTORICO, {
+    document.getElementById('display-title').textContent = titulo;
+
+    if (videoUrl) {
+        let finalUrl = decodeURIComponent(videoUrl);
+        // Autoplay Forçado (Mudo para não bloquear)
+        const params = "autoplay=1&mute=1&muted=1&playsinline=1&modestbranding=1";
+        finalUrl += (finalUrl.includes('?') ? '&' : '?') + params;
+        
+        document.getElementById('video-frame').src = finalUrl;
+    }
+
+    // Histórico (Sua API)
+    function salvarHistorico() {
+        const idUser = sessionStorage.getItem('idUsuario');
+        if (!idUser) return;
+        fetch('SUA_URL_DO_GOOGLE_SCRIPT', {
             method: 'POST',
-            mode: 'no-cors', // Fundamental para não travar no iOS
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dados)
+            mode: 'no-cors',
+            body: JSON.stringify({ action: "salvar", id_user: idUser, titulo: titulo })
         });
-        console.log("Progresso salvo: " + obterTempoFormatado());
-    } catch (err) { 
-        console.error("Erro histórico:", err); 
     }
-}
 
-function voltar() { window.history.back(); }
-
-// Gatilhos de salvamento
-window.addEventListener('load', salvarNoHistorico);
-setInterval(salvarNoHistorico, 30000); // Salva a cada 30 segundos
+    setInterval(salvarHistorico, 40000);
 </script>
 </body>
 </html>
