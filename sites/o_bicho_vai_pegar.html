@@ -70,34 +70,30 @@
 </div>
 
 <script>
-// ==================== CONFIGURAÇÃO MEGA (Link Direto) ====================
-const linksMega = {
-    1: "https://mega.nz/file/vD43XC7I#jVR0Y4lOc5EtkhtpIG5cjbSItyy-Fb6S36AophdnIGs",   // cole o link completo aqui
-    2: "https://mega.nz/file/SEU_LINK_AQUI_2",
-    3: "https://mega.nz/file/SEU_LINK_AQUI_3",
-    4: "https://mega.nz/file/SEU_LINK_AQUI_4"
+// ==================== CONFIGURAÇÃO MEGA ====================
+const idsMega = {
+    1: "https://mega.nz/file/vD43XC7I#jVR0Y4lOc5EtkhtpIG5cjbSItyy-Fb6S36AophdnIGs",   // ← cole o link completo do Embed
+    2: "https://mega.nz/embed/SEU_CODIGO_AQUI_2#SUA_CHAVE_AQUI_2",
+    3: "https://mega.nz/embed/SEU_CODIGO_AQUI_3#SUA_CHAVE_AQUI_3",
+    4: "https://mega.nz/embed/SEU_CODIGO_AQUI_4#SUA_CHAVE_AQUI_4"
 };
 
-// ==================== FUNÇÃO PARA ASSISTIR ====================
+// ==================== FUNÇÃO PARA ASSISTIR NO PLAYER MEGA ====================
 function assistirFilme(numero, titulo) {
-    let url = linksMega[numero];
+    const urlMega = idsMega[numero];
     
-    if (!url || url.includes("SEU_LINK_AQUI")) {
-        alert("Este filme ainda não está disponível!");
+    if (!urlMega || urlMega.includes("SEU_CODIGO_AQUI")) {
+        alert("Este filme ainda não está disponível no MEGA!");
         return;
     }
 
-    // Converte link normal do Mega para link direto de streaming
-    if (url.includes("mega.nz/file/")) {
-        url = url.replace("/file/", "/embed/");
-    }
+    const idUnico = `FILME_OBVP_${numero}`;
+    const caminhoPlayer = "../player_mega.html";   // ← seu novo player
 
-    const caminhoPlayer = "../player.html";
-    
-    window.location.href = `${caminhoPlayer}?url=${encodeURIComponent(url)}&titulo=${encodeURIComponent(titulo)}`;
+    window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlMega)}&titulo=${encodeURIComponent(titulo)}`;
 }
 
-// Botão "Assistir Agora"
+// Botão principal
 document.querySelector('#play-button').onclick = () => {
     assistirFilme(numFilme, nomesFilmes[numFilme]);
 };
