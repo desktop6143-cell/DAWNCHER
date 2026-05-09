@@ -197,13 +197,14 @@
     const footer = document.getElementById('footer');
     const overlay = document.getElementById('uiOverlay');
     const touchArea = document.getElementById('touchArea');
+    const iframe = document.getElementById('video-frame');
     let timer;
+    let videoDuration = 0;
+    let isPlaying = false;
 
-    // Função para mostrar/esconder controles
+    // ==================== CONTROLES UI ====================
     function toggleUI() {
-        const isShowing = header.classList.contains('show');
-        
-        if (isShowing) {
+        if (header.classList.contains('show')) {
             hideUI();
         } else {
             showUI();
@@ -214,9 +215,8 @@
         header.classList.add('show');
         footer.classList.add('show');
         overlay.classList.add('active');
-        
         clearTimeout(timer);
-        timer = setTimeout(hideUI, 4000); // Esconde após 4 segundos
+        timer = setTimeout(hideUI, 5000);
     }
 
     function hideUI() {
@@ -225,37 +225,95 @@
         overlay.classList.remove('active');
     }
 
-    // Eventos de toque
     touchArea.addEventListener('click', toggleUI);
 
-    // ==================== LÓGICA DO VÍDEO & AUTOPLAY ====================
+    // ==================== CARREGAR VÍDEO ====================
     const urlParams = new URLSearchParams(window.location.search);
-    const videoUrl = urlParams.get('url');
+    let videoUrl = urlParams.get('url');
     const titulo = decodeURIComponent(urlParams.get('titulo') || "Vídeo");
 
     document.getElementById('display-title').textContent = titulo;
 
     if (videoUrl) {
-        let finalUrl = decodeURIComponent(videoUrl);
-        // Autoplay Forçado (Mudo para não bloquear)
-        const params = "autoplay=1&mute=1&muted=1&playsinline=1&modestbranding=1";
-        finalUrl += (finalUrl.includes('?') ? '&' : '?') + params;
+        videoUrl = decodeURIComponent(videoUrl);
         
-        document.getElementById('video-frame').src = finalUrl;
+        // Parâmetros importantes para esconder controles nativos
+        const extraParams = [
+            "autoplay=1",
+            "mute=1",
+            "modestbranding=1",
+            "controls=0",           // Tenta esconder controles
+            "fs=0",
+            "iv_load_policy=3"
+        ].join('&');
+
+        const separator = videoUrl.includes('?') ? '&' : '?';
+        iframe.src = videoUrl + separator + extraParams;
     }
 
-    // Histórico (Sua API)
-    function salvarHistorico() {
-        const idUser = sessionStorage.getItem('idUsuario');
-        if (!idUser) return;
-        fetch('SUA_URL_DO_GOOGLE_SCRIPT', {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({ action: "salvar", id_user: idUser, titulo: titulo })
-        });
+    // ==================== PROGRESSO CUSTOMIZADO ====================
+    const progressContainer = document.querySelector('.progress-container');
+    const progressBar = document.querySelector('.progress-bar');
+    const timeDisplay = document.querySelector('.time-display');
+
+    // Clique na barra de progresso
+    progressContainer.addEventListener('click', (e) => {
+        const rect = progressContainer.getBoundingClientRect();
+        const percent = (e.clientX - rect.left) / rect.width;
+        
+        // Tenta buscar o vídeo dentro do iframe (funciona melhor em alguns players)
+        try {
+            const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+            const video = innerDoc.querySelector('video');
+            if (video) {
+                video.currentTime = percent * video.duration;
+            }
+        } catch (e) {
+            console.log("Não foi possível acessar o vídeo interno (CORS)");
+            // Fallback: tentar via postMessage (funciona em alguns players)
+            iframe.contentWindow.postMessage({ action: "seek", percent: percent }, "*");
+        }
+    });
+
+    // Atualiza progresso (se conseguir acessar)
+    function updateProgress() {
+        try {
+            const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+            const video = innerDoc.querySelector('video');
+            if (video) {
+                if (!videoDuration) videoDuration = video.duration;
+                
+                const percent = (video.currentTime / video.duration) * 100;
+                progressBar.style.width = percent + '%';
+                
+                timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+                isPlaying = !video.paused;
+            }
+        } catch (e) {
+            // Se não conseguir acessar, deixa a barra estática ou anima fake
+        }
     }
 
-    setInterval(salvarHistorico, 40000);
+    function formatTime(seconds) {
+        if (!seconds || isNaN(seconds)) return "00:00";
+        const min = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60);
+        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+    }
+
+    // Atualiza a cada 500ms
+    setInterval(updateProgress, 500);
+
+    // Tenta forçar autoplay após carregar
+    iframe.onload = () => {
+        setTimeout(() => {
+            try {
+                const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+                const video = innerDoc.querySelector('video');
+                if (video) video.play();
+            } catch(e){}
+        }, 1500);
+    };
 </script>
 </body>
 </html>
