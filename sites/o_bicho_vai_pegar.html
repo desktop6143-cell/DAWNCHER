@@ -70,46 +70,34 @@
 </div>
 
 <script>
-// ==================== CONFIGURAÇÃO MEGA ====================
-const idsMega = {
-    1: {
-        id: "vD43XC7I",           // ← cole o File ID aqui
-        key: "jVR0Y4lOc5EtkhtpIG5cjbSItyy-Fb6S36AophdnIGs"  // ← cole a Key aqui
-    },
-    2: {
-        id: "SEU_ID_MEGA_2",
-        key: "SUA_KEY_MEGA_2"
-    },
-    3: {
-        id: "SEU_ID_MEGA_3",
-        key: "SUA_KEY_MEGA_3"
-    },
-    4: {
-        id: "SEU_ID_MEGA_4",
-        key: "SUA_KEY_MEGA_4"
-    }
+// ==================== CONFIGURAÇÃO MEGA (Link Direto) ====================
+const linksMega = {
+    1: "https://mega.nz/file/vD43XC7I#jVR0Y4lOc5EtkhtpIG5cjbSItyy-Fb6S36AophdnIGs",   // cole o link completo aqui
+    2: "https://mega.nz/file/SEU_LINK_AQUI_2",
+    3: "https://mega.nz/file/SEU_LINK_AQUI_3",
+    4: "https://mega.nz/file/SEU_LINK_AQUI_4"
 };
 
-// ==================== FUNÇÃO PARA ASSISTIR (MEGA) ====================
+// ==================== FUNÇÃO PARA ASSISTIR ====================
 function assistirFilme(numero, titulo) {
-    const mega = idsMega[numero];
+    let url = linksMega[numero];
     
-    if (!mega || !mega.id || mega.id === "SEU_ID_MEGA_" + numero) {
-        alert("Este filme ainda não está disponível no MEGA!");
+    if (!url || url.includes("SEU_LINK_AQUI")) {
+        alert("Este filme ainda não está disponível!");
         return;
     }
 
-    // Link de embed do MEGA (melhor forma para player)
-    const urlVideoParaOPlayer = `https://mega.nz/embed/${mega.id}#${mega.key}`;
+    // Converte link normal do Mega para link direto de streaming
+    if (url.includes("mega.nz/file/")) {
+        url = url.replace("/file/", "/embed/");
+    }
 
-    const idUnico = `FILME_OBVP_${numero}`;
     const caminhoPlayer = "../player.html";
-    const tituloCompleto = titulo;
-
-    window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(tituloCompleto)}`;
+    
+    window.location.href = `${caminhoPlayer}?url=${encodeURIComponent(url)}&titulo=${encodeURIComponent(titulo)}`;
 }
 
-// Clique do botão principal
+// Botão "Assistir Agora"
 document.querySelector('#play-button').onclick = () => {
     assistirFilme(numFilme, nomesFilmes[numFilme]);
 };
