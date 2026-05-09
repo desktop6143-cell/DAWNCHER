@@ -3,96 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Player AnimeFire Fix</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>Player Estilo AnimeFire</title>
     <style>
-        :root { --af-blue: #00aeef; --af-bg: #1A1A1A; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Quicksand', sans-serif; }
-        body, html { width: 100%; height: 100%; background-color: #000; overflow: hidden; }
-
-        .player-container {
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html {
+            width: 100%; height: 100%;
+            background: #000;
+            overflow: hidden;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            touch-action: manipulation;
+        }
+        .main-container {
             position: relative;
-            width: 100vw; height: 100vh;
-            display: flex; align-items: center; justify-content: center;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
         }
 
-        /* Camada do Vídeo - Z-INDEX BAIXO */
+        /* Vídeo */
         .video-wrapper {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 1;
         }
-        iframe { width: 100%; height: 100%; border: none; }
+        iframe {
+            width: 100%; height: 100%;
+            border: none;
+        }
 
-        /* Camada da Interface - Z-INDEX ALTO */
-        .ui-overlay {
+        /* Overlay de Toque */
+        .touch-overlay {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Header */
+        .header {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            padding: calc(env(safe-area-inset-top) + 15px) 20px 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            color: white;
             z-index: 10;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.7) 100%);
-            display: flex; flex-direction: column; justify-content: space-between;
-            pointer-events: none; opacity: 0; transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateY(-100%);
+            transition: transform 0.4s ease;
+        }
+        .header.show { transform: translateY(0); }
+
+        .btn-back {
+            background: rgba(255,255,255,0.15);
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
         }
 
-        .player-container.active .ui-overlay { opacity: 1; pointer-events: auto; }
+        /* Footer */
+        .footer {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            padding: 15px 20px calc(env(safe-area-inset-bottom) + 15px);
+            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+            z-index: 10;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+        .footer.show { transform: translateY(0); }
 
-        /* Área de toque central: se clicar nela, os controles aparecem */
-        .touch-area {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 5;
+        .progress-container {
+            height: 5px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            position: relative;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #00aeef;
+            border-radius: 3px;
+            transition: width 0.1s linear;
         }
 
-        /* HEADER */
-        .header { padding: 20px; display: flex; align-items: center; gap: 15px; color: white; }
-        .btn-back { cursor: pointer; width: 35px; height: 35px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-
-        /* PROGRESS BAR TOP (O que você curtiu) */
-        .progress-area { padding: 0 20px; margin-bottom: 10px; }
-        .bar-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 10px; position: relative; }
-        .bar-fill { 
-            width: 0%; height: 100%; background: var(--af-blue); 
-            box-shadow: 0 0 10px var(--af-blue); border-radius: 10px; 
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
         }
-
-        /* CONTROLES */
-        .controls { padding: 0 20px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .group { display: flex; align-items: center; gap: 20px; }
-        .icon { width: 24px; height: 24px; fill: white; cursor: pointer; }
-        .time { color: white; font-size: 0.85rem; }
+        .icon-btn {
+            cursor: pointer;
+            padding: 5px;
+            opacity: 0.9;
+        }
+        .icon-btn:hover { opacity: 1; }
+        .time-display {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
-
-    <div class="player-container" id="pContainer">
-        <div class="touch-area" onclick="handleTouch()"></div>
-
+    <div class="main-container">
+        <!-- Vídeo -->
         <div class="video-wrapper">
-            <iframe id="vIframe" allow="autoplay; fullscreen"></iframe>
+            <iframe id="video-frame" allowfullscreen allow="autoplay; fullscreen"></iframe>
         </div>
 
-        <div class="ui-overlay">
-            <div class="header">
-                <div class="btn-back" onclick="window.history.back()">
-                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="white" stroke-width="2" fill="none"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                </div>
-                <span id="vTitulo">Carregando...</span>
-            </div>
+        <!-- Toque -->
+        <div class="touch-overlay" id="touchArea"></div>
 
-            <div class="footer">
-                <div class="progress-area">
-                    <div class="bar-bg">
-                        <div class="bar-fill" id="vBar"></div>
+        <!-- Header -->
+        <div class="header" id="header">
+            <div class="btn-back" onclick="window.history.back()">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+            </div>
+            <div id="display-title" style="font-size:1.05rem; font-weight:500;">Carregando...</div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer" id="footer">
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="controls">
+                <div style="display:flex; gap:20px;">
+                    <div class="icon-btn" id="playPauseBtn">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
                     </div>
+                    <div class="time-display" id="timeDisplay">00:00 / --:--</div>
                 </div>
-                <div class="controls">
-                    <div class="group">
-                        <svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        <span class="time">00:00 / --:--</span>
-                    </div>
-                    <div class="group">
-                        <svg class="icon" onclick="toggleFS()" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+
+                <div style="display:flex; gap:20px;">
+                    <div class="icon-btn" id="volumeBtn">🔊</div>
+                    <div class="icon-btn" id="fullscreenBtn">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
+                            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -100,50 +161,144 @@
     </div>
 
     <script>
-        const container = document.getElementById('pContainer');
-        const iframe = document.getElementById('vIframe');
-        const bar = document.getElementById('vBar');
-        let timer;
+        // ==================== ELEMENTOS ====================
+        const header = document.getElementById('header');
+        const footer = document.getElementById('footer');
+        const touchArea = document.getElementById('touchArea');
+        const iframe = document.getElementById('video-frame');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const titleEl = document.getElementById('display-title');
 
-        // Função para mostrar interface
-        function handleTouch() {
-            container.classList.add('active');
-            clearTimeout(timer);
-            timer = setTimeout(() => {
-                container.classList.remove('active');
-            }, 3000);
+        let hideTimer;
+        let lastSavedTime = 0;
+
+        // ==================== URL PARAMS ====================
+        const urlParams = new URLSearchParams(window.location.search);
+        let videoUrl = urlParams.get('url');
+        const titulo = decodeURIComponent(urlParams.get('titulo') || 'Anime');
+        const episodeId = urlParams.get('ep') || '1';
+
+        titleEl.textContent = titulo;
+
+        // ==================== CARREGAR VÍDEO ====================
+        if (videoUrl) {
+            videoUrl = decodeURIComponent(videoUrl);
+            const params = "autoplay=1&mute=0&modestbranding=1&controls=0&fs=1";
+            const separator = videoUrl.includes('?') ? '&' : '?';
+            iframe.src = videoUrl + separator + params;
         }
 
-        // Função Tela Cheia corrigida
-        function toggleFS() {
+        // ==================== UI CONTROLS ====================
+        function showUI() {
+            header.classList.add('show');
+            footer.classList.add('show');
+            clearTimeout(hideTimer);
+            hideTimer = setTimeout(hideUI, 4500);
+        }
+
+        function hideUI() {
+            header.classList.remove('show');
+            footer.classList.remove('show');
+        }
+
+        touchArea.addEventListener('click', () => {
+            if (header.classList.contains('show')) hideUI();
+            else showUI();
+        });
+
+        // ==================== PROGRESSO E TEMPO ====================
+        progressContainer.addEventListener('click', (e) => {
+            const rect = progressContainer.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const percent = clickX / rect.width;
+
+            try {
+                const innerVideo = iframe.contentWindow.document.querySelector('video');
+                if (innerVideo) innerVideo.currentTime = innerVideo.duration * percent;
+            } catch (err) {
+                console.log("Não foi possível buscar o vídeo interno");
+            }
+        });
+
+        function formatTime(sec) {
+            if (!sec || isNaN(sec)) return "00:00";
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        // Atualiza progresso
+        setInterval(() => {
+            try {
+                const innerVideo = iframe.contentWindow.document.querySelector('video');
+                if (innerVideo && innerVideo.duration) {
+                    const percent = (innerVideo.currentTime / innerVideo.duration) * 100;
+                    progressBar.style.width = percent + "%";
+                    timeDisplay.textContent = `${formatTime(innerVideo.currentTime)} / ${formatTime(innerVideo.duration)}`;
+                }
+            } catch (e) {}
+        }, 800);
+
+        // ==================== SALVAMENTO DA API ====================
+        function salvarProgresso() {
+            const idUser = sessionStorage.getItem('idUsuario');
+            if (!idUser) return;
+
+            let currentTime = 0;
+            try {
+                const innerVideo = iframe.contentWindow.document.querySelector('video');
+                if (innerVideo) currentTime = Math.floor(innerVideo.currentTime);
+            } catch (e) {}
+
+            // Só salva se tiver avançado pelo menos 10 segundos
+            if (currentTime > lastSavedTime + 10) {
+                lastSavedTime = currentTime;
+
+                fetch('SUA_URL_DO_GOOGLE_SCRIPT', {  // ← Troque pela sua URL real
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: "salvar",
+                        id_user: idUser,
+                        titulo: titulo,
+                        episodio: episodeId,
+                        tempo: currentTime,
+                        duracao: "auto"   // você pode pegar a duração depois
+                    })
+                });
+            }
+        }
+
+        // Salva a cada 15 segundos
+        setInterval(salvarProgresso, 15000);
+
+        // Salva quando o usuário sair da página
+        window.addEventListener('beforeunload', salvarProgresso);
+
+        // ==================== BOTÕES ====================
+        document.getElementById('fullscreenBtn').addEventListener('click', () => {
             if (!document.fullscreenElement) {
-                container.requestFullscreen().catch(e => {});
+                document.documentElement.requestFullscreen();
             } else {
                 document.exitFullscreen();
             }
-        }
+        });
 
-        // Lógica de URL
-        const p = new URLSearchParams(window.location.search);
-        let videoUrl = p.get('url');
-        document.getElementById('vTitulo').innerText = decodeURIComponent(p.get('titulo') || "Anime");
+        // Tenta autoplay após carregar
+        iframe.onload = () => {
+            setTimeout(() => {
+                try {
+                    const video = iframe.contentWindow.document.querySelector('video');
+                    if (video) video.play();
+                } catch (e) {}
+            }, 1200);
+        };
 
-        if (videoUrl) {
-            videoUrl = decodeURIComponent(videoUrl);
-            
-            // CORREÇÃO CRUCIAL PARA GOOGLE DRIVE
-            if (videoUrl.includes('drive.google.com')) {
-                let id = videoUrl.split('/d/')[1]?.split('/')[0] || videoUrl.split('id=')[1]?.split('&')[0];
-                // Usamos o link de preview que é o único que funciona em players externos
-                videoUrl = `https://drive.google.com/file/d/${id}/preview`;
-            }
-            
-            iframe.src = videoUrl;
-        }
-
-        // Remover a barra que se movia sozinha se o vídeo não estiver carregado
-        // A barra só deve se mover se você tiver o controle real do vídeo (via API)
-        // Por enquanto, deixaremos ela estática em 0% até o vídeo iniciar no Drive.
+        // Mostrar UI ao iniciar
+        setTimeout(showUI, 600);
     </script>
 </body>
 </html>
