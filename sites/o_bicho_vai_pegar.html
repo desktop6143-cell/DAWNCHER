@@ -1,77 +1,87 @@
 <link rel="stylesheet" type="text/css" href="all_filmes.css">
 <script src="../base/seglock.js"></script>
+
 <a href="javascript:history.back()" class="btn-voltar">
     <span class="icon">←</span>
     <span class="text">Voltar</span>
 </a>
-<div class="main-wrapper"> <!-- Adicionado para centralizar tudo -->
+
+<div class="main-wrapper">
     <main class="movie-container">
         <section class="poster-section">
             <div class="poster-card">
                 <img src="../pngs/capas/tela10.jpg" alt="Poster">
             </div>
-         <button id="play-button" class="btn-trailer">▶ Assistir Agora</button>
+            <button id="play-button" class="btn-trailer">▶ Assistir Agora</button>
         </section>
 
         <section class="info-section">
-            <h1 class="title">O bicho vai pegar</h1>
-            <div class="divider"></div> <!-- Linha decorativa -->
-            
+            <h1 class="title">O Bicho Vai Pegar</h1>
+            <div class="divider"></div>
+           
             <div class="details">
                 <p><strong>Lançamento:</strong> <span>6 de outubro de 2006</span></p>
                 <p><strong>Classificação:</strong> <span class="age-rating">12</span></p>
                 <p><strong>Duração:</strong> <span>1h 26m</span></p>
             </div>
-
             <p class="sinopse">
                 Boog, um urso pardo domesticado, vê sua vida virar de cabeça para baixo após conhecer Elliot, um cervo tagarela.
             </p>
         </section>
 
+        <section class="sequels-container">
+            <h3 class="section-label">Continuações e Sequências</h3>
+           
+            <div class="sequels-grid">
+                <a href="javascript:void(0)" class="sequel-item" onclick="assistirFilme('1', 'O Bicho Vai Pegar 1')">
+                    <div class="thumb-wrapper">
+                        <img src="../pngs/capas/tela1.jpg" alt="Filme 1">
+                        <div class="play-overlay"><span>▶</span></div>
+                    </div>
+                    <span class="sequel-name">O Bicho Vai Pegar 1</span>
+                </a>
 
-<section class="sequels-container">
-    <h3 class="section-label">Continuações e Sequências</h3>
-    
-    <div class="sequels-grid">
-        <!-- Card 1 -->
-<a href="javascript:void(0)" class="sequel-item" onclick="assistirFilme('2', 'O Bicho Vai Pegar 2')">
-    <div class="thumb-wrapper">
-        <img src="../pngs/capas/tela2.jpg" alt="Filme 2">
-        <div class="play-overlay"><span>▶</span></div>
-    </div>
-    <span class="sequel-name">O Bicho Vai Pegar 2</span>
-</a>
+                <a href="javascript:void(0)" class="sequel-item" onclick="assistirFilme('2', 'O Bicho Vai Pegar 2')">
+                    <div class="thumb-wrapper">
+                        <img src="../pngs/capas/tela2.jpg" alt="Filme 2">
+                        <div class="play-overlay"><span>▶</span></div>
+                    </div>
+                    <span class="sequel-name">O Bicho Vai Pegar 2</span>
+                </a>
 
-        <!-- Card 2 -->
-<a href="javascript:void(0)" class="sequel-item" onclick="assistirFilme('3', 'O Bicho Vai Pegar 3')">
-    <div class="thumb-wrapper">
-        <img src="../pngs/capas/tela3.jpg" alt="Filme 3">
-        <div class="play-overlay"><span>▶</span></div>
-    </div>
-    <span class="sequel-name">O Bicho Vai Pegar 3</span>
-</a>
+                <a href="javascript:void(0)" class="sequel-item" onclick="assistirFilme('3', 'O Bicho Vai Pegar 3')">
+                    <div class="thumb-wrapper">
+                        <img src="../pngs/capas/tela3.jpg" alt="Filme 3">
+                        <div class="play-overlay"><span>▶</span></div>
+                    </div>
+                    <span class="sequel-name">O Bicho Vai Pegar 3</span>
+                </a>
 
-        <!-- Card 3 -->
-       <!-- Remova o href direto para o mp4 e adicione o onclick -->
-<a href="javascript:void(0)" class="sequel-item" onclick="assistirFilme('4', 'O Bicho Vai Pegar 4')">
-    <div class="thumb-wrapper">
-        <img src="../pngs/capas/tela4.jpg" alt="Filme 4">
-        <div class="play-overlay"><span>▶</span></div>
-    </div>
-    <span class="sequel-name">O Bicho Vai Pegar 4</span>
-</a>
-
-    </div>
-</section>
+                <a href="javascript:void(0)" class="sequel-item" onclick="assistirFilme('4', 'O Bicho Vai Pegar 4')">
+                    <div class="thumb-wrapper">
+                        <img src="../pngs/capas/tela4.jpg" alt="Filme 4">
+                        <div class="play-overlay"><span>▶</span></div>
+                    </div>
+                    <span class="sequel-name">O Bicho Vai Pegar 4</span>
+                </a>
+            </div>
+        </section>
     </main>
 </div>
 
- <script>
-    // 1. Identifica qual filme carregar (lê o ?f= da URL)
-    const params = new URLSearchParams(window.location.search);
-    const numFilme = params.get('f') || "1"; 
+<script>
+    // ==================== CONFIGURAÇÃO GOOGLE DRIVE ====================
+    const idsGoogleDrive = {
+        1: "1Z4TzjtdzDiopUl2cdMOuY67PSqDkbWOz",
+        2: "SEU_ID_DO_GOOGLE_DRIVE_AQUI_2",
+        3: "SEU_ID_DO_GOOGLE_DRIVE_AQUI_3",
+        4: "SEU_ID_DO_GOOGLE_DRIVE_AQUI_4"
+    };
 
-    // 2. Banco de dados simples para os títulos
+    // ==================== PARÂMETROS DA URL ====================
+    const params = new URLSearchParams(window.location.search);
+    const numFilme = params.get('f') || "1";
+
     const nomesFilmes = {
         "1": "O Bicho Vai Pegar 1",
         "2": "O Bicho Vai Pegar 2",
@@ -79,27 +89,31 @@
         "4": "O Bicho Vai Pegar 4"
     };
 
-    // 3. Atualiza os elementos visuais da página principal baseado na URL
+    // Atualiza título e poster conforme o filme da URL
     if (nomesFilmes[numFilme]) {
         document.querySelector('.title').innerText = nomesFilmes[numFilme];
         document.querySelector('.poster-card img').src = `../pngs/capas/tela${numFilme}.jpg`;
     }
 
-    // 4. FUNÇÃO ÚNICA PARA ASSISTIR (Usada tanto pelo botão quanto pelos cards)
+    // ==================== FUNÇÃO PARA ASSISTIR ====================
     function assistirFilme(numero, titulo) {
+        const idDrive = idsGoogleDrive[numero];
+
+        if (!idDrive || idDrive === "SEU_ID_DO_GOOGLE_DRIVE_AQUI_" + numero) {
+            alert("Este filme ainda não está disponível no Google Drive!");
+            return;
+        }
+
+        const urlVideoParaOPlayer = `https://drive.google.com/file/d/${idDrive}/preview`;
         const idUnico = `FILME_OBVP_${numero}`;
         const caminhoPlayer = "../player.html";
-        const urlVideo = `filmes/FILME${numero}.mp4`;
+        const tituloCompleto = titulo;
 
-        window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideo)}&titulo=${encodeURIComponent(titulo)}`;
+        window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(tituloCompleto)}`;
     }
 
-    // 5. Configura o clique do botão principal "Assistir Agora"
+    // Clique do botão principal
     document.querySelector('#play-button').onclick = () => {
         assistirFilme(numFilme, nomesFilmes[numFilme]);
     };
-
-    // NOTA: Os cards já possuem onclick="assistirFilme(...)" no HTML.
-    // O código antigo cards.forEach foi removido para não dar conflito.
 </script>
-
