@@ -38,7 +38,13 @@
         <span id="titulo-player">Carregando...</span>
     </div>
 
-    <iframe id="mega-player" allowfullscreen allow="autoplay"></iframe>
+    <iframe 
+    id="mega-player" 
+    allowfullscreen 
+    allow="autoplay; encrypted-media; picture-in-picture"
+    sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+    style="width: 100%; height: 100vh; border: none;">
+    </iframe>
 
    <script>
     // 1. Pega os dados da URL (o que veio da página principal)
