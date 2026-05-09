@@ -3,208 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Player Estilo AnimeFire</title>
+    <title>Player Estilo AnimeFire Original</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet">
+    
     <style>
-        /* ================= ESTILO BASE ================= */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
+        :root {
+            --af-blue: #00aeef;
+            --af-bg: #1A1A1A;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body, html {
             width: 100%; height: 100%;
             background-color: #000;
             overflow: hidden;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
-        .main-container {
+        /* Container Principal */
+        .af-player-container {
             position: relative;
             width: 100vw;
             height: 100vh;
             background: #000;
             display: flex;
             flex-direction: column;
+            justify-content: center;
         }
 
-        /* ================= VÍDEO (IFRAME) ================= */
-        .video-wrapper {
+        /* Iframe do Vídeo (Fundo) */
+        .video-canvas {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 1;
         }
+        iframe { width: 100%; height: 100%; border: none; }
 
-        iframe {
-            width: 100%; height: 100%;
-            border: none;
-        }
-
-        /* ================= CAMADA DE TOQUE (O SEGREDO) ================= */
-        /* Essa camada detecta o toque mas "deixa passar" o clique para o vídeo quando o menu some */
-        .ui-overlay {
+        /* Camada de UI (Controles) */
+        .af-ui-overlay {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            z-index: 2;
-            pointer-events: none; /* Deixa clicar no vídeo por padrão */
-            transition: background 0.3s ease;
-        }
-
-        .ui-overlay.active {
-            pointer-events: auto; /* Bloqueia o vídeo para você clicar nos SEUS botões */
-            background: rgba(0, 0, 0, 0.4); /* Efeito de escurecer suave ao abrir o menu */
-        }
-
-        /* Área invisível para detectar o toque de abrir o menu */
-        .touch-detector {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 3;
-        }
-
-        /* ================= CABEÇALHO (IGUAL FOTO 3) ================= */
-        .player-header {
-            position: absolute;
-            top: 0; left: 0; width: 100%;
-            padding: calc(env(safe-area-inset-top) + 15px) 20px 40px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            color: white;
             z-index: 10;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.9) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .af-player-container.active .af-ui-overlay {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Área de toque central para abrir menu */
+        .touch-zone {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 5;
+        }
+
+        /* --- BARRA SUPERIOR (CONFORME FOTO E CÓDIGO) --- */
+        .af-header {
+            padding: 20px;
             display: flex;
             align-items: center;
             gap: 15px;
-            transform: translateY(-100%);
-            transition: transform 0.3s ease;
         }
 
-        .player-header.show { transform: translateY(0); }
-
-        .btn-back {
+        .af-btn-back {
+            cursor: pointer;
+            width: 35px; height: 35px;
+            display: flex; align-items: center; justify-content: center;
             background: rgba(255,255,255,0.1);
             border-radius: 50%;
-            width: 40px; height: 40px;
-            display: flex; align-items: center; justify-content: center;
+        }
+
+        .af-title {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 400;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* --- BARRA DE PROGRESSO (A "TOP" QUE VOCÊ QUER) --- */
+        .af-progress-wrapper {
+            padding: 0 20px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .af-progress-bar {
+            width: 100%;
+            height: 5px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            position: relative;
             cursor: pointer;
         }
 
-        .video-title {
-            font-size: 1rem;
-            font-weight: 500;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-        }
-
-        /* ================= BARRA INFERIOR (ESTILO ANIMEFIRE) ================= */
-        .player-footer {
-            position: absolute;
-            bottom: 0; left: 0; width: 100%;
-            padding: 20px 20px calc(env(safe-area-inset-bottom) + 10px);
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-            z-index: 10;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-        }
-
-        .player-footer.show { transform: translateY(0); }
-
-        /* Barra de Progresso Fictícia (Visual) */
-        .progress-container {
-            width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            margin-bottom: 15px;
-            border-radius: 2px;
+        .af-progress-filled {
+            width: 45%; /* Exemplo de progresso */
+            height: 100%;
+            background: var(--af-blue);
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(0, 174, 239, 0.6);
             position: relative;
         }
-        .progress-bar {
-            width: 30%; /* Exemplo */
-            height: 100%;
-            background: #00aeef; /* Azul AnimeFire */
-            border-radius: 2px;
+
+        /* Bolinha da barra (Seeker) */
+        .af-progress-filled::after {
+            content: '';
+            position: absolute;
+            right: -6px; top: -4px;
+            width: 13px; height: 13px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
 
-        .controls-row {
+        /* --- CONTROLES INFERIORES --- */
+        .af-controls {
+            padding: 0 25px 25px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            color: white;
+            align-items: center;
         }
 
-        .left-controls, .right-controls {
+        .af-controls-left, .af-controls-right {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 25px;
         }
 
-        .icon-btn {
+        .af-icon {
             width: 24px; height: 24px;
+            fill: #fff;
             cursor: pointer;
-            opacity: 0.9;
+            transition: transform 0.1s;
         }
-        .icon-btn:hover { opacity: 1; }
 
-        .time-display {
-            font-size: 0.85rem;
-            font-family: monospace;
+        .af-icon:active { transform: scale(0.9); }
+
+        .af-time {
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 300;
         }
+
+        /* --- MENUS DE QUALIDADE/VELOCIDADE --- */
+        .af-menu-pop {
+            position: absolute;
+            bottom: 80px; right: 20px;
+            background: var(--af-bg);
+            border-radius: 5px;
+            width: 250px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .af-menu-item {
+            padding: 15px;
+            color: #fff;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .af-menu-item:hover { background: rgba(255,255,255,0.1); }
+        .af-menu-item.active { color: var(--af-blue); }
 
     </style>
 </head>
 <body>
 
-    <div class="main-container" id="mainContainer">
+    <div class="af-player-container" id="mainPlayer">
         
-        <div class="touch-detector" id="touchArea"></div>
+        <div class="touch-zone" onclick="toggleUI()"></div>
 
-        <div class="player-header" id="header">
-            <div class="btn-back" onclick="window.history.back()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            </div>
-            <div class="video-title" id="display-title">Carregando...</div>
+        <div class="video-canvas">
+            <iframe id="iframePlayer" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
         </div>
 
-        <div class="ui-overlay" id="uiOverlay"></div>
-
-        <div class="player-footer" id="footer">
-            <div class="progress-container">
-                <div class="progress-bar"></div>
-            </div>
-            <div class="controls-row">
-                <div class="left-controls">
-                    <div class="icon-btn"> <svg viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                    </div>
-                    <div class="icon-btn"> <svg viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-                    </div>
-                    <div class="time-display">00:00 / --:--</div>
+        <div class="af-ui-overlay" id="uiOverlay">
+            
+            <div class="af-header">
+                <div class="af-btn-back" onclick="window.history.back()">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="white" stroke-width="2.5" fill="none"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 </div>
-                <div class="right-controls">
-                    <div class="icon-btn"> <svg viewBox="0 0 24 24" fill="white"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/></svg>
-                    </div>
-                    <div class="icon-btn"> <svg viewBox="0 0 24 24" fill="white"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                    </div>
-                    <div class="icon-btn"> <svg viewBox="0 0 24 24" fill="white"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                <div class="af-title" id="video-title">Carregando Nome do Anime...</div>
+            </div>
+
+            <div></div>
+
+            <div class="af-footer-area">
+                
+                <div class="af-progress-wrapper">
+                    <div class="af-progress-bar">
+                        <div class="af-progress-filled" id="progressFill"></div>
                     </div>
                 </div>
+
+                <div class="af-controls">
+                    <div class="af-controls-left">
+                        <svg class="af-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> <div class="af-time">08:12 / 24:00</div>
+                    </div>
+                    
+                    <div class="af-controls-right">
+                        <svg class="af-icon" onclick="toggleMenu()" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                        
+                        <svg class="af-icon" onclick="toggleFS()" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="video-wrapper">
-            <iframe id="video-frame" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
-        </div>
+            <div class="af-menu-pop" id="qualityMenu">
+                <div class="af-menu-item"><span>Reprodução automática</span> <input type="checkbox" checked></div>
+                <div class="af-menu-item"><span>Velocidade</span> <span>Normal ></span></div>
+                <div class="af-menu-item active"><span>Qualidade</span> <span>1080p ></span></div>
+            </div>
 
+        </div>
     </div>
 
 <script>
-    const header = document.getElementById('header');
-    const footer = document.getElementById('footer');
-    const overlay = document.getElementById('uiOverlay');
-    const touchArea = document.getElementById('touchArea');
-    const iframe = document.getElementById('video-frame');
-    let timer;
-    let videoDuration = 0;
-    let isPlaying = false;
+    const player = document.getElementById('mainPlayer');
+    const menu = document.getElementById('qualityMenu');
+    let uiTimer;
 
-    // ==================== CONTROLES UI ====================
+    // Função para ligar/desligar UI
     function toggleUI() {
-        if (header.classList.contains('show')) {
+        if (player.classList.contains('active')) {
             hideUI();
         } else {
             showUI();
@@ -212,108 +254,54 @@
     }
 
     function showUI() {
-        header.classList.add('show');
-        footer.classList.add('show');
-        overlay.classList.add('active');
-        clearTimeout(timer);
-        timer = setTimeout(hideUI, 5000);
+        player.classList.add('active');
+        clearTimeout(uiTimer);
+        uiTimer = setTimeout(hideUI, 4000);
     }
 
     function hideUI() {
-        header.classList.remove('show');
-        footer.classList.remove('show');
-        overlay.classList.remove('active');
+        player.classList.remove('active');
+        menu.style.display = 'none';
     }
 
-    touchArea.addEventListener('click', toggleUI);
+    function toggleMenu() {
+        menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+        clearTimeout(uiTimer); // Mantém o menu aberto
+    }
 
-    // ==================== CARREGAR VÍDEO ====================
+    // Tela Cheia
+    function toggleFS() {
+        if (!document.fullscreenElement) {
+            player.requestFullscreen().catch(err => {});
+        } else {
+            document.exitFullscreen();
+        }
+    }
+
+    // Lógica de URL e Iframe
     const urlParams = new URLSearchParams(window.location.search);
-    let videoUrl = urlParams.get('url');
-    const titulo = decodeURIComponent(urlParams.get('titulo') || "Vídeo");
+    const videoUrl = urlParams.get('url');
+    const titulo = urlParams.get('titulo') || "Youjo Senki - Episódio 1";
 
-    document.getElementById('display-title').textContent = titulo;
+    document.getElementById('video-title').textContent = decodeURIComponent(titulo);
 
     if (videoUrl) {
-        videoUrl = decodeURIComponent(videoUrl);
-        
-        // Parâmetros importantes para esconder controles nativos
-        const extraParams = [
-            "autoplay=1",
-            "mute=1",
-            "modestbranding=1",
-            "controls=0",           // Tenta esconder controles
-            "fs=0",
-            "iv_load_policy=3"
-        ].join('&');
-
-        const separator = videoUrl.includes('?') ? '&' : '?';
-        iframe.src = videoUrl + separator + extraParams;
+        let finalUrl = decodeURIComponent(videoUrl);
+        // Adicionando parâmetros para tentar remover controles originais e dar autoplay
+        const params = "autoplay=1&controls=0&modestbranding=1&rel=0";
+        finalUrl += (finalUrl.includes('?') ? '&' : '?') + params;
+        document.getElementById('iframePlayer').src = finalUrl;
     }
 
-    // ==================== PROGRESSO CUSTOMIZADO ====================
-    const progressContainer = document.querySelector('.progress-container');
-    const progressBar = document.querySelector('.progress-bar');
-    const timeDisplay = document.querySelector('.time-display');
-
-    // Clique na barra de progresso
-    progressContainer.addEventListener('click', (e) => {
-        const rect = progressContainer.getBoundingClientRect();
-        const percent = (e.clientX - rect.left) / rect.width;
-        
-        // Tenta buscar o vídeo dentro do iframe (funciona melhor em alguns players)
-        try {
-            const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-            const video = innerDoc.querySelector('video');
-            if (video) {
-                video.currentTime = percent * video.duration;
-            }
-        } catch (e) {
-            console.log("Não foi possível acessar o vídeo interno (CORS)");
-            // Fallback: tentar via postMessage (funciona em alguns players)
-            iframe.contentWindow.postMessage({ action: "seek", percent: percent }, "*");
+    // Movimentação da barra (apenas visual para esta demonstração)
+    let p = 45;
+    setInterval(() => {
+        if(p < 100) {
+            p += 0.05;
+            document.getElementById('progressFill').style.width = p + "%";
         }
-    });
+    }, 1000);
 
-    // Atualiza progresso (se conseguir acessar)
-    function updateProgress() {
-        try {
-            const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-            const video = innerDoc.querySelector('video');
-            if (video) {
-                if (!videoDuration) videoDuration = video.duration;
-                
-                const percent = (video.currentTime / video.duration) * 100;
-                progressBar.style.width = percent + '%';
-                
-                timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
-                isPlaying = !video.paused;
-            }
-        } catch (e) {
-            // Se não conseguir acessar, deixa a barra estática ou anima fake
-        }
-    }
-
-    function formatTime(seconds) {
-        if (!seconds || isNaN(seconds)) return "00:00";
-        const min = Math.floor(seconds / 60);
-        const sec = Math.floor(seconds % 60);
-        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-    }
-
-    // Atualiza a cada 500ms
-    setInterval(updateProgress, 500);
-
-    // Tenta forçar autoplay após carregar
-    iframe.onload = () => {
-        setTimeout(() => {
-            try {
-                const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-                const video = innerDoc.querySelector('video');
-                if (video) video.play();
-            } catch(e){}
-        }, 1500);
-    };
 </script>
 </body>
 </html>
