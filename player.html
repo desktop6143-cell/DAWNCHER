@@ -2,303 +2,222 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Player Estilo AnimeFire</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra Cinematic Player</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html {
-            width: 100%; height: 100%;
-            background: #000;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
             overflow: hidden;
-            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-            touch-action: manipulation;
+            font-family: 'Inter', system-ui, sans-serif;
         }
-        .main-container {
+        .main-wrapper {
             position: relative;
             width: 100vw;
             height: 100vh;
-            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
-        /* Vídeo */
-        .video-wrapper {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
+        .video-container {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            position: relative;
         }
         iframe {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             border: none;
         }
-
-        /* Overlay de Toque */
-        .touch-overlay {
+        .floating-controls {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        /* Header */
-        .header {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            padding: calc(env(safe-area-inset-top) + 15px) 20px 20px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-            color: white;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 20px 40px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%);
             z-index: 10;
             display: flex;
             align-items: center;
-            gap: 15px;
-            transform: translateY(-100%);
-            transition: transform 0.4s ease;
+            gap: 20px;
+            transition: opacity 0.4s ease;
+            opacity: 0;
+            pointer-events: none;
         }
-        .header.show { transform: translateY(0); }
+        .main-wrapper.show-controls .floating-controls {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-        .btn-back {
-            background: rgba(255,255,255,0.15);
-            width: 42px; height: 42px;
+        .back-circle {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-        }
-
-        /* Footer */
-        .footer {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            padding: 15px 20px calc(env(safe-area-inset-bottom) + 15px);
-            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
-            z-index: 10;
-            transform: translateY(100%);
-            transition: transform 0.4s ease;
-        }
-        .footer.show { transform: translateY(0); }
-
-        .progress-container {
-            height: 5px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 3px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            position: relative;
-        }
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: #00aeef;
-            border-radius: 3px;
-            transition: width 0.1s linear;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             color: white;
+            transition: all 0.2s ease;
         }
-        .icon-btn {
-            cursor: pointer;
-            padding: 5px;
-            opacity: 0.9;
+        .back-circle:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.25);
         }
-        .icon-btn:hover { opacity: 1; }
-        .time-display {
-            font-family: monospace;
-            font-size: 0.9rem;
+        .video-info h2 {
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: white;
+            text-shadow: 0 2px 15px rgba(0,0,0,0.9);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80vw;
+        }
+
+        /* Mensagem quando não tem URL */
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff6b6b;
+            text-align: center;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <!-- Vídeo -->
-        <div class="video-wrapper">
-            <iframe id="video-frame" allowfullscreen allow="autoplay; fullscreen"></iframe>
-        </div>
-
-        <!-- Toque -->
-        <div class="touch-overlay" id="touchArea"></div>
-
-        <!-- Header -->
-        <div class="header" id="header">
-            <div class="btn-back" onclick="window.history.back()">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+    <div class="main-wrapper" id="wrapper">
+        <div class="floating-controls" id="controls">
+            <div class="back-circle" id="back-btn">
+                <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
                 </svg>
             </div>
-            <div id="display-title" style="font-size:1.05rem; font-weight:500;">Carregando...</div>
+            <div class="video-info">
+                <h2 id="video-title">Carregando...</h2>
+            </div>
         </div>
 
-        <!-- Footer -->
-        <div class="footer" id="footer">
-            <div class="progress-container" id="progressContainer">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-            <div class="controls">
-                <div style="display:flex; gap:20px;">
-                    <div class="icon-btn" id="playPauseBtn">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
-                            <path d="M8 5v14l11-7z"/>
-                        </svg>
-                    </div>
-                    <div class="time-display" id="timeDisplay">00:00 / --:--</div>
-                </div>
-
-                <div style="display:flex; gap:20px;">
-                    <div class="icon-btn" id="volumeBtn">🔊</div>
-                    <div class="icon-btn" id="fullscreenBtn">
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
-                            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
-                        </svg>
-                    </div>
-                </div>
+        <div class="video-container">
+            <iframe id="video-frame" src="" allowfullscreen allow="autoplay; encrypted-media; fullscreen"></iframe>
+            <div class="error-message" id="error-msg">
+                <h2>URL do vídeo não encontrada</h2>
             </div>
         </div>
     </div>
 
-    <script>
-        // ==================== ELEMENTOS ====================
-        const header = document.getElementById('header');
-        const footer = document.getElementById('footer');
-        const touchArea = document.getElementById('touchArea');
-        const iframe = document.getElementById('video-frame');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressBar = document.getElementById('progressBar');
-        const timeDisplay = document.getElementById('timeDisplay');
-        const titleEl = document.getElementById('display-title');
+<script>
+// ==================== CONFIGURAÇÕES ====================
+const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbwe7k3THvlFrsfvSpAl3JfyF7FqRNaTzoxSfK5S12PzPaS6JZmIK89LCgyWczmgCf7VCQ/exec';
+const idUser = sessionStorage.getItem('idUsuario') || localStorage.getItem('idUsuario');
 
-        let hideTimer;
-        let lastSavedTime = 0;
+// Parâmetros da URL
+const urlParams = new URLSearchParams(window.location.search);
+const videoUrl = urlParams.get('url');
+const tituloRaw = urlParams.get('titulo') || "Vídeo sem título";
+const tituloFormatado = decodeURIComponent(tituloRaw);
 
-        // ==================== URL PARAMS ====================
-        const urlParams = new URLSearchParams(window.location.search);
-        let videoUrl = urlParams.get('url');
-        const titulo = decodeURIComponent(urlParams.get('titulo') || 'Anime');
-        const episodeId = urlParams.get('ep') || '1';
+// Elementos
+const videoTitleEl = document.getElementById('video-title');
+const videoFrame = document.getElementById('video-frame');
+const wrapper = document.getElementById('wrapper');
+const errorMsg = document.getElementById('error-msg');
 
-        titleEl.textContent = titulo;
+// ==================== INICIALIZAÇÃO ====================
+videoTitleEl.textContent = tituloFormatado;
 
-        // ==================== CARREGAR VÍDEO ====================
-        if (videoUrl) {
-            videoUrl = decodeURIComponent(videoUrl);
-            const params = "autoplay=1&mute=0&modestbranding=1&controls=0&fs=1";
-            const separator = videoUrl.includes('?') ? '&' : '?';
-            iframe.src = videoUrl + separator + params;
-        }
+if (videoUrl) {
+    videoFrame.src = decodeURIComponent(videoUrl);
+} else {
+    errorMsg.style.display = 'block';
+}
 
-        // ==================== UI CONTROLS ====================
-        function showUI() {
-            header.classList.add('show');
-            footer.classList.add('show');
-            clearTimeout(hideTimer);
-            hideTimer = setTimeout(hideUI, 4500);
-        }
+// Extrai número do episódio
+let episodioAtual = "1";
+const matchEp = tituloFormatado.match(/Epis[óo]dio\s*(\d+)/i);
+if (matchEp) episodioAtual = matchEp[1];
 
-        function hideUI() {
-            header.classList.remove('show');
-            footer.classList.remove('show');
-        }
+// ==================== FUNÇÕES ====================
+function obterTempoFormatado() {
+    return new Date().toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+}
 
-        touchArea.addEventListener('click', () => {
-            if (header.classList.contains('show')) hideUI();
-            else showUI();
+async function salvarNoHistorico() {
+    if (!idUser) return;
+
+    const dados = {
+        action: "salvar",
+        id_user: idUser,
+        titulo: tituloFormatado,
+        url_acesso: window.location.href,
+        episodio: episodioAtual,
+        tempo: obterTempoFormatado()
+    };
+
+    try {
+        const response = await fetch(API_HISTORICO, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
         });
+        const resultado = await response.json();
+        console.log(`[${dados.tempo}] ✅ Histórico salvo`);
+    } catch (err) {
+        console.error("❌ Erro ao salvar histórico:", err);
+    }
+}
 
-        // ==================== PROGRESSO E TEMPO ====================
-        progressContainer.addEventListener('click', (e) => {
-            const rect = progressContainer.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const percent = clickX / rect.width;
+// ==================== CONTROLES ====================
+// Mostrar controles ao tocar na tela (melhor experiência mobile)
+let timeoutControles;
 
-            try {
-                const innerVideo = iframe.contentWindow.document.querySelector('video');
-                if (innerVideo) innerVideo.currentTime = innerVideo.duration * percent;
-            } catch (err) {
-                console.log("Não foi possível buscar o vídeo interno");
-            }
-        });
+function mostrarControles() {
+    wrapper.classList.add('show-controls');
+    clearTimeout(timeoutControles);
+    timeoutControles = setTimeout(() => {
+        wrapper.classList.remove('show-controls');
+    }, 4000);
+}
 
-        function formatTime(sec) {
-            if (!sec || isNaN(sec)) return "00:00";
-            const m = Math.floor(sec / 60);
-            const s = Math.floor(sec % 60);
-            return `${m}:${s < 10 ? '0' : ''}${s}`;
-        }
+document.getElementById('back-btn').addEventListener('click', () => {
+    window.history.back();
+});
 
-        // Atualiza progresso
-        setInterval(() => {
-            try {
-                const innerVideo = iframe.contentWindow.document.querySelector('video');
-                if (innerVideo && innerVideo.duration) {
-                    const percent = (innerVideo.currentTime / innerVideo.duration) * 100;
-                    progressBar.style.width = percent + "%";
-                    timeDisplay.textContent = `${formatTime(innerVideo.currentTime)} / ${formatTime(innerVideo.duration)}`;
-                }
-            } catch (e) {}
-        }, 800);
+// Toque na tela
+wrapper.addEventListener('click', (e) => {
+    // Se clicou no botão voltar, não faz toggle
+    if (e.target.closest('#back-btn')) return;
+    mostrarControles();
+});
 
-        // ==================== SALVAMENTO DA API ====================
-        function salvarProgresso() {
-            const idUser = sessionStorage.getItem('idUsuario');
-            if (!idUser) return;
+// Hover no desktop
+wrapper.addEventListener('mousemove', () => {
+    mostrarControles();
+});
 
-            let currentTime = 0;
-            try {
-                const innerVideo = iframe.contentWindow.document.querySelector('video');
-                if (innerVideo) currentTime = Math.floor(innerVideo.currentTime);
-            } catch (e) {}
+// ==================== EVENTOS ====================
+window.addEventListener('load', () => {
+    salvarNoHistorico();
+});
 
-            // Só salva se tiver avançado pelo menos 10 segundos
-            if (currentTime > lastSavedTime + 10) {
-                lastSavedTime = currentTime;
+setInterval(salvarNoHistorico, 30000);
 
-                fetch('SUA_URL_DO_GOOGLE_SCRIPT', {  // ← Troque pela sua URL real
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: "salvar",
-                        id_user: idUser,
-                        titulo: titulo,
-                        episodio: episodeId,
-                        tempo: currentTime,
-                        duracao: "auto"   // você pode pegar a duração depois
-                    })
-                });
-            }
-        }
-
-        // Salva a cada 15 segundos
-        setInterval(salvarProgresso, 15000);
-
-        // Salva quando o usuário sair da página
-        window.addEventListener('beforeunload', salvarProgresso);
-
-        // ==================== BOTÕES ====================
-        document.getElementById('fullscreenBtn').addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-            } else {
-                document.exitFullscreen();
-            }
-        });
-
-        // Tenta autoplay após carregar
-        iframe.onload = () => {
-            setTimeout(() => {
-                try {
-                    const video = iframe.contentWindow.document.querySelector('video');
-                    if (video) video.play();
-                } catch (e) {}
-            }, 1200);
-        };
-
-        // Mostrar UI ao iniciar
-        setTimeout(showUI, 600);
-    </script>
+window.addEventListener('beforeunload', () => {
+    salvarNoHistorico();
+});
+</script>
 </body>
 </html>
