@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player MEGA</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { height: 100%; background: #000; overflow: hidden; font-family: Arial, sans-serif; }
+        
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .btn-voltar {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        iframe {
+            width: 100%;
+            height: 100vh;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="javascript:history.back()" class="btn-voltar">← Voltar</a>
+        <span id="titulo-player">Carregando...</span>
+    </div>
+
+    <iframe id="mega-player" allowfullscreen allow="autoplay"></iframe>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const urlVideo = params.get('url');
+        const titulo = params.get('titulo');
+
+        if (titulo) {
+            document.getElementById('titulo-player').innerText = titulo;
+            document.title = titulo;
+        }
+
+        if (urlVideo) {
+            document.getElementById('mega-player').src = urlVideo;
+        } else {
+            alert("URL do vídeo não encontrada!");
+        }
+    </script>
+</body>
+</html>
