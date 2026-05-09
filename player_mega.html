@@ -41,20 +41,41 @@
     <iframe id="mega-player" allowfullscreen allow="autoplay"></iframe>
 
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const urlVideo = params.get('url');
-        const titulo = params.get('titulo');
+// ==================== CONFIGURAÇÃO MEGA ====================
+const idsMega = {
+    // Agora você pode colar tanto o link de EMBED quanto o link de ARQUIVO comum
+    1: "https://mega.nz/file/vD43XC7I#jVR0Y4lOc5EtkhtpIG5cjbSItyy-Fb6S36AophdnIGs",
+    2: "https://mega.nz/file/SEU_CODIGO_AQUI_2#SUA_CHAVE_AQUI_2",
+    3: "https://mega.nz/file/SEU_CODIGO_AQUI_3#SUA_CHAVE_AQUI_3"
+};
 
-        if (titulo) {
-            document.getElementById('titulo-player').innerText = titulo;
-            document.title = titulo;
-        }
+// ==================== FUNÇÃO PARA ASSISTIR NO PLAYER MEGA ====================
+function assistirFilme(numero, titulo) {
+    let urlMega = idsMega[numero];
+    
+    if (!urlMega || urlMega.includes("SEU_CODIGO_AQUI")) {
+        alert("Este filme ainda não está disponível no MEGA!");
+        return;
+    }
 
-        if (urlVideo) {
-            document.getElementById('mega-player').src = urlVideo;
-        } else {
-            alert("URL do vídeo não encontrada!");
-        }
+    // --- CORREÇÃO DE LINK ON-THE-FLY ---
+    // Se o link vier como /file/, transformamos em /embed/ para o player funcionar
+    if (urlMega.includes("mega.nz/file/")) {
+        urlMega = urlMega.replace("mega.nz/file/", "mega.nz/embed/");
+    }
+
+    const idUnico = `FILME_OBVP_${numero}`;
+    const caminhoPlayer = "../player_mega.html"; 
+
+    // Usamos encodeURIComponent para garantir que símbolos como '#' e '&' no link do MEGA 
+    // não confundam a URL do seu navegador
+    window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlMega)}&titulo=${encodeURIComponent(titulo)}`;
+}
+
+// Botão principal (Certifique-se que numFilme e nomesFilmes estejam definidos no seu escopo global)
+document.querySelector('#play-button').onclick = () => {
+    assistirFilme(numFilme, nomesFilmes[numFilme]);
+};
     </script>
 </body>
 </html>
