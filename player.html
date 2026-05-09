@@ -2,17 +2,21 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ultra Cinematic Player</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Ultra Cinematic Player - Pro</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ================= RESET E BASE ================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body, html {
             width: 100%;
             height: 100%;
-            background-color: #000;
+            background-color: #050505; /* Fundo levemente mais suave que o preto puro */
             overflow: hidden;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            position: fixed;
         }
+
         .main-wrapper {
             position: relative;
             width: 100vw;
@@ -20,178 +24,294 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background: #000;
         }
+
+        /* ================= CONTAINER DO VÍDEO ================= */
         .video-container {
             width: 100%;
             height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
             background: #000;
-            position: relative;
         }
+
         iframe {
             width: 100%;
             height: 100%;
             border: none;
+            display: block;
+            opacity: 0; /* Começa invisível para transição suave */
+            transition: opacity 0.8s ease-in-out;
         }
+
+        iframe.loaded {
+            opacity: 1;
+        }
+
+        /* ================= TELA DE CARREGAMENTO (SPINNER) ================= */
+        .loader-container {
+            position: absolute;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            transition: opacity 0.5s ease;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-text {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ================= CAMADAS E CONTROLES (UX) ================= */
+        .click-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            cursor: pointer;
+        }
+
         .floating-controls {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            padding: 20px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
+            padding: calc(env(safe-area-inset-top) + 20px) 25px 30px 25px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
             z-index: 10;
             display: flex;
             align-items: center;
-            gap: 20px;
-            transition: opacity 0.4s ease;
+            gap: 18px;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
             pointer-events: none;
+            transform: translateY(-15px);
         }
-        .main-wrapper:active .floating-controls,
-        .main-wrapper:hover .floating-controls {
+
+        .floating-controls.active {
             opacity: 1;
             pointer-events: auto;
+            transform: translateY(0);
         }
+
+        /* Estilo Premium para o Botão Voltar (Glassmorphism) */
         .back-circle {
-            width: 45px;
-            height: 45px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            color: white;
+            color: #fff;
+            flex-shrink: 0;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
+
+        .back-circle:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .video-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
         .video-info h2 {
             font-size: 1.1rem;
-            font-weight: 500;
-            color: white;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 65vw;
+        }
+
+        .video-info span {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
         }
     </style>
 </head>
 <body>
+
     <div class="main-wrapper" id="wrapper">
+        
+        <div class="loader-container" id="loader">
+            <div class="spinner"></div>
+            <div class="loader-text">Conectando...</div>
+        </div>
+
+        <div class="click-overlay" id="overlay"></div>
+
         <div class="floating-controls" id="controls">
-            <div class="back-circle" onclick="voltar()">
+            <div class="back-circle" onclick="voltar()" title="Voltar">
                 <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m-7 7h18"/>
                 </svg>
             </div>
             <div class="video-info">
                 <h2 id="video-title">Carregando...</h2>
+                <span id="video-subtitle">Preparando player</span>
             </div>
         </div>
+
         <div class="video-container">
-            <iframe id="video-frame" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+            <iframe 
+                id="video-frame" 
+                src="" 
+                allowfullscreen 
+                webkitallowfullscreen 
+                mozallowfullscreen
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture">
+            </iframe>
         </div>
     </div>
 
 <script>
-// ==================== 1. CONFIGURAÇÕES E VARIÁVEIS GLOBAIS ====================
-const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbwe7k3THvlFrsfvSpAl3JfyF7FqRNaTzoxSfK5S12PzPaS6JZmIK89LCgyWczmgCf7VCQ/exec';
-const idUser        = sessionStorage.getItem('idUsuario');
+// ==================== 1. INTERFACE E ANIMAÇÕES ====================
+const controls = document.getElementById('controls');
+const overlay = document.getElementById('overlay');
+const iframe = document.getElementById('video-frame');
+const loader = document.getElementById('loader');
+let hideTimer;
 
-// Parâmetros da URL e Formatação de Título
-const urlParams       = new URLSearchParams(window.location.search);
-const videoUrl        = urlParams.get('url');
+// Gerencia a exibição do menu ao tocar na tela
+function toggleControls() {
+    controls.classList.add('active');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+        controls.classList.remove('active');
+    }, 3500); // Esconde após 3.5 segundos
+}
+
+overlay.addEventListener('click', toggleControls);
+overlay.addEventListener('touchstart', toggleControls);
+
+// Esconde o spinner suavemente quando o iframe termina de carregar
+iframe.addEventListener('load', () => {
+    loader.style.opacity = '0';
+    setTimeout(() => {
+        loader.style.display = 'none';
+        iframe.classList.add('loaded'); // Faz o vídeo aparecer suavemente (Fade-in)
+        document.getElementById('video-subtitle').textContent = "Reproduzindo";
+    }, 500);
+});
+
+
+// ==================== 2. LÓGICA DE URL E AUTOPLAY ====================
+const urlParams = new URLSearchParams(window.location.search);
+const videoUrl = urlParams.get('url');
 const tituloFormatado = decodeURIComponent(urlParams.get('titulo') || "Vídeo sem título");
 
-// Elementos da Interface
 document.getElementById('video-title').textContent = tituloFormatado;
 
-if (videoUrl) {
-    document.getElementById('video-frame').src = decodeURIComponent(videoUrl);
-} else {
-    document.getElementById('video-title').textContent = "URL do vídeo não encontrada!";
-}
-
-// Extração do Número do Episódio (Ex: "Anime - Episódio 05" -> "05")
+// Extração de Episódio para a UI
 let episodioAtual = "1";
 const matchEp = tituloFormatado.match(/Epis[óo]dio\s*(\d+)/i);
-if (matchEp) {
-    episodioAtual = matchEp[1];
+if (matchEp) { 
+    episodioAtual = matchEp[1]; 
+    document.getElementById('video-subtitle').textContent = `Episódio ${episodioAtual}`;
+}
+
+// Configuração do Iframe com Autoplay Forçado
+if (videoUrl) {
+    let finalUrl = decodeURIComponent(videoUrl);
+    
+    /* PARÂMETROS ESSENCIAIS PARA FUNCIONAR NO CELULAR:
+       playsinline=1 -> Impede o iPhone de abrir em tela cheia sozinho.
+       autoplay=1 -> Tenta iniciar automaticamente.
+       mute=1 & muted=1 -> Obriga o vídeo a começar mudo, única forma do autoplay não ser bloqueado.
+    */
+    const parametrosPlayer = "playsinline=1&autoplay=1&mute=1&muted=1&modestbranding=1";
+    
+    if(finalUrl.includes('?')) {
+        finalUrl += "&" + parametrosPlayer;
+    } else {
+        finalUrl += "?" + parametrosPlayer;
+    }
+    
+    iframe.src = finalUrl;
+} else {
+    document.getElementById('video-title').textContent = "Erro na URL";
+    document.getElementById('video-subtitle').textContent = "Nenhum vídeo fornecido.";
+    loader.style.display = 'none';
 }
 
 
-// ==================== 2. FUNÇÕES DE TEMPO E FORMATAÇÃO ====================
+// ==================== 3. API E HISTÓRICO ====================
+const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbwe7k3THvlFrsfvSpAl3JfyF7FqRNaTzoxSfK5S12PzPaS6JZmIK89LCgyWczmgCf7VCQ/exec';
+const idUser = sessionStorage.getItem('idUsuario');
 
-/**
- * Gera o horário atual no formato HH:mm:ss (24h)
- * Essencial para que a comparação de "progresso maior" funcione na planilha.
- */
 function obterTempoFormatado() {
     return new Date().toLocaleTimeString('pt-BR', {
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit',
-        hour12: false 
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
     });
 }
 
-
-// ==================== 3. FUNÇÃO SALVAR HISTÓRICO ====================
-
-/**
- * Envia os dados de progresso para o Google Apps Script.
- * Verifica o ID do usuário e envia o tempo formatado.
- */
 async function salvarNoHistorico() {
     if (!idUser) return;
-
-    const tempoAssistido = obterTempoFormatado();
-
     const dados = {
         action: "salvar",
         id_user: idUser,
         titulo: tituloFormatado,
         url_acesso: window.location.href,
         episodio: episodioAtual, 
-        tempo: tempoAssistido
+        tempo: obterTempoFormatado()
     };
 
     try {
-        const response = await fetch(API_HISTORICO, {
+        await fetch(API_HISTORICO, {
             method: 'POST',
-            redirect: 'follow',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            mode: 'no-cors', // Fundamental para não travar no iOS
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)
         });
-        
-        const resultado = await response.json();
-        console.log(`[${tempoAssistido}] ✅ API Respondeu: ${resultado.message}`);
-    } catch (err) {
-        console.error("❌ Erro ao salvar histórico:", err);
+        console.log("Progresso salvo: " + obterTempoFormatado());
+    } catch (err) { 
+        console.error("Erro histórico:", err); 
     }
 }
 
+function voltar() { window.history.back(); }
 
-// ==================== 4. GATILHOS E EVENTOS ====================
-
-// Ação de Voltar
-function voltar() {
-    window.history.back();
-}
-
-// Evento: Quando a página termina de carregar
-window.addEventListener('load', () => {
-    salvarNoHistorico();
-});
-
-// Evento: Salvamento Automático a cada 30 segundos
-setInterval(() => {
-    console.log("⏱️ Iniciando salvamento automático...");
-    salvarNoHistorico();
-}, 30000);
-
-// Evento: Quando o usuário fecha a aba ou sai da página
-window.addEventListener('beforeunload', () => {
-    salvarNoHistorico();
-});
-
+// Gatilhos de salvamento
+window.addEventListener('load', salvarNoHistorico);
+setInterval(salvarNoHistorico, 30000); // Salva a cada 30 segundos
 </script>
 </body>
 </html>
