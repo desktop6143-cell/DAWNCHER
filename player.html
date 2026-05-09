@@ -135,7 +135,14 @@ const errorMsg = document.getElementById('error-msg');
 videoTitleEl.textContent = tituloFormatado;
 
 if (videoUrl) {
-    videoFrame.src = decodeURIComponent(videoUrl);
+    if (videoUrl) {
+    let urlCorrigida = decodeURIComponent(videoUrl);
+    // Garante que o link termine em /preview para permitir o iframe
+    if (urlCorrigida.includes('/view')) {
+        urlCorrigida = urlCorrigida.replace('/view', '/preview');
+    }
+    videoFrame.src = urlCorrigida;
+}
 } else {
     errorMsg.style.display = 'block';
 }
