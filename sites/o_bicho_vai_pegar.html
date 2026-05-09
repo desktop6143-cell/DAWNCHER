@@ -71,36 +71,32 @@
 <script>
 // ==================== CONFIGURAÇÃO MEGA ====================
 const idsMega = {
-    // Agora você pode colar tanto o link de EMBED quanto o link de ARQUIVO comum
     1: "https://mega.nz/file/vD43XC7I#jVR0Y4lOc5EtkhtpIG5cjbSItyy-Fb6S36AophdnIGs",
-    2: "https://mega.nz/embed/vD43XC7I#jVR0Y4lOc5EtkhtpIG5cjbSItyy-Fb6S36AophdnIGs",
-    3: "https://mega.nz/file/SEU_CODIGO_AQUI_3#SUA_CHAVE_AQUI_3"
+    2: "https://mega.nz/file/SEU_CODIGO_2#CHAVE_2",
+    3: "https://mega.nz/file/SEU_CODIGO_3#CHAVE_3"
 };
 
-// ==================== FUNÇÃO PARA ASSISTIR NO PLAYER MEGA ====================
+// ==================== FUNÇÃO PARA ASSISTIR ====================
 function assistirFilme(numero, titulo) {
     let urlMega = idsMega[numero];
     
     if (!urlMega || urlMega.includes("SEU_CODIGO_AQUI")) {
-        alert("Este filme ainda não está disponível no MEGA!");
+        alert("Este filme ainda não está disponível!");
         return;
     }
 
-    // --- CORREÇÃO DE LINK ON-THE-FLY ---
-    // Se o link vier como /file/, transformamos em /embed/ para o player funcionar
+    // Transforma /file/ em /embed/ automaticamente
     if (urlMega.includes("mega.nz/file/")) {
         urlMega = urlMega.replace("mega.nz/file/", "mega.nz/embed/");
     }
 
-    const idUnico = `FILME_OBVP_${numero}`;
-    const caminhoPlayer = "../player_mega.html"; 
+    const caminhoPlayer = "player_mega.html"; // Verifique se o caminho está correto
 
-    // Usamos encodeURIComponent para garantir que símbolos como '#' e '&' no link do MEGA 
-    // não confundam a URL do seu navegador
-    window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlMega)}&titulo=${encodeURIComponent(titulo)}`;
+    window.location.href = `${caminhoPlayer}?url=${encodeURIComponent(urlMega)}&titulo=${encodeURIComponent(titulo)}`;
 }
 
-// Botão principal (Certifique-se que numFilme e nomesFilmes estejam definidos no seu escopo global)
+// Aciona a função ao clicar no botão da página principal
+// Certifique-se que 'numFilme' e 'nomesFilmes' existem aqui
 document.querySelector('#play-button').onclick = () => {
     assistirFilme(numFilme, nomesFilmes[numFilme]);
 };
