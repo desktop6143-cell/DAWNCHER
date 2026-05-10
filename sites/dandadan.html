@@ -22,70 +22,60 @@
 <script>
 const container = document.getElementById('lista-episodios');
 
-// 1. ADICIONE OS IDs DO GOOGLE DRIVE AQUI (Mapeados pelo número global do episódio)
-const idsGoogleDrive = {
-    1: "ID_DO_EPISODIO_1"
+// 1. ADICIONE OS LINKS COMPLETOS DO MEGA AQUI (Mapeados pelo número do episódio)
+const linksMega = {
+    1: "https://mega.nz/file/vD43XC7I#jVR0Y4lOc5EtkhtpIG5cjbSItyy-Fb6S36AophdnIGs",
+    2: "https://mega.nz/file/XKxjlYrZ#k7EOPGZv7jpCjwAZfWV2ymVGmy-UUKP_fhSdswOCops",
+    3: "SEU_LINK_DO_MEGA_AQUI" 
 };
 
-// CONFIGURAÇÃO MANUAL DAS TEMPORADAS
+// CONFIGURAÇÃO DAS TEMPORADAS
 const configTemporadas = [
     { nome: "Temporada 1", eps: 12 },
     { nome: "Temporada 2", eps: 12 },
 ];
 
-const pastaAnime = "dandadan"; 
 const pastaThumb = "dandadan";
 const nomeAnime = "Dandadan"; 
-
 let contadorGlobal = 1; 
 
 configTemporadas.forEach((temp) => {
+    // Gerador de Título da Temporada
     if (temp.nome !== "") {
         const linhaTitulo = document.createElement('div');
-        linhaTitulo.style.width = "100%";
-        linhaTitulo.style.display = "flex";
-        linhaTitulo.style.justifyContent = "flex-start";
-        linhaTitulo.style.margin = "35px 0 15px 0";
-
+        linhaTitulo.style = "width: 100%; display: flex; justify-content: flex-start; margin: 35px 0 15px 0;";
         const tituloBtn = document.createElement('div');
         tituloBtn.innerText = temp.nome;
-        
-        // ESTILIZAÇÃO
-        tituloBtn.style.backgroundColor = "#e74c3c";
-        tituloBtn.style.color = "#ffffff";
-        tituloBtn.style.width = "210px";        
-        tituloBtn.style.padding = "12px 18px";
-        tituloBtn.style.textAlign = "left";
-        tituloBtn.style.fontSize = "19px";      
-        tituloBtn.style.fontWeight = "700";
-        tituloBtn.style.borderRadius = "6px";
-        tituloBtn.style.boxShadow = "2px 2px 5px rgba(0,0,0,0.2)";
-
+        tituloBtn.style = "background-color: #e74c3c; color: #ffffff; width: 210px; padding: 12px 18px; font-size: 19px; font-weight: 700; border-radius: 6px;";
         linhaTitulo.appendChild(tituloBtn);
         container.appendChild(linhaTitulo);
     }
 
+    // Gerador de Cards de Episódios
     for (let i = 1; i <= temp.eps; i++) {
-        const numeroEP = contadorGlobal; // Este é o número usado para pegar o ID no Drive
+        const numeroEP = contadorGlobal;
         const div = document.createElement('div');
         div.className = 'ep-card';
         
         div.onclick = () => {
-            const idDrive = idsGoogleDrive[numeroEP];
+            let urlMega = linksMega[numeroEP];
             
-            // Verifica se o ID existe no objeto acima
-            if (!idDrive || idDrive === "ID_AQUI") {
-                alert("Este episódio ainda não está disponível no Google Drive!");
+            // Validação do Link
+            if (!urlMega || urlMega.includes("SEU_LINK")) {
+                alert("Este episódio ainda não está disponível no MEGA!");
                 return;
             }
 
-            // Link de Preview do Drive (Igual ao seu primeiro código)
-            const urlVideoParaOPlayer = `https://drive.google.com/file/d/${idDrive}/preview`;
-            const idUnico = `${pastaAnime}_EP${numeroEP}`;
-            const caminhoPlayer = "../player.html";
-            const tituloCompleto = `${nomeAnime} - EP ${numeroEP}`;
+            // CONVERSÃO AUTOMÁTICA: Transforma link de arquivo em link de Player (Embed)
+            if (urlMega.includes("mega.nz/file/")) {
+                urlMega = urlMega.replace("mega.nz/file/", "mega.nz/embed/");
+            }
 
-            window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(tituloCompleto)}`;
+            const tituloCompleto = `${nomeAnime} - EP ${numeroEP}`;
+            // ATENÇÃO: Verifique se o nome do seu arquivo de player é 'player_mega.html' ou 'player.html'
+            const caminhoPlayer = "../player_mega.html"; 
+
+            window.location.href = `${caminhoPlayer}?url=${encodeURIComponent(urlMega)}&titulo=${encodeURIComponent(tituloCompleto)}`;
         };
 
         div.innerHTML = `
@@ -95,7 +85,7 @@ configTemporadas.forEach((temp) => {
         `;
 
         container.appendChild(div);
-        contadorGlobal++; // Incrementa para o próximo episódio
+        contadorGlobal++;
     }
 });
 </script>
