@@ -140,7 +140,7 @@ body {
     background-position: center;
 }
 .hotbar-item:nth-child(2) { 
-    background-image: url('../pngs/play.jpg');
+    background-image: url('../pngs/livro.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
