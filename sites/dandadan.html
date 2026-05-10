@@ -1,94 +1,95 @@
 <div class="conteudo-principal">
 <div class="anime-header">
-    <LINK rel="stylesheet" href="all_animes.css"></LINK>
-    <img src="../pngs/capas/capa21.jpg" class="poster"> <!-- Coloque o poster aqui -->
+    <LINK rel="stylesheet" href="all_animes.css">
+    <img src="../pngs/capas/capa21.jpg" class="poster">
     <div class="info">
         <h1>Dandadan</h1>
         <p class="ano">2024</p>
         <div class="rating">⭐ 0</div>
-        <div class="tags">  </div>
+        <div class="tags"></div>
         <p class="sinopse">
- Esta é uma história sobre Momo, uma garota do ensino médio que vem de uma família de médiuns espirituais, e seu colega de classe Okarun, um garoto fanático pelo ocultismo. Depois que Momo resgata Okarun de uns valentões, eles começam a conversar… No entanto, surge uma discussão entre eles, já que Momo acredita em fantasmas, mas nega a existência de alienígenas, e Okarun acredita em alienígenas, mas nega a existência de fantasmas. Visando provar que o que acreditam é real, Momo vai a um hospital abandonado onde um OVNI foi avistado e Okarun vai a um túnel que dizem ser assombrado. Para surpresa deles, cada um se depara com atividades paranormais avassaladoras que transcendem a compreensão. Em meio a isso tudo, Momo desperta seu poder oculto e Okarun ganha o poder de uma maldição para superar esses novos perigos! Será que o amor deles destinado também começa aqui!?       </div>
+            Esta é uma história sobre Momo, uma garota do ensino médio que vem de uma família de médiuns espirituais, e seu colega de classe Okarun, um garoto fanático pelo ocultismo. Depois que Momo resgata Okarun de uns valentões, eles começam a conversar… No entanto, surge uma discussão entre eles, já que Momo acredita em fantasmas, mas nega a existência de alienígenas, e Okarun acredita em alienígenas, mas nega a existência de fantasmas. Visando provar que o que acreditam é real, Momo vai a um hospital abandonado onde um OVNI foi avistado e Okarun vai a um túnel que dizem ser assombrado. Para surpresa deles, cada um se depara com atividades paranormais avassaladoras que transcendem a compreensão. Em meio a isso tudo, Momo desperta seu poder oculto e Okarun ganha o poder de uma maldição para superar esses novos perigos! Será que o amor deles destinado também começa aqui!?
+        </p>
+    </div>
 </div>
 
 <div class="episodios-container">
     <h2>Temporadas e Episódios</h2>
-    <P></P>
-    
-    
-<div id="lista-episodios" class="container-cards">
-    <!-- O JavaScript vai preencher aqui automaticamente -->
+   
+    <div id="lista-episodios" class="container-cards">
+        <!-- Os cards são gerados automaticamente pelo JavaScript -->
+    </div>
 </div>
-<script>
-const container = document.getElementById('lista-episodios');
 
-// 1. ADICIONE OS LINKS COMPLETOS DO MEGA AQUI (Mapeados pelo número do episódio)
+<script>
+// ==================== DADOS DO ANIME ====================
 const linksMega = {
     1: "https://mega.nz/file/DLZVhIaQ#62Ub9chiCAULw-KEHi7O7e6HoqZ9PIDIoBZ82SMsOHo",
     2: "https://mega.nz/file/3SYm0DZS#Rk7YPoDFGhpbgmtLdVdGtyMVTSJ5XdPlQKHb7I8hYco",
     3: "https://mega.nz/file/fGIw3bKQ#-n1S1CtFkconmlnn4U1l9vxoERouwcJxTHrUNMo4EOs",
     4: "https://mega.nz/file/TPQxVbiS#G3EKhmfB7zrec3g89lNH1GIxA3rppmVQgqGKdcLvR3Q",
-    5:"https://mega.nz/file/LKgFERIJ#kcIyDGg12FQiCmVEmBXcdeurJiyjBQcNIKROkCyNgCQ",
-    6:"https://mega.nz/file/jXQjwJ5Q#yfnwm3eN7A3bFulnaSgSotSPdWiTgNlPSQ3NnDuY-3g",
-    7:"https://mega.nz/file/fe5zQZrS#RrD78n_aM9UC22kaEHB29H1KH3RHxZn9NT6bBi96U_8",
-    8:"https://mega.nz/file/vWQ0VKwS#dPz-rWfq7F_ACJImE0R15WTk-mTKJ5ByMtJ6rNO7gA8",
-    9:"",
-   10:"".
-   11:"".
-   12:""
+    5: "https://mega.nz/file/LKgFERIJ#kcIyDGg12FQiCmVEmBXcdeurJiyjBQcNIKROkCyNgCQ",
+    6: "https://mega.nz/file/jXQjwJ5Q#yfnwm3eN7A3bFulnaSgSotSPdWiTgNlPSQ3NnDuY-3g",
+    7: "https://mega.nz/file/fe5zQZrS#RrD78n_aM9UC22kaEHB29H1KH3RHxZn9NT6bBi96U_8",
+    8: "https://mega.nz/file/vWQ0VKwS#dPz-rWfq7F_ACJImE0R15WTk-mTKJ5ByMtJ6rNO7gA8",
+    9: "",
+    10: "",
+    11: "",
+    12: ""
 };
 
-// CONFIGURAÇÃO DAS TEMPORADAS
 const configTemporadas = [
     { nome: "Temporada 1", eps: 12 },
-    { nome: "Temporada 2", eps: 12 },
+    { nome: "Temporada 2", eps: 12 }
 ];
 
 const pastaThumb = "dandadan";
-const nomeAnime = "Dandadan"; 
-let contadorGlobal = 1; 
+const nomeAnime = "Dandadan";
 
+const container = document.getElementById('lista-episodios');
+let contadorGlobal = 1;
+
+// ==================== GERAÇÃO DOS CARDS ====================
 configTemporadas.forEach((temp) => {
-    // Gerador de Título da Temporada
-    if (temp.nome !== "") {
+    // Título da Temporada
+    if (temp.nome) {
         const linhaTitulo = document.createElement('div');
         linhaTitulo.style = "width: 100%; display: flex; justify-content: flex-start; margin: 35px 0 15px 0;";
-        const tituloBtn = document.createElement('div');
-        tituloBtn.innerText = temp.nome;
-        tituloBtn.style = "background-color: #e74c3c; color: #ffffff; width: 210px; padding: 12px 18px; font-size: 19px; font-weight: 700; border-radius: 6px;";
-        linhaTitulo.appendChild(tituloBtn);
+        linhaTitulo.innerHTML = `
+            <div style="background-color: #e74c3c; color: #ffffff; width: 210px; padding: 12px 18px; font-size: 19px; font-weight: 700; border-radius: 6px;">
+                ${temp.nome}
+            </div>
+        `;
         container.appendChild(linhaTitulo);
     }
 
-    // Gerador de Cards de Episódios
+    // Cards de Episódios
     for (let i = 1; i <= temp.eps; i++) {
         const numeroEP = contadorGlobal;
         const div = document.createElement('div');
         div.className = 'ep-card';
-        
+
         div.onclick = () => {
             let urlMega = linksMega[numeroEP];
-            
-            // Validação do Link
-            if (!urlMega || urlMega.includes("SEU_LINK")) {
-                alert("Este episódio ainda não está disponível no MEGA!");
+
+            if (!urlMega || urlMega.trim() === "") {
+                alert(`⚠️ Episódio ${numeroEP} ainda não está disponível!`);
                 return;
             }
 
-            // CONVERSÃO AUTOMÁTICA: Transforma link de arquivo em link de Player (Embed)
+            // Converte link normal para embed
             if (urlMega.includes("mega.nz/file/")) {
                 urlMega = urlMega.replace("mega.nz/file/", "mega.nz/embed/");
             }
 
             const tituloCompleto = `${nomeAnime} - EP ${numeroEP}`;
-            // ATENÇÃO: Verifique se o nome do seu arquivo de player é 'player_mega.html' ou 'player.html'
-            const caminhoPlayer = "../player_mega.html"; 
+            const caminhoPlayer = "../player_mega.html";   // Altere se seu player tiver outro nome
 
             window.location.href = `${caminhoPlayer}?url=${encodeURIComponent(urlMega)}&titulo=${encodeURIComponent(tituloCompleto)}`;
         };
 
         div.innerHTML = `
-            <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${numeroEP}.jpg'); background-size: cover; background-position: center;">
+            <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${numeroEP}.jpg');">
             </div>
             <p>Episódio ${numeroEP}</p>
         `;
