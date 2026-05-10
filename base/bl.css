@@ -144,6 +144,7 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+    /* livro */
 }
 .hotbar-item:nth-child(3) { 
     background-image: url('../pngs/lupa1.png');
