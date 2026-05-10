@@ -11,11 +11,11 @@
     <div class="cards-container"></div> 
 
     <div class="hotbar-container">
-        <div class="hotbar-item" title="Início" id="btnhm"></div>
-        <div class="hotbar-item" title="Biblioteca" id="npt"></div>
-        <div class="hotbar-item" title="Pesquisa" id="btnLP"></div>
-        <div class="hotbar-item" title="Informação" id="btnnt"></div>
-        <div class="hotbar-item" title="Sair" id="btn-sair"></div>
+        <div class="hotbar-item" title="Início" id="home"></div>
+        <div class="hotbar-item" title="Biblioteca" id="vazio"></div>
+        <div class="hotbar-item" title="Pesquisa" id="pqs"></div>
+        <div class="hotbar-item" title="Informação" id="info"></div>
+        <div class="hotbar-item" title="Sair" id="sair"></div>
     </div>
 
 <script>
@@ -70,11 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Configura todos os botões de uma vez
     const configuracoesBotoes = {
-        'btn-home': () => window.location.reload(),
+        'home': () => window.location.reload(),
         'btnBL':   () => window.location.href = "bl.html",
-        'btnLP':   () => window.location.href = "../sites/bar.html",
-        'btnnt':   () => window.location.href = "info.html",
-        'btn-sair': () => { 
+        'pqs':   () => window.location.href = "../sites/bar.html",
+        'info':   () => window.location.href = "info.html",
+        'sair': () => { 
             sessionStorage.clear(); 
             window.location.href = "../index.html"; 
         }
