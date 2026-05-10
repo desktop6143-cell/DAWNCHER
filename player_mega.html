@@ -38,34 +38,101 @@
         <span id="titulo-player">Carregando...</span>
     </div>
 
-    <iframe 
-    id="mega-player" 
-    allowfullscreen 
+   <iframe
+    id="mega-player"
+    allowfullscreen
     allow="autoplay; encrypted-media; picture-in-picture"
     src="LINK_AQUI"
     style="width: 100%; height: 100vh; border: none;">
-   </iframe>
-   <script>
-    // 1. Pega os dados da URL (o que veio da página principal)
-    const params = new URLSearchParams(window.location.search);
-    const urlVideo = params.get('url');
-    const titulo = params.get('titulo');
+</iframe>
 
-    // 2. Atualiza o título na barra do topo
-    if (titulo) {
-        const tituloDecodificado = decodeURIComponent(titulo);
-        document.getElementById('titulo-player').innerText = tituloDecodificado;
-        document.title = tituloDecodificado;
-    }
+<script>
+// ==================== CONFIGURAÇÕES ====================
+const API_HISTORICO = 'https://script.google.com/macros/s/AKfycbxot8YdPc_33_trN2BfAj0dQBJBSTEtoX4X5-iAqLxR1_ZTJUOFGLiUH0YOt-J0JAH0IQ/exec';
+const idUser = sessionStorage.getItem('idUsuario') || localStorage.getItem('idUsuario');
 
-    // 3. Coloca o link do MEGA dentro do iframe
-    if (urlVideo) {
-        // decodeURIComponent recupera os caracteres especiais como : / e #
-        document.getElementById('mega-player').src = decodeURIComponent(urlVideo);
-    } else {
-        document.getElementById('titulo-player').innerText = "Erro: Link não encontrado";
-        console.error("Nenhuma URL de vídeo foi passada nos parâmetros.");
+// Parâmetros da URL
+const params = new URLSearchParams(window.location.search);
+const urlVideo = params.get('url');
+const tituloRaw = params.get('titulo') || "Vídeo sem título";
+const tituloFormatado = decodeURIComponent(tituloRaw);
+
+// ==================== INICIALIZAÇÃO ====================
+// Atualiza título
+if (tituloFormatado) {
+    document.getElementById('titulo-player').innerText = tituloFormatado;
+    document.title = tituloFormatado;
+}
+
+// Coloca o link do vídeo no iframe
+if (urlVideo) {
+    document.getElementById('mega-player').src = decodeURIComponent(urlVideo);
+} else {
+    document.getElementById('titulo-player').innerText = "Erro: Link não encontrado";
+    console.error("Nenhuma URL de vídeo foi passada nos parâmetros.");
+}
+
+// Extrai número do episódio
+let episodioAtual = "1";
+const matchEp = tituloFormatado.match(/Epis[óo]dio\s*(\d+)/i);
+if (matchEp) episodioAtual = matchEp[1];
+
+// ==================== FUNÇÕES ====================
+function obterTempoFormatado() {
+    return new Date().toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+}
+
+async function salvarNoHistorico() {
+    if (!idUser) return;
+
+    const dados = {
+        action: "salvar",
+        id_user: idUser,
+        titulo: tituloFormatado,
+        url_acesso: window.location.href,
+        episodio: episodioAtual,
+        tempo: obterTempoFormatado()
+    };
+
+    try {
+        await fetch(API_HISTORICO, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'text/plain',
+            },
+            body: JSON.stringify(dados)
+        });
+        
+        console.log(`[${dados.tempo}] ✅ Histórico salvo`);
+    } catch (err) {
+        console.error("❌ Erro ao salvar histórico:", err);
     }
+}
+
+// ==================== EVENTOS ====================
+// Salvar ao carregar a página
+window.addEventListener('load', () => {
+    salvarNoHistorico();
+});
+
+// Salvar a cada 30 segundos
+setInterval(salvarNoHistorico, 30000);
+
+// Salvar ao sair da página
+window.addEventListener('beforeunload', () => {
+    salvarNoHistorico();
+});
+
+// Opcional: Salvar quando o usuário sai do foco da aba
+window.addEventListener('blur', () => {
+    salvarNoHistorico();
+});
 </script>
 </body>
 </html>
