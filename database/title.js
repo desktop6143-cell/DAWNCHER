@@ -23,4 +23,7 @@ const bancoDeDados = {
     "BLEACH"  : "bleach",
     "death note"  : "death_note",
     "Death Note"  : "death_note",
+    "dandandan"  : "dandandan",
+    "Dandandan"  : "dandandan",
+    "DanDanDan"  : "dandandan",
 };
