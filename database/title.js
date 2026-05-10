@@ -1,14 +1,19 @@
 // db.js
 const bancoDeDados = {
     // ANIMES
+    "Ore": "ore",
     "ore": "ore",
     "ore dake": "ore",
     "one room": "one",
     "danny": "danny",
+    "Danny": "danny",
+    "danny phantom": "danny",
+    "Danny phantom": "danny",
     "the franxx": "darling",
     "darling"  : "darling",
     "darling in the franxx"  : "darling",
     "death"  : "death",
+    "Death"  : "death",
     "death march"  : "death",
     "dungeon ni deai"  : "ni_deai",
     "ni deai"  : "ni_deai",
@@ -16,13 +21,6 @@ const bancoDeDados = {
     "Bleach"  : "bleach",
     "bleach"  : "bleach",
     "BLEACH"  : "bleach",
-
-
-
-    // FILMES (O Bicho Vai Pegar)
-    "o bicho vai pegar": "O_BICHO_VAI_PEGAR", // ou o nome do seu arquivo html de filmes
-    "o bicho vai pegar 1": "O_BICHO_VAI_PEGAR",
-    "o bicho vai pegar 2": "O_BICHO_VAI_PEGAR",
-    "o bicho vai pegar 3": "O_BICHO_VAI_PEGAR",
-    "o bicho vai pegar 4": "O_BICHO_VAI_PEGAR"
+    "death Note"  : "death_note",
+    "Death Note"  : "death_note",
 };
