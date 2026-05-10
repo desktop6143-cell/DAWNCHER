@@ -26,7 +26,7 @@ if (sessionStorage.getItem('logado') !== 'true') {
 
 // ==================== Configuração dos botões ====================
 const configuracoesBotoes = {
-    'home': () => window.location.href = "p1.html",
+    'home': () => window.location.reload(),
     'pqs': () => window.location.href = "../sites/bar.html",
     'info': () => window.location.href = "info.html",
     'sair': () => {
@@ -35,19 +35,17 @@ const configuracoesBotoes = {
     }
 };
 
-// ==================== Aplicar cliques nos botões ====================
+// ==================== Inicializar botões da hotbar ====================
 function inicializarBotoes() {
     Object.keys(configuracoesBotoes).forEach(id => {
         const botao = document.getElementById(id);
         if (botao) {
             botao.addEventListener('click', configuracoesBotoes[id]);
-        } else {
-            console.warn(`Botão com id "${id}" não encontrado!`);
         }
     });
 }
 
-// ==================== Carregar cards ====================
+// ==================== Carregar os cards ====================
 async function carregarCards() {
     const container = document.querySelector('.cards-container');
     
@@ -68,15 +66,29 @@ async function carregarCards() {
             container.innerHTML += cardhtml;
         });
     } catch (erro) {
-        console.error("Erro:", erro);
+        console.error("Erro ao carregar cards:", erro);
         container.innerHTML = "<p style='color:white;'>Erro ao carregar dados.</p>";
     }
 }
 
-// ==================== Inicialização ====================
+// ==================== Clique nos cards ====================
+function inicializarCards() {
+    document.addEventListener('click', (e) => {
+        const card = e.target.closest('.card');
+        if (card) {
+            const href = card.getAttribute('data-href');
+            if (href) {
+                window.location.href = href;
+            }
+        }
+    });
+}
+
+// ==================== Inicialização Geral ====================
 document.addEventListener('DOMContentLoaded', () => {
     carregarCards();
     inicializarBotoes();
+    inicializarCards();
 });
 </script>
 </body>
