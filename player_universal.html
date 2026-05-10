@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title id="titulo-player">Carregando...</title>
+    <title id="page-title">Carregando...</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #0f0f0f;
-            color: white;
+            color: #fff;
             font-family: Arial, sans-serif;
             overflow: hidden;
         }
@@ -30,9 +30,9 @@
             background: rgba(255,255,255,0.1);
             border: none;
             color: white;
-            font-size: 24px;
-            width: 45px;
-            height: 45px;
+            font-size: 26px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -56,28 +56,28 @@
             height: 100%;
             border: none;
         }
-
-        .aviso-mobile {
+        .aviso {
             position: absolute;
             bottom: 15px;
             left: 15px;
             right: 15px;
-            background: rgba(231, 76, 60, 0.95);
+            background: rgba(231, 76, 60, 0.92);
             color: white;
-            padding: 14px 16px;
+            padding: 12px 15px;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 14.5px;
             text-align: center;
-            z-index: 20;
+            z-index: 30;
             display: none;
             cursor: pointer;
         }
-
-        /* Mostra apenas em mobile */
-        @media (max-width: 768px) {
-            .aviso-mobile {
-                display: block;
-            }
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            text-align: center;
         }
     </style>
 </head>
@@ -90,76 +90,87 @@
     </div>
 
     <div class="player-wrapper">
-        <iframe
-            id="mega-player"
-            allowfullscreen
-            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-            sandbox="allow-scripts allow-same-origin allow-popups allow-forms">
-        </iframe>
+        <div class="loading" id="loading">
+            <p>🔄 Carregando vídeo...</p>
+        </div>
 
-        <div class="aviso-mobile" id="aviso-mobile">
-            ⚠️ Mega nem sempre funciona bem no celular<br>
-            <strong>Toque aqui para abrir direto no Mega</strong>
+        <iframe id="video-player" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe>
+
+        <div class="aviso" id="aviso">
+            ⚠️ Player não carregou?<br>
+            <strong>Toque aqui para abrir direto no host</strong>
         </div>
     </div>
 </div>
 
 <script>
-// ==================== CONFIGURAÇÕES ====================
+// ==================== PEGA PARÂMETROS ====================
 const params = new URLSearchParams(window.location.search);
 const urlVideo = params.get('url');
 const tituloRaw = params.get('titulo');
 
+// Elementos
 const tituloEl = document.getElementById('titulo-player');
-const iframe = document.getElementById('mega-player');
-const avisoMobile = document.getElementById('aviso-mobile');
+const iframe = document.getElementById('video-player');
+const aviso = document.getElementById('aviso');
+const loading = document.getElementById('loading');
 
 // ==================== INICIALIZAÇÃO ====================
 if (tituloRaw) {
-    const tituloDecodificado = decodeURIComponent(tituloRaw);
-    tituloEl.textContent = tituloDecodificado;
-    document.title = tituloDecodificado;
+    const titulo = decodeURIComponent(tituloRaw);
+    tituloEl.textContent = titulo;
+    document.title = titulo;
 }
 
 if (urlVideo) {
-    let linkFinal = decodeURIComponent(urlVideo);
-    
-    if (linkFinal.includes("mega.nz/file/")) {
-        linkFinal = linkFinal.replace("mega.nz/file/", "mega.nz/embed/");
+    let link = decodeURIComponent(urlVideo).trim();
+
+    // Converte automaticamente links comuns para embed
+    if (link.includes("mega.nz/file/")) {
+        link = link.replace("mega.nz/file/", "mega.nz/embed/");
     }
-    
-    iframe.src = linkFinal;
+    if (link.includes("mixdrop.co/f/")) {
+        link = link.replace("mixdrop.co/f/", "mixdrop.co/e/");
+    }
+
+    iframe.src = link;
+
+    // Esconde loading
+    setTimeout(() => {
+        loading.style.display = "none";
+    }, 3000);
 
 } else {
-    tituloEl.textContent = "❌ Link não encontrado";
+    tituloEl.textContent = "❌ Erro: Nenhum link encontrado";
 }
 
-// ==================== AVISO MOBILE (8 SEGUNDOS) ====================
-if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth <= 768) {
-    avisoMobile.style.display = 'block';
-
-    // Esconde automaticamente após 8 segundos
-    setTimeout(() => {
-        avisoMobile.style.transition = 'opacity 0.5s';
-        avisoMobile.style.opacity = '0';
+// ==================== AVISO MOBILE (8 segundos) ====================
+function mostrarAviso() {
+    if (window.innerWidth <= 768) {
+        aviso.style.display = "block";
         
         setTimeout(() => {
-            avisoMobile.style.display = 'none';
-        }, 600);
-    }, 8000);
+            aviso.style.transition = "opacity 0.6s";
+            aviso.style.opacity = "0";
+            setTimeout(() => aviso.style.display = "none", 700);
+        }, 8000);
+    }
 }
 
-// ==================== ABRIR NO MEGA ====================
-avisoMobile.addEventListener('click', () => {
+setTimeout(mostrarAviso, 2500);
+
+// ==================== ABRIR NO HOST ORIGINAL ====================
+aviso.addEventListener('click', () => {
     if (urlVideo) {
         window.open(decodeURIComponent(urlVideo), '_blank');
     }
 });
 
-// Clique duplo no player também abre no Mega
+// Clique duplo no player também abre no host
 iframe.addEventListener('dblclick', () => {
     if (urlVideo) window.open(decodeURIComponent(urlVideo), '_blank');
 });
 </script>
+
 </body>
 </html>
