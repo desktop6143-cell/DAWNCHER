@@ -19,11 +19,11 @@
     </div>
 
 <script>
-                               // SEGURANÇA
+    // ==================== segurança ====================
     if (sessionStorage.getItem('logado') !== 'true') {
         window.location.href = "../index.html";
     }
-
+    // ==================== caregar os cardsdo db.html ====================
     async function carregarCards() {
         const container = document.querySelector('.cards-container');
         
@@ -51,7 +51,7 @@
         }
     }
 
-    // Inicia a carga dos cards
+      // ==================== carregar os cards ====================
     carregarCards();
 
     // Evento de Clique nos cards
@@ -64,11 +64,6 @@
     });
 
     // ==================== INICIALIZAÇÃO ÚNICA ====================
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Carrega os dados da planilha
-    carregarHistorico();
-
-    // 2. Configura todos os botões de uma vez
     const configuracoesBotoes = {
         'home': () => window.location.reload(),
         'btnBL':   () => window.location.href = "bl.html",
@@ -77,18 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'sair': () => { 
             sessionStorage.clear(); 
             window.location.href = "../index.html"; 
-        }
-    };
-
-    // Aplica os cliques apenas se o elemento existir no HTML
-    Object.keys(configuracoesBotoes).forEach(id => {
-        const elemento = document.getElementById(id);
-        if (elemento) {
-            elemento.onclick = configuracoesBotoes[id];
-        }
-    });
-});
-    // Inicializa a página corretamente chamando a função 
+        }};
+        // ==================== ler os cards ====================
     window.onload = carregarCards; 
 
 </script>
