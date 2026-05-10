@@ -61,15 +61,23 @@
             bottom: 15px;
             left: 15px;
             right: 15px;
-            background: rgba(0,0,0,0.85);
-            color: #ffcc00;
-            padding: 12px 15px;
+            background: rgba(231, 76, 60, 0.95);
+            color: white;
+            padding: 14px 16px;
             border-radius: 8px;
-            font-size: 14px;
-            display: none;
-            z-index: 20;
+            font-size: 15px;
             text-align: center;
+            z-index: 20;
+            display: none; /* Escondido por padrão */
         }
+
+        /* Mostra o aviso SOMENTE em telas pequenas (mobile) */
+        @media (max-width: 768px) {
+            .aviso-mobile {
+                display: block;
+            }
+        }
+
         .loading {
             position: absolute;
             top: 50%;
@@ -77,22 +85,21 @@
             transform: translate(-50%, -50%);
             text-align: center;
             z-index: 15;
+            display: none;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Header -->
     <div class="header">
         <button class="back-btn" onclick="window.history.back()">←</button>
         <div class="titulo" id="titulo-player">Carregando vídeo...</div>
     </div>
 
-    <!-- Player -->
     <div class="player-wrapper">
         <div class="loading" id="loading">
-            <p>🔄 Carregando vídeo...</p>
+            <p>🔄 Carregando vídeo do Mega...</p>
         </div>
         
         <iframe
@@ -103,7 +110,8 @@
         </iframe>
 
         <div class="aviso-mobile" id="aviso-mobile">
-            ⚠️ espere até o video começar
+            ⚠️ O player do Mega nem sempre funciona bem no celular.<br>
+            <strong>Toque aqui para abrir direto no Mega</strong>
         </div>
     </div>
 </div>
@@ -112,16 +120,16 @@
 // ==================== CONFIGURAÇÕES ====================
 const params = new URLSearchParams(window.location.search);
 const urlVideo = params.get('url');
-const titulo = params.get('titulo');
+const tituloRaw = params.get('titulo');
 
-// ==================== INICIALIZAÇÃO ====================
 const tituloEl = document.getElementById('titulo-player');
 const iframe = document.getElementById('mega-player');
 const loading = document.getElementById('loading');
 const avisoMobile = document.getElementById('aviso-mobile');
 
-if (titulo) {
-    const tituloDecodificado = decodeURIComponent(titulo);
+// ==================== INICIALIZAÇÃO ====================
+if (tituloRaw) {
+    const tituloDecodificado = decodeURIComponent(tituloRaw);
     tituloEl.textContent = tituloDecodificado;
     document.title = tituloDecodificado;
 }
@@ -129,49 +137,32 @@ if (titulo) {
 if (urlVideo) {
     let linkFinal = decodeURIComponent(urlVideo);
     
-    // Converte para embed se for link normal do Mega
     if (linkFinal.includes("mega.nz/file/")) {
         linkFinal = linkFinal.replace("mega.nz/file/", "mega.nz/embed/");
     }
     
     iframe.src = linkFinal;
 
-    // Remove loading após 4 segundos
-    setTimeout(() => {
-        loading.style.display = 'none';
-    }, 4000);
-
-    // Detecta mobile e mostra aviso
-    if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
-        avisoMobile.style.display = 'block';
-    }
+    // Esconde loading depois de um tempo
+    setTimeout(() => loading.style.display = 'none', 3500);
 
 } else {
-    tituloEl.textContent = "❌ Erro: Link não encontrado";
+    tituloEl.textContent = "❌ Link não encontrado";
 }
 
-// ==================== BOTÃO ABRIR NO MEGA (Mobile) ====================
-function abrirNoMega() {
+// ==================== ABRIR NO MEGA (Mobile) ====================
+avisoMobile.style.cursor = "pointer";
+avisoMobile.addEventListener('click', () => {
     if (urlVideo) {
-        let linkOriginal = decodeURIComponent(urlVideo);
+        const linkOriginal = decodeURIComponent(urlVideo);
         window.open(linkOriginal, '_blank');
     }
-}
+});
 
-// Clique longo no player abre no Mega (útil no celular)
-iframe.addEventListener('dblclick', abrirNoMega);
-
-// Salvar no histórico (mantendo o que você já usa)
-const idUser = sessionStorage.getItem('idUsuario') || localStorage.getItem('idUsuario');
-
-async function salvarNoHistorico() {
-    if (!idUser) return;
-    // ... (cole aqui a função salvarNoHistorico completa que te passei antes)
-}
-
-// Chama histórico
-window.addEventListener('load', salvarNoHistorico);
-setInterval(salvarNoHistorico, 30000);
+// Clique duplo no iframe também abre no Mega
+iframe.addEventListener('dblclick', () => {
+    if (urlVideo) window.open(decodeURIComponent(urlVideo), '_blank');
+});
 </script>
 
 </body>
