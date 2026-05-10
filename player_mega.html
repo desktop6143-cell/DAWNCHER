@@ -56,6 +56,7 @@
             height: 100%;
             border: none;
         }
+
         .aviso-mobile {
             position: absolute;
             bottom: 15px;
@@ -68,24 +69,15 @@
             font-size: 15px;
             text-align: center;
             z-index: 20;
-            display: none; /* Escondido por padrão */
+            display: none;
+            cursor: pointer;
         }
 
-        /* Mostra o aviso SOMENTE em telas pequenas (mobile) */
+        /* Mostra apenas em mobile */
         @media (max-width: 768px) {
             .aviso-mobile {
                 display: block;
             }
-        }
-
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 15;
-            display: none;
         }
     </style>
 </head>
@@ -98,10 +90,6 @@
     </div>
 
     <div class="player-wrapper">
-        <div class="loading" id="loading">
-            <p>🔄 Carregando vídeo do Mega...</p>
-        </div>
-        
         <iframe
             id="mega-player"
             allowfullscreen
@@ -110,7 +98,7 @@
         </iframe>
 
         <div class="aviso-mobile" id="aviso-mobile">
-            ⚠️ O player do Mega nem sempre funciona bem no celular.<br>
+            ⚠️ Mega nem sempre funciona bem no celular<br>
             <strong>Toque aqui para abrir direto no Mega</strong>
         </div>
     </div>
@@ -124,7 +112,6 @@ const tituloRaw = params.get('titulo');
 
 const tituloEl = document.getElementById('titulo-player');
 const iframe = document.getElementById('mega-player');
-const loading = document.getElementById('loading');
 const avisoMobile = document.getElementById('aviso-mobile');
 
 // ==================== INICIALIZAÇÃO ====================
@@ -143,27 +130,36 @@ if (urlVideo) {
     
     iframe.src = linkFinal;
 
-    // Esconde loading depois de um tempo
-    setTimeout(() => loading.style.display = 'none', 3500);
-
 } else {
     tituloEl.textContent = "❌ Link não encontrado";
 }
 
-// ==================== ABRIR NO MEGA (Mobile) ====================
-avisoMobile.style.cursor = "pointer";
+// ==================== AVISO MOBILE (8 SEGUNDOS) ====================
+if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth <= 768) {
+    avisoMobile.style.display = 'block';
+
+    // Esconde automaticamente após 8 segundos
+    setTimeout(() => {
+        avisoMobile.style.transition = 'opacity 0.5s';
+        avisoMobile.style.opacity = '0';
+        
+        setTimeout(() => {
+            avisoMobile.style.display = 'none';
+        }, 600);
+    }, 8000);
+}
+
+// ==================== ABRIR NO MEGA ====================
 avisoMobile.addEventListener('click', () => {
     if (urlVideo) {
-        const linkOriginal = decodeURIComponent(urlVideo);
-        window.open(linkOriginal, '_blank');
+        window.open(decodeURIComponent(urlVideo), '_blank');
     }
 });
 
-// Clique duplo no iframe também abre no Mega
+// Clique duplo no player também abre no Mega
 iframe.addEventListener('dblclick', () => {
     if (urlVideo) window.open(decodeURIComponent(urlVideo), '_blank');
 });
 </script>
-
 </body>
 </html>
