@@ -22,80 +22,94 @@
 </div>
 
 <script>
-// ==================== DADOS DO ANIME ====================
-const linksMega = {
-    1: "https://mega.nz/file/DLZVhIaQ#62Ub9chiCAULw-KEHi7O7e6HoqZ9PIDIoBZ82SMsOHo",
-    2: "https://mega.nz/file/3SYm0DZS#Rk7YPoDFGhpbgmtLdVdGtyMVTSJ5XdPlQKHb7I8hYco",
-    3: "https://mega.nz/file/fGIw3bKQ#-n1S1CtFkconmlnn4U1l9vxoERouwcJxTHrUNMo4EOs",
-    4: "https://mega.nz/file/TPQxVbiS#G3EKhmfB7zrec3g89lNH1GIxA3rppmVQgqGKdcLvR3Q",
-    5: "https://mega.nz/file/LKgFERIJ#kcIyDGg12FQiCmVEmBXcdeurJiyjBQcNIKROkCyNgCQ",
-    6: "https://mega.nz/file/jXQjwJ5Q#yfnwm3eN7A3bFulnaSgSotSPdWiTgNlPSQ3NnDuY-3g",
-    7: "https://mega.nz/file/fe5zQZrS#RrD78n_aM9UC22kaEHB29H1KH3RHxZn9NT6bBi96U_8",
-    8: "https://mega.nz/file/vWQ0VKwS#dPz-rWfq7F_ACJImE0R15WTk-mTKJ5ByMtJ6rNO7gA8",
-    9: "https://mega.nz/file/ODImzLrb#_UXknm5h2oZxH1TJK05dFH2Kdt8beUjdab5b_6k05qU",
-    10: "https://mega.nz/file/uOg0lBRb#l6VtWZmIRNsrWBIIg7jGpe8T2AidEFlaMyGkPrnw2uQ",
-    11: "https://mega.nz/file/SPoV1KDT#NYI73eavG4xM8vb-MRatpOyIlVKxZTxzssJ18wW4SGI",
-    12: "https://mega.nz/file/PT5RSTZZ#XGF0gkPr09vwYQaBMZKesbMFzZavNZmPR1Qyd0MM3_0"
+const container = document.getElementById('lista-episodios');
+
+// 1. ADICIONE OS IDs DO GOOGLE DRIVE AQUI (Mapeados pelo número global do episódio)
+const idsGoogleDrive = {
+12:	"1_ou95KIG2gB3Bo56o69mwm9rvzSOljq-",
+11:	"1SWgQA1SFf1HWhAK8MoHC1dgiDnOFWkIm",
+10:	"1daaKByOq6k8Pbti-e6yNsj_keaWqtcwA",
+9:	"1x2AkJJoqoNaRQuUO_avcAQr8VbEamhAh",
+8:	"19IL5tyiCyEfrAfd-FmssNxAZwVatnicp",
+7:	"1gvCZjZPO9HQAJJTzQhiGHbnPld-_dbpH",
+6:	"1fn8OknucPnoKcGezGpkNYqyeCphf-jSm",
+5:	"1VOfgip1za1h2nqpxapGK7YOHFQdq71oe",
+4:	"1R3nSvDPorus8OBmf_dM4gmrt2mbtAloI",
+3:	"1AfWYsgg8PQZiooK940NN3w-fInX-OnQk",
+2:	"1RTwX09gmwXuuIMJrX1TE-LK4EdF72UQX",
+1:	"1KDh7HDyvd9OdM4fXpiIAyrSEEfuV2Pnj"
 };
 
+// CONFIGURAÇÃO MANUAL DAS TEMPORADAS
 const configTemporadas = [
     { nome: "Temporada 1", eps: 12 },
-    { nome: "Temporada 2", eps: 12 }
+    //{ nome: "Temporada 2", eps: 12 }
 ];
 
-const pastaThumb = "dandadan";
-const nomeAnime = "Dandadan";
+const pastaAnime = "dandandan"; 
+const pastaThumb = "dandandan";
+const nomeAnime = "Dandandan"; 
 
-const container = document.getElementById('lista-episodios');
-let contadorGlobal = 1;
+let contadorGlobal = 1; 
 
-// ==================== GERAÇÃO DOS CARDS ====================
 configTemporadas.forEach((temp) => {
-    // Título da Temporada
-    if (temp.nome) {
+    if (temp.nome !== "") {
         const linhaTitulo = document.createElement('div');
-        linhaTitulo.style = "width: 100%; display: flex; justify-content: flex-start; margin: 35px 0 15px 0;";
-        linhaTitulo.innerHTML = `
-            <div style="background-color: #e74c3c; color: #ffffff; width: 210px; padding: 12px 18px; font-size: 19px; font-weight: 700; border-radius: 6px;">
-                ${temp.nome}
-            </div>
-        `;
+        linhaTitulo.style.width = "100%";
+        linhaTitulo.style.display = "flex";
+        linhaTitulo.style.justifyContent = "flex-start";
+        linhaTitulo.style.margin = "35px 0 15px 0";
+
+        const tituloBtn = document.createElement('div');
+        tituloBtn.innerText = temp.nome;
+        
+        // ESTILIZAÇÃO
+        tituloBtn.style.backgroundColor = "#e74c3c";
+        tituloBtn.style.color = "#ffffff";
+        tituloBtn.style.width = "210px";        
+        tituloBtn.style.padding = "12px 18px";
+        tituloBtn.style.textAlign = "left";
+        tituloBtn.style.fontSize = "19px";      
+        tituloBtn.style.fontWeight = "700";
+        tituloBtn.style.borderRadius = "6px";
+        tituloBtn.style.boxShadow = "2px 2px 5px rgba(0,0,0,0.2)";
+
+        linhaTitulo.appendChild(tituloBtn);
         container.appendChild(linhaTitulo);
     }
 
-    // Cards de Episódios
     for (let i = 1; i <= temp.eps; i++) {
-        const numeroEP = contadorGlobal;
+        const numeroEP = contadorGlobal; // Este é o número usado para pegar o ID no Drive
         const div = document.createElement('div');
         div.className = 'ep-card';
-
+        
         div.onclick = () => {
-            let urlMega = linksMega[numeroEP];
-
-            if (!urlMega || urlMega.trim() === "") {
-                alert(`⚠️ Episódio ${numeroEP} ainda não está disponível!`);
+            const idDrive = idsGoogleDrive[numeroEP];
+            
+            // Verifica se o ID existe no objeto acima
+            if (!idDrive || idDrive === "ID_AQUI") {
+                alert("Este episódio ainda não está disponível no Google Drive!");
                 return;
             }
 
-            // Converte link normal para embed
-            if (urlMega.includes("mega.nz/file/")) {
-                urlMega = urlMega.replace("mega.nz/file/", "mega.nz/embed/");
-            }
-
+            // Link de Preview do Drive (Igual ao seu primeiro código)
+            const urlVideoParaOPlayer = `https://drive.google.com/file/d/${idDrive}/preview`;
+            const idUnico = `${pastaAnime}_EP${numeroEP}`;
+            const caminhoPlayer = "../player.html";
             const tituloCompleto = `${nomeAnime} - EP ${numeroEP}`;
-            const caminhoPlayer = "../player_mega.html";   // Altere se seu player tiver outro nome
 
-            window.location.href = `${caminhoPlayer}?url=${encodeURIComponent(urlMega)}&titulo=${encodeURIComponent(tituloCompleto)}`;
+            window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideoParaOPlayer)}&titulo=${encodeURIComponent(tituloCompleto)}`;
         };
 
         div.innerHTML = `
-            <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${numeroEP}.jpg');">
+            <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${numeroEP}.jpg'); background-size: cover; background-position: center;">
+                ${numeroEP}
             </div>
             <p>Episódio ${numeroEP}</p>
         `;
 
         container.appendChild(div);
-        contadorGlobal++;
+        contadorGlobal++; // Incrementa para o próximo episódio
     }
 });
 </script>
