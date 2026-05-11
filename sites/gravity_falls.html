@@ -1,0 +1,87 @@
+<div id="lista-episodios" class="container-cards"></div>
+
+<script>
+const container = document.getElementById('lista-episodios');
+const nomeAnime = "Liar Liar";
+const pastaAnime = "liar_liar";
+const pastaThumb = "liar_liar";
+const caminhoPlayer = "../player.html";
+
+// ←←← COLE AQUI O LINK DA SUA PLANILHA (CSV) 
+const urlPlanilha = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQH9rb94XaBOik8IKhGLc1G6LjUbA2oA1n3kH--awvx3TKKdpM32ROk4y4agPLFoit_-dnl4gsneKHs/pub?gid=0&single=true&output=csv";
+
+fetch(urlPlanilha)
+    .then(res => res.text())
+    .then(csv => {
+        const episodios = parseCSV(csv);
+        let contadorGlobal = 1;
+
+        // Agrupa por temporada
+        const porTemporada = {};
+        episodios.forEach(ep => {
+            if (!porTemporada[ep.Temporada]) porTemporada[ep.Temporada] = [];
+            porTemporada[ep.Temporada].push(ep);
+        });
+
+        Object.keys(porTemporada).forEach(temporada => {
+            // Título da Temporada
+            const linhaTitulo = document.createElement('div');
+            linhaTitulo.style.cssText = "width:100%; display:flex; justify-content:flex-start; margin:35px 0 15px 0;";
+            
+            const tituloBtn = document.createElement('div');
+            tituloBtn.innerText = temporada;
+            tituloBtn.style.cssText = `
+                background:#e74c3c; color:white; width:210px; padding:12px 18px;
+                text-align:left; font-size:19px; font-weight:700; border-radius:6px;
+                box-shadow:2px 2px 5px rgba(0,0,0,0.2);
+            `;
+            linhaTitulo.appendChild(tituloBtn);
+            container.appendChild(linhaTitulo);
+
+            // Cria cards
+            porTemporada[temporada].forEach(ep => {
+                const div = document.createElement('div');
+                div.className = 'ep-card';
+                
+                div.onclick = () => {
+                    if (!ep.ID_Google_Drive || ep.ID_Google_Drive.length < 10) {
+                        alert("Este episódio ainda não está disponível!");
+                        return;
+                    }
+
+                    const urlVideo = `https://drive.google.com/file/d/${ep.ID_Google_Drive}/preview`;
+                    const idUnico = `${pastaAnime}_EP${ep.Episodio}`;
+                    const titulo = `${nomeAnime} - EP ${ep.Episodio}`;
+
+                    window.location.href = `${caminhoPlayer}?id=${idUnico}&url=${encodeURIComponent(urlVideo)}&titulo=${encodeURIComponent(titulo)}`;
+                };
+
+                div.innerHTML = `
+                    <div class="ep-thumb" style="background-image: url('../pngs/minicap/${pastaThumb}/ep${ep.Episodio}.jpg');"></div>
+                    <p>Episódio ${ep.Episodio}</p>
+                `;
+
+                container.appendChild(div);
+            });
+        });
+    })
+    .catch(err => {
+        console.error(err);
+        container.innerHTML = "<p style='color:red'>Erro ao carregar a planilha.</p>";
+    });
+
+// Função para converter CSV em array de objetos
+function parseCSV(csv) {
+    const linhas = csv.trim().split('\n');
+    const headers = linhas[0].split(',').map(h => h.trim().replace(/"/g, ''));
+    
+    return linhas.slice(1).map(linha => {
+        const valores = linha.split(',').map(v => v.trim().replace(/"/g, ''));
+        const obj = {};
+        headers.forEach((header, i) => {
+            obj[header] = valores[i] || '';
+        });
+        return obj;
+    });
+}
+</script>
