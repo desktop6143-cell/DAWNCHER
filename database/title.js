@@ -26,4 +26,6 @@ const bancoDeDados = {
     "dandandan"  : "dandandan",
     "Dandandan"  : "dandandan",
     "DanDanDan"  : "dandandan",
+"gravity falls"  : "gravity_falls",
+    "gravity"  : "gravity_falls"
 };
